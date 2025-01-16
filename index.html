@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Gestão de Vendas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="dashboard-header">
+            <h1 class="dashboard-title">Dashboard de Gestão de Vendas</h1>
+            <nav class="navigation">
+                <button class="nav-button active" onclick="showTab('dashboard')">Dashboard</button>
+                <button class="nav-button" onclick="showTab('cadastros')">Cadastros</button>
+                <button class="nav-button" onclick="showTab('vendas')">Vendas</button>
+                <button class="nav-button" onclick="showTab('relatorios')">Relatórios</button>
+            </nav>
+        </header>
+
+        <!-- Conteúdo das abas -->
+        <div id="dashboard" class="tab-content active">
+            <p>Conteúdo do Dashboard</p>
+        </div>
+        <div id="cadastros" class="tab-content">
+            <p>Conteúdo de Cadastros</p>
+        </div>
+        <div id="vendas" class="tab-content">
+            <p>Conteúdo de Vendas</p>
+        </div>
+        <div id="relatorios" class="tab-content">
+            <p>Conteúdo de Relatórios</p>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>
