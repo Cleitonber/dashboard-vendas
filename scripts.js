@@ -559,12 +559,33 @@ function exportarRelatorioPDF() {
         data.push(rowData);
     });
 
-    const doc = new jsPDF();
+    const doc = new jsPDF({
+        orientation: 'landscape', // Orientação horizontal
+        unit: 'mm',
+        format: 'a4'
+    });
+
+    // Adicionar título ao PDF
+    doc.setFontSize(16);
+    doc.text('Relatório de Vendas', 14, 20);
+
+    // Adicionar tabela ao PDF
     doc.autoTable({
         head: [headers],
         body: data,
+        startY: 25, // Posição inicial da tabela
+        theme: 'grid', // Estilo da tabela
+        styles: {
+            fontSize: 10, // Tamanho da fonte
+            cellPadding: 3, // Espaçamento interno das células
+        },
+        headStyles: {
+            fillColor: [79, 70, 229], // Cor de fundo do cabeçalho (azul)
+            textColor: [255, 255, 255] // Cor do texto do cabeçalho (branco)
+        }
     });
 
+    // Salvar o PDF
     doc.save('relatorio_vendas.pdf');
 }
 
@@ -616,10 +637,12 @@ function atualizarDashboard() {
 
     atualizarTotalVendas(vendasFiltradas);
     atualizarComissoes(vendasFiltradas);
+    atualizarTotalClientes(vendasFiltradas);
+    atualizarTicketMedio(vendasFiltradas);
+    atualizarConversaoVendas(vendasFiltradas);
     atualizarGraficoVendasPorServico(vendasFiltradas);
     atualizarGraficoDesempenhoVendedores(vendasFiltradas);
-    atualizarComparacaoMensal();
-    atualizarRankingVendedores(vendasFiltradas);
+    atualizarGraficoVendasPorCategoria(vendasFiltradas);
 }
 
 // Função para atualizar o total de vendas
@@ -632,6 +655,35 @@ function atualizarTotalVendas(vendasFiltradas) {
 function atualizarComissoes(vendasFiltradas) {
     const totalComissoes = vendasFiltradas.reduce((total, venda) => total + venda.valorReceber, 0);
     document.getElementById('totalComissoesDash').textContent = formatarMoeda(totalComissoes);
+}
+
+// Função para calcular o total de clientes atendidos
+function atualizarTotalClientes(vendasFiltradas) {
+    const clientesUnicos = new Set(vendasFiltradas.map(venda => venda.nomeCliente));
+    document.getElementById('totalClientes').textContent = clientesUnicos.size;
+}
+
+// Função para calcular o ticket médio por venda
+function atualizarTicketMedio(vendasFiltradas) {
+    const totalVendas = vendasFiltradas.reduce((total, venda) => total + venda.valorVenda, 0);
+    const ticketMedio = vendasFiltradas.length > 0 ? totalVendas / vendasFiltradas.length : 0;
+    document.getElementById('ticketMedio').textContent = formatarMoeda(ticketMedio);
+}
+
+// Função para calcular a conversão de vendas por vendedor
+function atualizarConversaoVendas(vendasFiltradas) {
+    const vendedores = dados.vendedores.map(vendedor => vendedor.nome);
+    const conversao = vendedores.map(vendedor => {
+        const vendasVendedor = vendasFiltradas.filter(venda => venda.vendedor === vendedor);
+        const clientesUnicos = new Set(vendasVendedor.map(venda => venda.nomeCliente));
+        return {
+            vendedor,
+            conversao: clientesUnicos.size > 0 ? (vendasVendedor.length / clientesUnicos.size) * 100 : 0
+        };
+    });
+
+    const conversaoMedia = conversao.reduce((total, item) => total + item.conversao, 0) / conversao.length;
+    document.getElementById('conversaoVendas').textContent = `${conversaoMedia.toFixed(2)}%`;
 }
 
 // Função para atualizar o gráfico de vendas por serviço
@@ -668,46 +720,19 @@ function atualizarGraficoDesempenhoVendedores(vendasFiltradas) {
     desempenhoVendedoresChart.update();
 }
 
-// Função para atualizar a comparação mensal de vendas
-function atualizarComparacaoMensal() {
-    const meses = Array.from({ length: 12 }, (_, i) => i);
-    const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
-
-    const vendasPorMes = meses.map(mes => {
-        return dados.vendas.filter(venda => {
-            const dataVenda = new Date(venda.data.split('/').reverse().join('-'));
-            return dataVenda.getMonth() === mes && dataVenda.getFullYear() === anoSelecionado;
-        }).reduce((total, venda) => total + venda.valorVenda, 0);
+// Função para atualizar o gráfico de vendas por categoria de serviço
+function atualizarGraficoVendasPorCategoria(vendasFiltradas) {
+    const categorias = [...new Set(dados.servicos.map(servico => servico.categoria))];
+    const vendasPorCategoria = categorias.map(categoria => {
+        return vendasFiltradas.filter(venda => {
+            const servico = dados.servicos.find(s => s.nome === venda.servico);
+            return servico.categoria === categoria;
+        }).length;
     });
 
-    comparacaoMensalChart.data.datasets[0].data = vendasPorMes;
-    comparacaoMensalChart.update();
-}
-
-// Função para atualizar o ranking de vendedores
-function atualizarRankingVendedores(vendasFiltradas) {
-    const ranking = dados.vendedores.map(vendedor => {
-        const vendasVendedor = vendasFiltradas.filter(venda => venda.vendedor === vendedor.nome);
-        const totalVendas = vendasVendedor.reduce((total, venda) => total + venda.valorVenda, 0);
-        return {
-            nome: vendedor.nome,
-            quantidade: vendasVendedor.length,
-            total: totalVendas
-        };
-    }).sort((a, b) => b.total - a.total);
-
-    const tbody = document.querySelector('#rankingVendedores tbody');
-    tbody.innerHTML = '';
-
-    ranking.forEach(vendedor => {
-        const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${vendedor.nome}</td>
-            <td>${vendedor.quantidade}</td>
-            <td>${formatarMoeda(vendedor.total)}</td>
-        `;
-        tbody.appendChild(row);
-    });
+    vendasCategoriaChart.data.labels = categorias;
+    vendasCategoriaChart.data.datasets[0].data = vendasPorCategoria;
+    vendasCategoriaChart.update();
 }
 
 // Inicialização dos gráficos
@@ -747,23 +772,34 @@ const desempenhoVendedoresChart = new Chart(document.getElementById('desempenhoV
     }
 });
 
-const comparacaoMensalChart = new Chart(document.getElementById('comparacaoMensalChart'), {
-    type: 'bar',
+const vendasCategoriaChart = new Chart(document.getElementById('vendasCategoriaChart'), {
+    type: 'pie',
     data: {
-        labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+        labels: [],
         datasets: [{
-            label: 'Vendas',
+            label: 'Vendas por Categoria',
             data: [],
-            backgroundColor: 'rgba(79, 70, 229, 0.2)',
-            borderColor: 'rgba(79, 70, 229, 1)',
-            borderWidth: 1
+            backgroundColor: ['#4f46e5', '#ef4444', '#22c55e', '#f59e0b', '#3b82f6'],
         }]
     },
     options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
+        responsive: true,
     }
 });
+
+// Formatação automática do campo de telefone
+document.getElementById('telefoneVendedor').addEventListener('input', function (e) {
+    let telefone = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+    if (telefone.length > 0) {
+        telefone = `(${telefone.substring(0, 2)}) ${telefone.substring(2, 7)}-${telefone.substring(7, 11)}`;
+    }
+    e.target.value = telefone;
+});
+
+// Atualização do tema com base na cor selecionada
+function atualizarTema() {
+    const corPrimaria = document.getElementById('corPrimaria').value;
+    document.documentElement.style.setProperty('--primary', corPrimaria);
+    document.documentElement.style.setProperty('--primary-light', `${corPrimaria}99`);
+    document.documentElement.style.setProperty('--primary-dark', `${corPrimaria}cc`);
+}
