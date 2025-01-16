@@ -539,4 +539,103 @@
     </div>
 
     <script>
-        // Função para alternar entre as ab
+        // Função para alternar entre as abas
+        function showTab(tabId) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+
+            const buttons = document.querySelectorAll('.nav-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+        }
+
+        // Inicializa a aba "Dashboard" como ativa ao carregar a página
+        document.addEventListener('DOMContentLoaded', function () {
+            showTab('dashboard');
+        });
+
+        // Função para gerar o relatório em PDF
+        function gerarRelatorioPDF() {
+            alert("Funcionalidade de exportar PDF ainda não implementada.");
+        }
+
+        // Função para filtrar o relatório
+        function filtrarRelatorio() {
+            alert("Funcionalidade de filtrar relatório ainda não implementada.");
+        }
+
+        // Exemplo de gráfico usando Chart.js
+        const vendasServicoChart = new Chart(document.getElementById('vendasServicoChart'), {
+            type: 'bar',
+            data: {
+                labels: ['Consultoria', 'Treinamento', 'Suporte Técnico'],
+                datasets: [{
+                    label: 'Vendas',
+                    data: [12, 19, 3],
+                    backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const desempenhoVendedoresChart = new Chart(document.getElementById('desempenhoVendedoresChart'), {
+            type: 'line',
+            data: {
+                labels: ['João Silva', 'Maria Souza'],
+                datasets: [{
+                    label: 'Desempenho',
+                    data: [12, 19],
+                    fill: false,
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    tension: 0.1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        // Exemplo de manipulação de formulários
+        document.getElementById('vendedorForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const nomeVendedor = document.getElementById('nomeVendedor').value;
+            const emailVendedor = document.getElementById('emailVendedor').value;
+            const telefoneVendedor = document.getElementById('telefoneVendedor').value;
+            console.log('Vendedor cadastrado:', { nomeVendedor, emailVendedor, telefoneVendedor });
+            alert('Vendedor cadastrado com sucesso!');
+        });
+
+        document.getElementById('servicoForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const nomeServico = document.getElementById('nomeServico').value;
+            const categoriaServico = document.getElementById('categoriaServico').value;
+            const precoServico = document.getElementById('precoServico').value;
+            console.log('Serviço cadastrado:', { nomeServico, categoriaServico, precoServico });
+            alert('Serviço cadastrado com sucesso!');
+        });
+
+        document.getElementById('vendaForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const vendedorVenda = document.getElementById('vendedorVenda').value;
+            const servicoVenda = document.getElementById('servicoVenda').value;
+            const dataVenda = document.getElementById('dataVenda').value;
+            console.log('Venda registrada:', { vendedorVenda, servicoVenda, dataVenda });
+            alert('Venda registrada com sucesso!');
+        });
+    </script>
+</body>
+</html>
