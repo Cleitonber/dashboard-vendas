@@ -405,6 +405,7 @@
         <!-- Cadastros -->
         <div id="cadastros" class="tab-content">
             <div class="grid">
+                <!-- Cadastro de Vendedor -->
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">Cadastro de Vendedor</h2>
@@ -413,21 +414,22 @@
                         <form id="vendedorForm">
                             <div class="form-group">
                                 <label class="form-label">Nome do Vendedor</label>
-                                <input type="text" id="nomeVendedor" class="form-input" required>
+                                <input type="text" id="nomeVendedor" class="form-input" placeholder="Digite o nome do vendedor" required>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Email</label>
-                                <input type="email" id="emailVendedor" class="form-input" required>
+                                <input type="email" id="emailVendedor" class="form-input" placeholder="Digite o email do vendedor" required>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Telefone</label>
-                                <input type="tel" id="telefoneVendedor" class="form-input">
+                                <input type="tel" id="telefoneVendedor" class="form-input" placeholder="Digite o telefone do vendedor">
                             </div>
                             <button type="submit" class="btn btn-primary">Cadastrar Vendedor</button>
                         </form>
                     </div>
                 </div>
 
+                <!-- Cadastro de Serviço -->
                 <div class="card">
                     <div class="card-header">
                         <h2 class="card-title">Cadastro de Serviço</h2>
@@ -436,7 +438,7 @@
                         <form id="servicoForm">
                             <div class="form-group">
                                 <label class="form-label">Nome do Serviço</label>
-                                <input type="text" id="nomeServico" class="form-input" required>
+                                <input type="text" id="nomeServico" class="form-input" placeholder="Digite o nome do serviço" required>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Categoria</label>
@@ -449,7 +451,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Preço</label>
-                                <input type="number" id="precoServico" class="form-input" step="0.01" required>
+                                <input type="number" id="precoServico" class="form-input" placeholder="Digite o preço do serviço" step="0.01" required>
                             </div>
                             <button type="submit" class="btn btn-primary">Cadastrar Serviço</button>
                         </form>
