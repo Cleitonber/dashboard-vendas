@@ -13,7 +13,6 @@
     --text-light: #64748b;
     --border: #e2e8f0;
     --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
     --radius: 0.5rem;
 }
 
@@ -125,6 +124,13 @@ body {
     margin-bottom: 0.5rem;
     font-weight: 500;
     color: var(--text);
+}
+
+.form-text {
+    display: block;
+    font-size: 0.875rem;
+    color: var(--text-light);
+    margin-top: 0.25rem;
 }
 
 .form-input {
@@ -312,62 +318,6 @@ th {
     color: var(--danger);
 }
 
-.filtro-data {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.filtro-data label {
-    font-weight: 500;
-    color: var(--text);
-}
-
-.filtro-data select {
-    padding: 0.5rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--surface);
-    color: var(--text);
-    cursor: pointer;
-}
-
-.list-group {
-    list-style: none;
-    padding: 0;
-}
-
-.list-group-item {
-    padding: 1rem;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.list-group-item:last-child {
-    border-bottom: none;
-}
-
-.list-group-item strong {
-    font-size: 1rem;
-    color: var(--text);
-}
-
-.list-group-item small {
-    font-size: 0.875rem;
-    color: var(--text-light);
-}
-
-.list-group-item .btn {
-    margin-left: 0.5rem;
-}
-
-.mt-4 {
-    margin-top: 2rem;
-}
-
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
@@ -381,14 +331,5 @@ th {
     .navigation {
         width: 100%;
         overflow-x: auto;
-    }
-
-    .filtro-data {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .filtro-data select {
-        width: 100%;
     }
 }
