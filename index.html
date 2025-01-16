@@ -450,6 +450,11 @@
                         <label class="form-label">Cor Primária</label>
                         <input type="color" id="corPrimaria" value="#4f46e5" onchange="atualizarTema()">
                     </div>
+                    <div class="form-group">
+                        <label class="form-label">Cor Secundária</label>
+                        <input type="color" id="corSecundaria" value="#64748b" onchange="atualizarTema()">
+                    </div>
+                    <button class="btn btn-secondary" onclick="restaurarTemaPadrao()">Restaurar Cores Padrão</button>
                 </div>
             </div>
         </div>
@@ -592,7 +597,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Comissão</label>
-                            <input type="text" id="comissao" class="form-input" placeholder="0,000%" required>
+                            <input type="text" id="comissao" class="form-input" placeholder="0,00" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Registrar Venda</button>
                     </form>
@@ -636,7 +641,8 @@
                                 <option value="nomeCliente">Nome do Cliente</option>
                                 <option value="empresaParceira">Empresa Parceira</option>
                                 <option value="comissao">Valor da Comissão</option>
-                                <option value="percentualComissao">% da Comissão</option>
+                                <option value="percentualComissao">Variável da Comissão</option>
+                                <option value="valorBrutoReceber">Valor Bruto a Receber</option>
                             </select>
                         </div>
                         <button class="btn btn-primary" onclick="filtrarRelatorio()">Gerar</button>
@@ -649,10 +655,7 @@
                             <!-- As linhas da tabela serão preenchidas dinamicamente via JavaScript -->
                         </tbody>
                         <tfoot>
-                            <tr>
-                                <td colspan="6" style="text-align: right;"><strong>Total da Comissão:</strong></td>
-                                <td id="totalComissaoRelatorio">R$ 0,00</td>
-                            </tr>
+                            <!-- O rodapé será preenchido dinamicamente via JavaScript -->
                         </tfoot>
                     </table>
                 </div>
@@ -1136,7 +1139,7 @@
             const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
 
             const vendasFiltradas = dados.vendas.filter(venda => {
-                const dataVenda = new Date(venda.data.split('/').reverse().join('-')); // Converte para formato Date
+                const dataVenda = new Date(venda.data.split('/').reverse().join('-'));
                 const dataInicialFiltro = new Date(dataInicial.split('/').reverse().join('-'));
                 const dataFinalFiltro = new Date(dataFinal.split('/').reverse().join('-'));
 
@@ -1154,7 +1157,8 @@
                 nomeCliente: 'Nome do Cliente',
                 empresaParceira: 'Empresa Parceira',
                 comissao: 'Valor da Comissão',
-                percentualComissao: '% da Comissão'
+                percentualComissao: 'Variável da Comissão',
+                valorBrutoReceber: 'Valor Bruto a Receber'
             };
 
             const thead = document.querySelector('#tabelaRelatorio thead');
@@ -1172,6 +1176,7 @@
             thead.appendChild(headerRow);
 
             let totalComissao = 0;
+            let totalValorBrutoReceber = 0;
 
             vendasFiltradas.forEach(venda => {
                 const row = document.createElement('tr');
@@ -1179,25 +1184,44 @@
                     const td = document.createElement('td');
                     let valor = venda[coluna];
 
-                    if (coluna === 'comissao') {
-                        valor = formatarMoeda(valor);
-                    } else if (coluna === 'percentualComissao') {
-                        valor = `${venda.comissao}%`;
+                    if (coluna === 'percentualComissao') {
+                        const servico = dados.servicos.find(s => s.nome === venda.servico);
+                        if (servico.tipoComissao === 'porcentagem') {
+                            valor = `${venda.comissao}%`;
+                        } else if (servico.tipoComissao === 'fixa') {
+                            valor = formatarMoeda(venda.comissao);
+                        }
+                    } else if (coluna === 'comissao') {
+                        const servico = dados.servicos.find(s => s.nome === venda.servico);
+                        if (servico.tipoComissao === 'porcentagem') {
+                            valor = formatarMoeda(venda.valorReceber * (venda.comissao / 100));
+                        } else if (servico.tipoComissao === 'fixa') {
+                            valor = formatarMoeda(venda.comissao);
+                        }
+                        totalComissao += parseFloat(valor.replace(/[^0-9,]/g, '').replace(',', '.'));
+                    } else if (coluna === 'valorBrutoReceber') {
+                        valor = formatarMoeda(venda.valorReceber);
+                        totalValorBrutoReceber += venda.valorReceber;
+                    } else if (coluna === 'data') {
+                        valor = venda.data;
                     }
 
                     td.textContent = valor;
                     row.appendChild(td);
                 });
                 tbody.appendChild(row);
-
-                if (venda.tipoComissao === 'fixa') {
-                    totalComissao += venda.comissao;
-                } else if (venda.tipoComissao === 'porcentagem') {
-                    totalComissao += venda.valorReceber * (venda.comissao / 100);
-                }
             });
 
-            document.getElementById('totalComissaoRelatorio').textContent = formatarMoeda(totalComissao);
+            // Atualizar totais no rodapé da tabela
+            const tfoot = document.querySelector('#tabelaRelatorio tfoot');
+            tfoot.innerHTML = `
+                <tr>
+                    <td colspan="${colunasSelecionadas.length - 2}" style="text-align: right;"><strong>Total da Comissão:</strong></td>
+                    <td>${formatarMoeda(totalComissao)}</td>
+                    <td colspan="2" style="text-align: right;"><strong>Total Valor Bruto a Receber:</strong></td>
+                    <td>${formatarMoeda(totalValorBrutoReceber)}</td>
+                </tr>
+            `;
         }
 
         // Função para exportar relatório em PDF
@@ -1211,7 +1235,8 @@
                 nomeCliente: 'Nome do Cliente',
                 empresaParceira: 'Empresa Parceira',
                 comissao: 'Valor da Comissão',
-                percentualComissao: '% da Comissão'
+                percentualComissao: 'Variável da Comissão',
+                valorBrutoReceber: 'Valor Bruto a Receber'
             };
 
             const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
@@ -1226,7 +1251,7 @@
             });
 
             const doc = new jsPDF({
-                orientation: 'landscape', // Orientação horizontal
+                orientation: 'landscape',
                 unit: 'mm',
                 format: 'a4'
             });
@@ -1239,19 +1264,19 @@
             doc.autoTable({
                 head: [headers],
                 body: data,
-                startY: 25, // Posição inicial da tabela
-                theme: 'grid', // Estilo da tabela
+                startY: 25,
+                theme: 'grid',
                 styles: {
-                    fontSize: 10, // Tamanho da fonte
-                    cellPadding: 3, // Espaçamento interno das células
+                    fontSize: 10,
+                    cellPadding: 3,
                 },
                 headStyles: {
-                    fillColor: [79, 70, 229], // Cor de fundo do cabeçalho (azul)
-                    textColor: [255, 255, 255] // Cor do texto do cabeçalho (branco)
+                    fillColor: [79, 70, 229],
+                    textColor: [255, 255, 255]
                 }
             });
 
-            // Salvar o PDF
+            // Abrir o PDF automaticamente para salvar
             doc.save('relatorio_vendas.pdf');
         }
 
@@ -1266,7 +1291,8 @@
                 nomeCliente: 'Nome do Cliente',
                 empresaParceira: 'Empresa Parceira',
                 comissao: 'Valor da Comissão',
-                percentualComissao: '% da Comissão'
+                percentualComissao: 'Variável da Comissão',
+                valorBrutoReceber: 'Valor Bruto a Receber'
             };
 
             const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
@@ -1296,19 +1322,59 @@
             const mesSelecionado = parseInt(document.getElementById('mesFiltro').value);
             const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
 
-            const vendasFiltradas = dados.vendas.filter(venda => {
+            // Filtrar vendas do mês atual
+            const vendasMesAtual = dados.vendas.filter(venda => {
                 const dataVenda = new Date(venda.data.split('/').reverse().join('-'));
                 return dataVenda.getMonth() === mesSelecionado && dataVenda.getFullYear() === anoSelecionado;
             });
 
-            atualizarTotalVendas(vendasFiltradas);
-            atualizarComissoes(vendasFiltradas);
-            atualizarTotalClientes(vendasFiltradas);
-            atualizarTicketMedio(vendasFiltradas);
-            atualizarConversaoVendas(vendasFiltradas);
-            atualizarGraficoVendasPorServico(vendasFiltradas);
-            atualizarGraficoDesempenhoVendedores(vendasFiltradas);
-            atualizarGraficoVendasPorCategoria(vendasFiltradas);
+            // Filtrar vendas do mês anterior
+            const mesAnterior = mesSelecionado === 0 ? 11 : mesSelecionado - 1; // Se o mês atual for janeiro (0), o anterior é dezembro (11)
+            const anoAnterior = mesSelecionado === 0 ? anoSelecionado - 1 : anoSelecionado;
+            const vendasMesAnterior = dados.vendas.filter(venda => {
+                const dataVenda = new Date(venda.data.split('/').reverse().join('-'));
+                return dataVenda.getMonth() === mesAnterior && dataVenda.getFullYear() === anoAnterior;
+            });
+
+            // Calcular totais do mês atual
+            const totalVendasMesAtual = vendasMesAtual.reduce((total, venda) => total + venda.valorVenda, 0);
+            const totalComissoesMesAtual = vendasMesAtual.reduce((total, venda) => total + venda.valorReceber, 0);
+
+            // Calcular totais do mês anterior
+            const totalVendasMesAnterior = vendasMesAnterior.reduce((total, venda) => total + venda.valorVenda, 0);
+            const totalComissoesMesAnterior = vendasMesAnterior.reduce((total, venda) => total + venda.valorReceber, 0);
+
+            // Calcular porcentagens de crescimento
+            const crescimentoVendas = totalVendasMesAnterior !== 0 ?
+                ((totalVendasMesAtual - totalVendasMesAnterior) / totalVendasMesAnterior) * 100 : 0;
+            const crescimentoComissoes = totalComissoesMesAnterior !== 0 ?
+                ((totalComissoesMesAtual - totalComissoesMesAnterior) / totalComissoesMesAnterior) * 100 : 0;
+
+            // Atualizar os textos
+            document.getElementById('totalVendasDash').textContent = formatarMoeda(totalVendasMesAtual);
+            document.getElementById('totalComissoesDash').textContent = formatarMoeda(totalComissoesMesAtual);
+
+            const statChangeVendas = document.querySelector('#dashboard .stat-card:nth-child(1) .stat-change');
+            const statChangeComissoes = document.querySelector('#dashboard .stat-card:nth-child(2) .stat-change');
+
+            statChangeVendas.innerHTML = `
+                <span>${crescimentoVendas >= 0 ? '↑' : '↓'} ${Math.abs(crescimentoVendas).toFixed(2)}%</span>
+                <span>vs. último mês</span>
+            `;
+            statChangeVendas.className = `stat-change ${crescimentoVendas >= 0 ? 'positive' : 'negative'}`;
+
+            statChangeComissoes.innerHTML = `
+                <span>${crescimentoComissoes >= 0 ? '↑' : '↓'} ${Math.abs(crescimentoComissoes).toFixed(2)}%</span>
+                <span>vs. último mês</span>
+            `;
+            statChangeComissoes.className = `stat-change ${crescimentoComissoes >= 0 ? 'positive' : 'negative'}`;
+
+            // Atualizar outras métricas e gráficos
+            atualizarTotalClientes(vendasMesAtual);
+            atualizarTicketMedio(vendasMesAtual);
+            atualizarGraficoVendasPorServico(vendasMesAtual);
+            atualizarGraficoDesempenhoVendedores(vendasMesAtual);
+            atualizarGraficoVendasPorCategoria(vendasMesAtual);
         }
 
         // Função para atualizar o total de vendas
@@ -1465,9 +1531,19 @@
         // Atualização do tema com base na cor selecionada
         function atualizarTema() {
             const corPrimaria = document.getElementById('corPrimaria').value;
+            const corSecundaria = document.getElementById('corSecundaria').value;
+
             document.documentElement.style.setProperty('--primary', corPrimaria);
             document.documentElement.style.setProperty('--primary-light', `${corPrimaria}99`);
             document.documentElement.style.setProperty('--primary-dark', `${corPrimaria}cc`);
+            document.documentElement.style.setProperty('--secondary', corSecundaria);
+        }
+
+        // Restaurar tema padrão
+        function restaurarTemaPadrao() {
+            document.getElementById('corPrimaria').value = '#4f46e5';
+            document.getElementById('corSecundaria').value = '#64748b';
+            atualizarTema();
         }
     </script>
 </body>
