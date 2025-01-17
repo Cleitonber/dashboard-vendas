@@ -333,37 +333,3 @@ th {
         overflow-x: auto;
     }
 }
-
-/* Espaçamento após os botões de cadastro */
-.mt-4 {
-    margin-top: 1.5rem;
-}
-
-/* Estilo para a lista de vendedores, serviços e empresas */
-.list-group {
-    list-style: none;
-    padding: 0;
-}
-
-.list-group-item {
-    padding: 1rem;
-    border-bottom: 1px solid var(--border);
-}
-
-.list-group-item:last-child {
-    border-bottom: none;
-}
-
-/* Estilo para o botão de restaurar tema */
-.btn-restaurar-tema {
-    margin-top: 1rem;
-}
-
-/* Estilo para o campo de comissão */
-.comissao-fixa {
-    color: var(--primary);
-}
-
-.comissao-porcentagem {
-    color: var(--success);
-}
