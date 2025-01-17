@@ -574,7 +574,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Data da Venda</label>
-                            <input type="text" id="dataVenda" class="form-input" placeholder="DD/MM/AAAA" pattern="\d{2}/\d{2}/\d{4}" required>
+                            <input type="date" id="dataVenda" class="form-input" onchange="formatarData(this)" required>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Nome do Cliente</label>
@@ -597,6 +597,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Comissão</label>
+                            <small id="tipoComissaoInfo" class="form-text"></small>
                             <input type="text" id="comissao" class="form-input" placeholder="0,00" required>
                         </div>
                         <button type="submit" class="btn btn-primary">Registrar Venda</button>
@@ -610,7 +611,6 @@
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">Relatório de Vendas</h2>
-                    <button class="btn btn-secondary" onclick="exportarRelatorioPDF()">Exportar PDF</button>
                     <button class="btn btn-secondary" onclick="exportarRelatorioExcel()">Exportar Excel</button>
                 </div>
                 <div class="card-body">
@@ -634,15 +634,15 @@
                             <label class="form-label">Colunas</label>
                             <small class="form-text">(Pressione Ctrl para selecionar mais de um item)</small>
                             <select id="filtroColunas" class="form-select" multiple>
-                                <option value="data">Data da Venda</option>
-                                <option value="vendedor">Nome do Vendedor</option>
-                                <option value="servico">Serviço Vendido</option>
-                                <option value="tipoComissao">Tipo de Comissão</option>
-                                <option value="nomeCliente">Nome do Cliente</option>
-                                <option value="empresaParceira">Empresa Parceira</option>
-                                <option value="comissao">Valor da Comissão</option>
-                                <option value="percentualComissao">Variável da Comissão</option>
-                                <option value="valorBrutoReceber">Valor Bruto a Receber</option>
+                                <option value="data" selected>Data da Venda</option>
+                                <option value="vendedor" selected>Nome do Vendedor</option>
+                                <option value="servico" selected>Serviço Vendido</option>
+                                <option value="tipoComissao" selected>Tipo de Comissão</option>
+                                <option value="nomeCliente" selected>Nome do Cliente</option>
+                                <option value="empresaParceira" selected>Empresa Parceira</option>
+                                <option value="comissao" selected>Valor da Comissão</option>
+                                <option value="percentualComissao" selected>Variável da Comissão</option>
+                                <option value="valorBrutoReceber" selected>Valor Bruto a Receber</option>
                             </select>
                         </div>
                         <button class="btn btn-primary" onclick="filtrarRelatorio()">Gerar</button>
@@ -666,6 +666,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script>
         const { jsPDF } = window.jspdf;
 
@@ -1171,6 +1172,7 @@
             colunasSelecionadas.forEach(coluna => {
                 const th = document.createElement('th');
                 th.textContent = colunas[coluna];
+                th.id = `coluna-${coluna}`; // Adiciona um ID único para cada célula do cabeçalho
                 headerRow.appendChild(th);
             });
             thead.appendChild(headerRow);
@@ -1222,62 +1224,37 @@
                     <td>${formatarMoeda(totalValorBrutoReceber)}</td>
                 </tr>
             `;
-        }
 
-        // Função para exportar relatório em PDF
-        function exportarRelatorioPDF() {
-            const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
-            const colunas = {
-                data: 'Data da Venda',
-                vendedor: 'Nome do Vendedor',
-                servico: 'Serviço Vendido',
-                tipoComissao: 'Tipo de Comissão',
-                nomeCliente: 'Nome do Cliente',
-                empresaParceira: 'Empresa Parceira',
-                comissao: 'Valor da Comissão',
-                percentualComissao: 'Variável da Comissão',
-                valorBrutoReceber: 'Valor Bruto a Receber'
-            };
+            // Habilitar arrastar e soltar nas colunas
+            const tabelaRelatorio = document.getElementById('tabelaRelatorio');
+            Sortable.create(tabelaRelatorio.querySelector('thead tr'), {
+                animation: 150,
+                onEnd: function (evt) {
+                    const colunasSelecionadas = Array.from(evt.from.children).map(th => th.id.replace('coluna-', ''));
+                    const novasColunas = colunasSelecionadas.map(coluna => colunas[coluna]);
+                    const novasVendasFiltradas = vendasFiltradas.map(venda => {
+                        const novaVenda = {};
+                        colunasSelecionadas.forEach(coluna => {
+                            novaVenda[coluna] = venda[coluna];
+                        });
+                        return novaVenda;
+                    });
 
-            const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
-            const data = [];
+                    // Atualizar a tabela com as novas colunas
+                    const tbody = tabelaRelatorio.querySelector('tbody');
+                    tbody.innerHTML = '';
 
-            document.querySelectorAll('#tabelaRelatorio tbody tr').forEach(row => {
-                const rowData = [];
-                row.querySelectorAll('td').forEach(cell => {
-                    rowData.push(cell.textContent);
-                });
-                data.push(rowData);
-            });
-
-            const doc = new jsPDF({
-                orientation: 'landscape',
-                unit: 'mm',
-                format: 'a4'
-            });
-
-            // Adicionar título ao PDF
-            doc.setFontSize(16);
-            doc.text('Relatório de Vendas', 14, 20);
-
-            // Adicionar tabela ao PDF
-            doc.autoTable({
-                head: [headers],
-                body: data,
-                startY: 25,
-                theme: 'grid',
-                styles: {
-                    fontSize: 10,
-                    cellPadding: 3,
-                },
-                headStyles: {
-                    fillColor: [79, 70, 229],
-                    textColor: [255, 255, 255]
+                    novasVendasFiltradas.forEach(venda => {
+                        const row = document.createElement('tr');
+                        colunasSelecionadas.forEach(coluna => {
+                            const td = document.createElement('td');
+                            td.textContent = venda[coluna];
+                            row.appendChild(td);
+                        });
+                        tbody.appendChild(row);
+                    });
                 }
             });
-
-            // Abrir o PDF automaticamente para salvar
-            doc.save('relatorio_vendas.pdf');
         }
 
         // Função para exportar relatório em Excel
