@@ -3,245 +3,1525 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Gestão de Vendas</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+    <title>Dashboard de Gestão de Vendas</title>
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-light: #6366f1;
+            --primary-dark: #4338ca;
+            --secondary: #64748b;
+            --success: #22c55e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --background: #f8fafc;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+            --radius: 0.5rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .dashboard-title {
+            font-size: 1.875rem;
+            font-weight: 700;
+            color: var(--text);
+            letter-spacing: -0.025em;
+        }
+
+        .navigation {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--surface);
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .nav-button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-light);
+            font-weight: 500;
+            border-radius: calc(var(--radius) - 0.25rem);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .nav-button:hover {
+            color: var(--primary);
+            background: #f1f5f9;
+        }
+
+        .nav-button.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-text {
+            display: block;
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: all 0.2s;
+            color: var(--text);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            background-color: var(--surface);
+            cursor: pointer;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            opacity: 0.9;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 1rem 0;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .stat-title {
+            font-size: 0.875rem;
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            margin-top: 0.5rem;
+            font-size: 0.875rem;
+        }
+
+        .stat-change.positive {
+            color: var(--success);
+        }
+
+        .stat-change.negative {
+            color: var(--danger);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--surface);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        th {
+            background: #f8fafc;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--success);
+        }
+
+        .badge-warning {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning);
+        }
+
+        .badge-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .navigation {
+                width: 100%;
+                overflow-x: auto;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <ul class="nav nav-tabs" id="myTab" role="tablist">
-            <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="vendas-tab" data-bs-toggle="tab" data-bs-target="#vendas" type="button" role="tab">Vendas</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="vendedores-tab" data-bs-toggle="tab" data-bs-target="#vendedores" type="button" role="tab">Vendedores</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="empresas-tab" data-bs-toggle="tab" data-bs-target="#empresas" type="button" role="tab">Empresas Parceiras</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="relatorios-tab" data-bs-toggle="tab" data-bs-target="#relatorios" type="button" role="tab">Relatórios</button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link" id="dashboard-tab" data-bs-toggle="tab" data-bs-target="#dashboard" type="button" role="tab">Dashboard</button>
-            </li>
-        </ul>
+    <div class="container">
+        <header class="dashboard-header">
+            <h1 class="dashboard-title">Dashboard de Gestão de Vendas</h1>
+            <nav class="navigation">
+                <button class="nav-button active" onclick="showTab('dashboard')">Dashboard</button>
+                <button class="nav-button" onclick="showTab('cadastros')">Cadastros</button>
+                <button class="nav-button" onclick="showTab('vendas')">Vendas</button>
+                <button class="nav-button" onclick="showTab('relatorios')">Relatórios</button>
+            </nav>
+        </header>
 
-        <div class="tab-content" id="myTabContent">
-            <!-- Aba de Vendas -->
-            <div class="tab-pane fade show active" id="vendas" role="tabpanel">
-                <div class="card mt-3">
+        <!-- Dashboard -->
+        <div id="dashboard" class="tab-content active">
+            <div class="filtro-data">
+                <label for="mesFiltro">Selecione o mês:</label>
+                <select id="mesFiltro" onchange="atualizarDashboard()">
+                    <option value="0">Janeiro</option>
+                    <option value="1">Fevereiro</option>
+                    <option value="2">Março</option>
+                    <option value="3">Abril</option>
+                    <option value="4">Maio</option>
+                    <option value="5">Junho</option>
+                    <option value="6">Julho</option>
+                    <option value="7">Agosto</option>
+                    <option value="8">Setembro</option>
+                    <option value="9">Outubro</option>
+                    <option value="10">Novembro</option>
+                    <option value="11">Dezembro</option>
+                </select>
+
+                <label for="anoFiltro">Selecione o ano:</label>
+                <select id="anoFiltro" onchange="atualizarDashboard()">
+                    <!-- Os anos serão preenchidos dinamicamente via JavaScript -->
+                </select>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Total de Vendas</div>
+                    <div class="stat-value" id="totalVendasDash">R$ 0,00</div>
+                    <div class="stat-change positive">
+                        <span>↑ 12%</span>
+                        <span>vs. último mês</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Comissões</div>
+                    <div class="stat-value" id="totalComissoesDash">R$ 0,00</div>
+                    <div class="stat-change positive">
+                        <span>↑ 8%</span>
+                        <span>vs. último mês</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Clientes Atendidos</div>
+                    <div class="stat-value" id="totalClientes">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Ticket Médio</div>
+                    <div class="stat-value" id="ticketMedio">R$ 0,00</div>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title">Cadastro de Vendas</h2>
+                        <h2 class="card-title">Vendas por Serviço</h2>
                     </div>
                     <div class="card-body">
-                        <form id="vendaForm">
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="vendedorVenda" class="form-label">Vendedor</label>
-                                    <select class="form-select" id="vendedorVenda" required></select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="servicoVenda" class="form-label">Serviço</label>
-                                    <select class="form-select" id="servicoVenda" required></select>
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="nomeCliente" class="form-label">Nome do Cliente</label>
-                                    <input type="text" class="form-control" id="nomeCliente" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="empresaParceira" class="form-label">Empresa Parceira</label>
-                                    <select class="form-select" id="empresaParceira" required></select>
-                                </div>
-                            </div>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="valorVenda" class="form-label">Valor da Venda</label>
-                                    <input type="number" class="form-control" id="valorVenda" step="0.01" required>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="dataVenda" class="form-label">Data da Venda</label>
-                                    <input type="date" class="form-control" id="dataVenda" required>
-                                </div>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Cadastrar Venda</button>
-                        </form>
+                        <div class="chart-container">
+                            <canvas id="vendasServicoChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Desempenho dos Vendedores</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="desempenhoVendedoresChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Vendas por Categoria de Serviço</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="vendasCategoriaChart"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Aba de Vendedores -->
-            <div class="tab-pane fade" id="vendedores" role="tabpanel">
-                <div class="card mt-3">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Personalizar Tema</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Cor Primária</label>
+                        <input type="color" id="corPrimaria" value="#4f46e5" onchange="atualizarTema()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cor Secundária</label>
+                        <input type="color" id="corSecundaria" value="#64748b" onchange="atualizarTema()">
+                    </div>
+                    <button class="btn btn-secondary" onclick="restaurarTemaPadrao()">Restaurar Cores Padrão</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cadastros -->
+        <div id="cadastros" class="tab-content">
+            <div class="grid">
+                <!-- Cadastro de Vendedor -->
+                <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title">Cadastro de Vendedores</h2>
+                        <h2 class="card-title">Cadastro de Vendedor</h2>
                     </div>
                     <div class="card-body">
                         <form id="vendedorForm">
-                            <div class="mb-3">
-                                <label for="nomeVendedor" class="form-label">Nome</label>
-                                <input type="text" class="form-control" id="nomeVendedor" required>
+                            <div class="form-group">
+                                <label class="form-label">Nome do Vendedor</label>
+                                <input type="text" id="nomeVendedor" class="form-input" placeholder="Digite o nome do vendedor" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="emailVendedor" class="form-label">Email</label>
-                                <input type="email" class="form-control" id="emailVendedor" required>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" id="emailVendedor" class="form-input" placeholder="Digite o email do vendedor" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="telefoneVendedor" class="form-label">Telefone</label>
-                                <input type="tel" class="form-control" id="telefoneVendedor" required>
+                            <div class="form-group">
+                                <label class="form-label">Telefone</label>
+                                <input type="tel" id="telefoneVendedor" class="form-input" placeholder="(XX) XXXXX-XXXX">
                             </div>
                             <button type="submit" class="btn btn-primary">Cadastrar Vendedor</button>
                         </form>
-                        <div class="mt-4">
+                        <div id="listaVendedores" class="mt-4">
                             <h3>Vendedores Cadastrados</h3>
-                            <ul class="list-group" id="vendedoresList"></ul>
+                            <input type="text" id="filtroVendedores" placeholder="Pesquisar vendedor..." class="form-input">
+                            <ul id="vendedoresList" class="list-group"></ul>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Aba de Empresas Parceiras -->
-            <div class="tab-pane fade" id="empresas" role="tabpanel">
-                <div class="card mt-3">
+                <!-- Cadastro de Serviço -->
+                <div class="card">
                     <div class="card-header">
-                        <h2 class="card-title">Cadastro de Empresas Parceiras</h2>
+                        <h2 class="card-title">Cadastro de Serviço</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="servicoForm">
+                            <div class="form-group">
+                                <label class="form-label">Nome do Serviço</label>
+                                <input type="text" id="nomeServico" class="form-input" placeholder="Digite o nome do serviço" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Categoria</label>
+                                <input type="text" id="categoriaServico" class="form-input" placeholder="Digite a categoria do serviço" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tipo de Comissão</label>
+                                <select id="tipoComissao" class="form-select" required>
+                                    <option value="fixa">Fixa</option>
+                                    <option value="porcentagem">Porcentagem</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cadastrar Serviço</button>
+                        </form>
+                        <div id="listaServicos" class="mt-4">
+                            <h3>Serviços Cadastrados</h3>
+                            <input type="text" id="filtroServicos" placeholder="Pesquisar serviço..." class="form-input">
+                            <ul id="servicosList" class="list-group"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cadastro de Empresa Parceira -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Cadastro de Empresa Parceira</h2>
                     </div>
                     <div class="card-body">
                         <form id="empresaForm">
-                            <div class="mb-3">
-                                <label for="nomeEmpresa" class="form-label">Nome da Empresa</label>
-                                <input type="text" class="form-control" id="nomeEmpresa" required>
+                            <div class="form-group">
+                                <label class="form-label">Nome da Empresa</label>
+                                <input type="text" id="nomeEmpresa" class="form-input" placeholder="Digite o nome da empresa" required>
                             </div>
-                            <div class="mb-3">
-                                <label for="categoriaEmpresa" class="form-label">Categoria</label>
-                                <input type="text" class="form-control" id="categoriaEmpresa" required>
+                            <div class="form-group">
+                                <label class="form-label">Categoria</label>
+                                <input type="text" id="categoriaEmpresa" class="form-input" placeholder="Digite a categoria da empresa" required>
                             </div>
                             <button type="submit" class="btn btn-primary">Cadastrar Empresa</button>
                         </form>
-                        <div class="mt-4">
-                            <h3>Empresas Cadastradas</h3>
-                            <ul class="list-group" id="empresasList"></ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Aba de Relatórios -->
-            <div class="tab-pane fade" id="relatorios" role="tabpanel">
-                <div class="card mt-3">
-                    <div class="card-header">
-                        <h2 class="card-title">Relatório de Vendas</h2>
-                        <button class="btn btn-secondary" onclick="exportarRelatorioExcel()">Exportar Excel</button>
-                        <button class="btn btn-secondary" onclick="exportarRelatorioPDF()">Exportar PDF</button>
-                    </div>
-                    <div class="card-body">
-                        <div class="row mb-3">
-                            <div class="col-md-3">
-                                <label for="dataInicial" class="form-label">Data Inicial</label>
-                                <input type="date" class="form-control" id="dataInicial">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="dataFinal" class="form-label">Data Final</label>
-                                <input type="date" class="form-control" id="dataFinal">
-                            </div>
-                            <div class="col-md-3">
-                                <label for="filtroVendedor" class="form-label">Vendedor</label>
-                                <select class="form-control" id="filtroVendedor"></select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="filtroColunas" class="form-label">Colunas</label>
-                                <select class="form-control" id="filtroColunas" multiple>
-                                    <option value="data" selected>Data da Venda</option>
-                                    <option value="vendedor" selected>Nome do Vendedor</option>
-                                    <option value="servico" selected>Serviço Vendido</option>
-                                    <option value="tipoComissao">Tipo de Comissão</option>
-                                    <option value="nomeCliente" selected>Nome do Cliente</option>
-                                    <option value="empresaParceira" selected>Empresa Parceira</option>
-                                    <option value="comissao" selected>Valor da Comissão</option>
-                                    <option value="percentualComissao" selected>Variável da Comissão</option>
-                                    <option value="valorBrutoReceber" selected>Valor Bruto a Receber</option>
-                                </select>
-                            </div>
-                        </div>
-                        <button class="btn btn-primary" onclick="filtrarRelatorio()">Gerar</button>
-                        <div class="table-responsive mt-3">
-                            <table id="tabelaRelatorio" class="table">
-                                <thead></thead>
-                                <tbody></tbody>
-                                <tfoot></tfoot>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Aba de Dashboard -->
-            <div class="tab-pane fade" id="dashboard" role="tabpanel">
-                <div class="card mt-3">
-                    <div class="card-header">
-                        <h2 class="card-title">Dashboard</h2>
-                        <div class="row">
-                            <div class="col-md-3">
-                                <label for="mesFiltro" class="form-label">Mês</label>
-                                <select class="form-control" id="mesFiltro" onchange="atualizarDashboard()">
-                                    <option value="0">Janeiro</option>
-                                    <option value="1">Fevereiro</option>
-                                    <option value="2">Março</option>
-                                    <option value="3">Abril</option>
-                                    <option value="4">Maio</option>
-                                    <option value="5">Junho</option>
-                                    <option value="6">Julho</option>
-                                    <option value="7">Agosto</option>
-                                    <option value="8">Setembro</option>
-                                    <option value="9">Outubro</option>
-                                    <option value="10">Novembro</option>
-                                    <option value="11">Dezembro</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3">
-                                <label for="anoFiltro" class="form-label">Ano</label>
-                                <select class="form-control" id="anoFiltro" onchange="atualizarDashboard()"></select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Total de Vendas</h5>
-                                        <p class="card-text" id="totalVendas">0</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Total de Comissões</h5>
-                                        <p class="card-text" id="totalComissoes">R$ 0,00</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <h5 class="card-title">Comparação com Mês Anterior</h5>
-                                        <p class="card-text" id="comparacaoMesAnterior">0%</p>
-                                    </div>
-                                </div>
-                            </div>
+                        <div id="listaEmpresas" class="mt-4">
+                            <h3>Empresas Parceiras Cadastradas</h3>
+                            <input type="text" id="filtroEmpresas" placeholder="Pesquisar empresa..." class="form-input">
+                            <ul id="empresasList" class="list-group"></ul>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Vendas -->
+        <div id="vendas" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Registrar Venda</h2>
+                </div>
+                <div class="card-body">
+                    <form id="vendaForm">
+                        <div class="form-group">
+                            <label class="form-label">Vendedor</label>
+                            <select id="vendedorVenda" class="form-select" required>
+                                <option value="">Selecione um vendedor</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Serviço</label>
+                            <select id="servicoVenda" class="form-select" required>
+                                <option value="">Selecione um serviço</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Data da Venda</label>
+                            <input type="date" id="dataVenda" class="form-input" onchange="formatarData(this)" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nome do Cliente</label>
+                            <input type="text" id="nomeCliente" class="form-input" placeholder="Digite o nome do cliente" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Empresa Parceira</label>
+                            <select id="empresaParceira" class="form-select" required>
+                                <option value="">Selecione uma empresa parceira</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Valor da Venda</label>
+                            <input type="text" id="valorVenda" class="form-input" placeholder="R$ 0,00" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Valor a Receber</label>
+                            <input type="text" id="valorReceber" class="form-input" placeholder="R$ 0,00" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Comissão</label>
+                            <small id="tipoComissaoInfo" class="form-text"></small>
+                            <input type="text" id="comissao" class="form-input" placeholder="0,00" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Registrar Venda</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relatórios -->
+        <div id="relatorios" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Relatório de Vendas</h2>
+                    <button class="btn btn-secondary" onclick="exportarRelatorioExcel()">Exportar Excel</button>
+                </div>
+                <div class="card-body">
+                    <div class="filters">
+                        <div class="form-group">
+                            <label class="form-label">Data Inicial</label>
+                            <input type="text" id="dataInicial" class="form-input" placeholder="DD/MM/AAAA" pattern="\d{2}/\d{2}/\d{4}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Data Final</label>
+                            <input type="text" id="dataFinal" class="form-input" placeholder="DD/MM/AAAA" pattern="\d{2}/\d{2}/\d{4}">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Vendedor</label>
+                            <select id="filtroVendedor" class="form-select">
+                                <option value="">Todos</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Colunas</label>
+                            <small class="form-text">(Pressione Ctrl para selecionar mais de um item)</small>
+                            <select id="filtroColunas" class="form-select" multiple>
+                                <option value="data" selected>Data da Venda</option>
+                                <option value="vendedor" selected>Nome do Vendedor</option>
+                                <option value="servico" selected>Serviço Vendido</option>
+                                <option value="tipoComissao" selected>Tipo de Comissão</option>
+                                <option value="nomeCliente" selected>Nome do Cliente</option>
+                                <option value="empresaParceira" selected>Empresa Parceira</option>
+                                <option value="comissao" selected>Valor da Comissão</option>
+                                <option value="percentualComissao" selected>Variável da Comissão</option>
+                                <option value="valorBrutoReceber" selected>Valor Bruto a Receber</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="filtrarRelatorio()">Gerar</button>
+                    </div>
+                    <table id="tabelaRelatorio">
+                        <thead>
+                            <!-- As colunas serão preenchidas dinamicamente via JavaScript -->
+                        </thead>
+                        <tbody>
+                            <!-- As linhas da tabela serão preenchidas dinamicamente via JavaScript -->
+                        </tbody>
+                        <tfoot>
+                            <!-- O rodapé será preenchido dinamicamente via JavaScript -->
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script>
+        const { jsPDF } = window.jspdf;
+
+        let dados = {
+            vendas: [],
+            vendedores: [],
+            servicos: [],
+            empresasParceiras: []
+        };
+
+        // Função para alternar entre as abas
+        function showTab(tabId) {
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+
+            const buttons = document.querySelectorAll('.nav-button');
+            buttons.forEach(button => button.classList.remove('active'));
+            document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+        }
+
+        // Inicializa a aba "Dashboard" como ativa ao carregar a página
+        document.addEventListener('DOMContentLoaded', function () {
+            showTab('dashboard');
+            preencherAnos();
+            atualizarOpcoesVendedores();
+            atualizarOpcoesServicos();
+            atualizarOpcoesEmpresas();
+        });
+
+        // Função para preencher o seletor de anos
+        function preencherAnos() {
+            const selectAno = document.getElementById('anoFiltro');
+            selectAno.innerHTML = '';
+
+            // Extrair anos únicos das vendas
+            const anosUnicos = [...new Set(dados.vendas.map(venda => new Date(venda.data.split('/').reverse().join('-')).getFullYear()))];
+            anosUnicos.sort((a, b) => b - a); // Ordenar do ano mais recente para o mais antigo
+
+            // Adicionar opções ao seletor
+            anosUnicos.forEach(ano => {
+                const option = document.createElement('option');
+                option.value = ano;
+                option.textContent = ano;
+                selectAno.appendChild(option);
+            });
+
+            // Selecionar o ano atual por padrão
+            const anoAtual = new Date().getFullYear();
+            selectAno.value = anoAtual;
+        }
+
+        // Função para atualizar as opções de vendedores
+        function atualizarOpcoesVendedores() {
+            const selectVendedor = document.getElementById('vendedorVenda');
+            selectVendedor.innerHTML = '<option value="">Selecione um vendedor</option>';
+            dados.vendedores.forEach(vendedor => {
+                const option = document.createElement('option');
+                option.value = vendedor.id;
+                option.textContent = vendedor.nome;
+                selectVendedor.appendChild(option);
+            });
+
+            const filtroVendedor = document.getElementById('filtroVendedor');
+            filtroVendedor.innerHTML = '<option value="">Todos</option>';
+            dados.vendedores.forEach(vendedor => {
+                const option = document.createElement('option');
+                option.value = vendedor.id;
+                option.textContent = vendedor.nome;
+                filtroVendedor.appendChild(option);
+            });
+        }
+
+        // Função para atualizar as opções de serviços
+        function atualizarOpcoesServicos() {
+            const selectServico = document.getElementById('servicoVenda');
+            selectServico.innerHTML = '<option value="">Selecione um serviço</option>';
+            dados.servicos.forEach(servico => {
+                const option = document.createElement('option');
+                option.value = servico.id;
+                option.textContent = servico.nome;
+                selectServico.appendChild(option);
+            });
+        }
+
+        // Função para atualizar as opções de empresas parceiras
+        function atualizarOpcoesEmpresas() {
+            const selectEmpresa = document.getElementById('empresaParceira');
+            selectEmpresa.innerHTML = '<option value="">Selecione uma empresa parceira</option>';
+            dados.empresasParceiras.forEach(empresa => {
+                const option = document.createElement('option');
+                option.value = empresa.id;
+                option.textContent = empresa.nome;
+                selectEmpresa.appendChild(option);
+            });
+        }
+
+        // Função para cadastrar vendedor
+        document.getElementById('vendedorForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const nomeVendedor = document.getElementById('nomeVendedor').value;
+            const emailVendedor = document.getElementById('emailVendedor').value;
+            const telefoneVendedor = document.getElementById('telefoneVendedor').value;
+
+            const novoVendedor = {
+                id: dados.vendedores.length + 1,
+                nome: nomeVendedor,
+                email: emailVendedor,
+                telefone: telefoneVendedor
+            };
+
+            dados.vendedores.push(novoVendedor);
+            atualizarListaVendedores();
+            atualizarOpcoesVendedores();
+            alert('Vendedor cadastrado com sucesso!');
+        });
+
+        // Função para atualizar a lista de vendedores
+        function atualizarListaVendedores() {
+            const listaVendedores = document.getElementById('vendedoresList');
+            listaVendedores.innerHTML = '';
+
+            dados.vendedores.forEach(vendedor => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${vendedor.nome}</strong><br>
+                            <small>${vendedor.email} - ${vendedor.telefone}</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary" onclick="editarVendedor(${vendedor.id})">Editar</button>
+                            <button class="btn btn-sm btn-danger" onclick="excluirVendedor(${vendedor.id})">Excluir</button>
+                        </div>
+                    </div>
+                `;
+                listaVendedores.appendChild(li);
+            });
+        }
+
+        // Função para editar vendedor
+        function editarVendedor(id) {
+            const vendedor = dados.vendedores.find(v => v.id === id);
+            if (vendedor) {
+                const listaVendedores = document.getElementById('vendedoresList');
+                listaVendedores.innerHTML = '';
+
+                dados.vendedores.forEach(v => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+
+                    if (v.id === id) {
+                        li.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <input type="text" id="editNomeVendedor" value="${v.nome}" class="form-input">
+                                    <input type="email" id="editEmailVendedor" value="${v.email}" class="form-input">
+                                    <input type="tel" id="editTelefoneVendedor" value="${v.telefone}" class="form-input">
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-success" onclick="salvarEdicaoVendedor(${v.id})">Salvar</button>
+                                    <button class="btn btn-sm btn-danger" onclick="cancelarEdicao()">Cancelar</button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        li.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>${v.nome}</strong><br>
+                                    <small>${v.email} - ${v.telefone}</small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-secondary" onclick="editarVendedor(${v.id})">Editar</button>
+                                    <button class="btn btn-sm btn-danger" onclick="excluirVendedor(${v.id})">Excluir</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    listaVendedores.appendChild(li);
+                });
+            }
+        }
+
+        // Função para salvar a edição do vendedor
+        function salvarEdicaoVendedor(id) {
+            const vendedor = dados.vendedores.find(v => v.id === id);
+            if (vendedor) {
+                vendedor.nome = document.getElementById('editNomeVendedor').value;
+                vendedor.email = document.getElementById('editEmailVendedor').value;
+                vendedor.telefone = document.getElementById('editTelefoneVendedor').value;
+                atualizarListaVendedores();
+                alert('Vendedor atualizado com sucesso!');
+            }
+        }
+
+        // Função para cancelar a edição
+        function cancelarEdicao() {
+            atualizarListaVendedores();
+        }
+
+        // Função para excluir vendedor
+        function excluirVendedor(id) {
+            dados.vendedores = dados.vendedores.filter(v => v.id !== id);
+            atualizarListaVendedores();
+            atualizarOpcoesVendedores();
+            alert('Vendedor excluído com sucesso!');
+        }
+
+        // Função para cadastrar serviço
+        document.getElementById('servicoForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const nomeServico = document.getElementById('nomeServico').value;
+            const categoriaServico = document.getElementById('categoriaServico').value;
+            const tipoComissao = document.getElementById('tipoComissao').value;
+
+            const novoServico = {
+                id: dados.servicos.length + 1,
+                nome: nomeServico,
+                categoria: categoriaServico,
+                tipoComissao: tipoComissao
+            };
+
+            dados.servicos.push(novoServico);
+            atualizarListaServicos();
+            atualizarOpcoesServicos();
+            alert('Serviço cadastrado com sucesso!');
+        });
+
+        // Função para atualizar a lista de serviços
+        function atualizarListaServicos() {
+            const listaServicos = document.getElementById('servicosList');
+            listaServicos.innerHTML = '';
+
+            dados.servicos.forEach(servico => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${servico.nome}</strong><br>
+                            <small>Categoria: ${servico.categoria} - Tipo de Comissão: ${servico.tipoComissao}</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary" onclick="editarServico(${servico.id})">Editar</button>
+                            <button class="btn btn-sm btn-danger" onclick="excluirServico(${servico.id})">Excluir</button>
+                        </div>
+                    </div>
+                `;
+                listaServicos.appendChild(li);
+            });
+        }
+
+        // Função para editar serviço
+        function editarServico(id) {
+            const servico = dados.servicos.find(s => s.id === id);
+            if (servico) {
+                const listaServicos = document.getElementById('servicosList');
+                listaServicos.innerHTML = '';
+
+                dados.servicos.forEach(s => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+
+                    if (s.id === id) {
+                        li.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <input type="text" id="editNomeServico" value="${s.nome}" class="form-input">
+                                    <input type="text" id="editCategoriaServico" value="${s.categoria}" class="form-input">
+                                    <select id="editTipoComissao" class="form-select">
+                                        <option value="fixa" ${s.tipoComissao === 'fixa' ? 'selected' : ''}>Fixa</option>
+                                        <option value="porcentagem" ${s.tipoComissao === 'porcentagem' ? 'selected' : ''}>Porcentagem</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-success" onclick="salvarEdicaoServico(${s.id})">Salvar</button>
+                                    <button class="btn btn-sm btn-danger" onclick="cancelarEdicao()">Cancelar</button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        li.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>${s.nome}</strong><br>
+                                    <small>Categoria: ${s.categoria} - Tipo de Comissão: ${s.tipoComissao}</small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-secondary" onclick="editarServico(${s.id})">Editar</button>
+                                    <button class="btn btn-sm btn-danger" onclick="excluirServico(${s.id})">Excluir</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    listaServicos.appendChild(li);
+                });
+            }
+        }
+
+        // Função para salvar a edição do serviço
+        function salvarEdicaoServico(id) {
+            const servico = dados.servicos.find(s => s.id === id);
+            if (servico) {
+                servico.nome = document.getElementById('editNomeServico').value;
+                servico.categoria = document.getElementById('editCategoriaServico').value;
+                servico.tipoComissao = document.getElementById('editTipoComissao').value;
+                atualizarListaServicos();
+                alert('Serviço atualizado com sucesso!');
+            }
+        }
+
+        // Função para excluir serviço
+        function excluirServico(id) {
+            dados.servicos = dados.servicos.filter(s => s.id !== id);
+            atualizarListaServicos();
+            atualizarOpcoesServicos();
+            alert('Serviço excluído com sucesso!');
+        }
+
+        // Função para cadastrar empresa parceira
+        document.getElementById('empresaForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const nomeEmpresa = document.getElementById('nomeEmpresa').value;
+            const categoriaEmpresa = document.getElementById('categoriaEmpresa').value;
+
+            const novaEmpresa = {
+                id: dados.empresasParceiras.length + 1,
+                nome: nomeEmpresa,
+                categoria: categoriaEmpresa
+            };
+
+            dados.empresasParceiras.push(novaEmpresa);
+            atualizarListaEmpresas();
+            atualizarOpcoesEmpresas();
+            alert('Empresa cadastrada com sucesso!');
+        });
+
+        // Função para atualizar a lista de empresas parceiras
+        function atualizarListaEmpresas() {
+            const listaEmpresas = document.getElementById('empresasList');
+            listaEmpresas.innerHTML = '';
+
+            dados.empresasParceiras.forEach(empresa => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item';
+                li.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${empresa.nome}</strong><br>
+                            <small>Categoria: ${empresa.categoria}</small>
+                        </div>
+                        <div>
+                            <button class="btn btn-sm btn-secondary" onclick="editarEmpresa(${empresa.id})">Editar</button>
+                            <button class="btn btn-sm btn-danger" onclick="excluirEmpresa(${empresa.id})">Excluir</button>
+                        </div>
+                    </div>
+                `;
+                listaEmpresas.appendChild(li);
+            });
+        }
+
+        // Função para editar empresa parceira
+        function editarEmpresa(id) {
+            const empresa = dados.empresasParceiras.find(e => e.id === id);
+            if (empresa) {
+                const listaEmpresas = document.getElementById('empresasList');
+                listaEmpresas.innerHTML = '';
+
+                dados.empresasParceiras.forEach(e => {
+                    const li = document.createElement('li');
+                    li.className = 'list-group-item';
+
+                    if (e.id === id) {
+                        li.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <input type="text" id="editNomeEmpresa" value="${e.nome}" class="form-input">
+                                    <input type="text" id="editCategoriaEmpresa" value="${e.categoria}" class="form-input">
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-success" onclick="salvarEdicaoEmpresa(${e.id})">Salvar</button>
+                                    <button class="btn btn-sm btn-danger" onclick="cancelarEdicao()">Cancelar</button>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        li.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <strong>${e.nome}</strong><br>
+                                    <small>Categoria: ${e.categoria}</small>
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-secondary" onclick="editarEmpresa(${e.id})">Editar</button>
+                                    <button class="btn btn-sm btn-danger" onclick="excluirEmpresa(${e.id})">Excluir</button>
+                                </div>
+                            </div>
+                        `;
+                    }
+                    listaEmpresas.appendChild(li);
+                });
+            }
+        }
+
+        // Função para salvar a edição da empresa
+        function salvarEdicaoEmpresa(id) {
+            const empresa = dados.empresasParceiras.find(e => e.id === id);
+            if (empresa) {
+                empresa.nome = document.getElementById('editNomeEmpresa').value;
+                empresa.categoria = document.getElementById('editCategoriaEmpresa').value;
+                atualizarListaEmpresas();
+                alert('Empresa atualizada com sucesso!');
+            }
+        }
+
+        // Função para excluir empresa parceira
+        function excluirEmpresa(id) {
+            dados.empresasParceiras = dados.empresasParceiras.filter(e => e.id !== id);
+            atualizarListaEmpresas();
+            atualizarOpcoesEmpresas();
+            alert('Empresa excluída com sucesso!');
+        }
+
+        // Função para registrar venda
+        document.getElementById('vendaForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const vendedorId = document.getElementById('vendedorVenda').value;
+            const servicoId = document.getElementById('servicoVenda').value;
+            const dataVenda = document.getElementById('dataVenda').value;
+            const nomeCliente = document.getElementById('nomeCliente').value;
+            const empresaParceiraId = document.getElementById('empresaParceira').value;
+            const valorVenda = parseFloat(document.getElementById('valorVenda').value.replace(/[^0-9,]/g, '').replace(',', '.'));
+            const valorReceber = parseFloat(document.getElementById('valorReceber').value.replace(/[^0-9,]/g, '').replace(',', '.'));
+            const comissao = parseFloat(document.getElementById('comissao').value.replace(/[^0-9,]/g, '').replace(',', '.'));
+
+            const vendedor = dados.vendedores.find(v => v.id == vendedorId);
+            const servico = dados.servicos.find(s => s.id == servicoId);
+            const empresaParceira = dados.empresasParceiras.find(e => e.id == empresaParceiraId);
+
+            if (!vendedor || !servico || !empresaParceira) {
+                alert('Por favor, selecione um vendedor, serviço e empresa parceira válidos.');
+                return;
+            }
+
+            const novaVenda = {
+                id: dados.vendas.length + 1,
+                vendedor: vendedor.nome,
+                servico: servico.nome,
+                data: dataVenda,
+                nomeCliente: nomeCliente,
+                empresaParceira: empresaParceira.nome,
+                valorVenda: valorVenda,
+                valorReceber: valorReceber,
+                comissao: comissao,
+                tipoComissao: servico.tipoComissao
+            };
+
+            dados.vendas.push(novaVenda);
+            alert('Venda registrada com sucesso!');
+            atualizarDashboard();
+        });
+
+        // Função para filtrar relatório
+        function filtrarRelatorio() {
+            const dataInicial = document.getElementById('dataInicial').value;
+            const dataFinal = document.getElementById('dataFinal').value;
+            const vendedorId = document.getElementById('filtroVendedor').value;
+            const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
+
+            const vendasFiltradas = dados.vendas.filter(venda => {
+                const dataVenda = new Date(venda.data.split('/').reverse().join('-'));
+                const dataInicialFiltro = new Date(dataInicial.split('/').reverse().join('-'));
+                const dataFinalFiltro = new Date(dataFinal.split('/').reverse().join('-'));
+
+                const filtroData = (!dataInicial || dataVenda >= dataInicialFiltro) && (!dataFinal || dataVenda <= dataFinalFiltro);
+                const filtroVendedor = !vendedorId || venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
+
+                return filtroData && filtroVendedor;
+            });
+
+            const colunas = {
+                data: 'Data da Venda',
+                vendedor: 'Nome do Vendedor',
+                servico: 'Serviço Vendido',
+                tipoComissao: 'Tipo de Comissão',
+                nomeCliente: 'Nome do Cliente',
+                empresaParceira: 'Empresa Parceira',
+                comissao: 'Valor da Comissão',
+                percentualComissao: 'Variável da Comissão',
+                valorBrutoReceber: 'Valor Bruto a Receber'
+            };
+
+            const thead = document.querySelector('#tabelaRelatorio thead');
+            const tbody = document.querySelector('#tabelaRelatorio tbody');
+
+            thead.innerHTML = '';
+            tbody.innerHTML = '';
+
+            const headerRow = document.createElement('tr');
+            colunasSelecionadas.forEach(coluna => {
+                const th = document.createElement('th');
+                th.textContent = colunas[coluna];
+                th.id = `coluna-${coluna}`; // Adiciona um ID único para cada célula do cabeçalho
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+
+            let totalComissao = 0;
+            let totalValorBrutoReceber = 0;
+
+            vendasFiltradas.forEach(venda => {
+                const row = document.createElement('tr');
+                colunasSelecionadas.forEach(coluna => {
+                    const td = document.createElement('td');
+                    let valor = venda[coluna];
+
+                    if (coluna === 'percentualComissao') {
+                        const servico = dados.servicos.find(s => s.nome === venda.servico);
+                        if (servico.tipoComissao === 'porcentagem') {
+                            valor = `${venda.comissao}%`;
+                        } else if (servico.tipoComissao === 'fixa') {
+                            valor = formatarMoeda(venda.comissao);
+                        }
+                    } else if (coluna === 'comissao') {
+                        const servico = dados.servicos.find(s => s.nome === venda.servico);
+                        if (servico.tipoComissao === 'porcentagem') {
+                            valor = formatarMoeda(venda.valorReceber * (venda.comissao / 100));
+                        } else if (servico.tipoComissao === 'fixa') {
+                            valor = formatarMoeda(venda.comissao);
+                        }
+                        totalComissao += parseFloat(valor.replace(/[^0-9,]/g, '').replace(',', '.'));
+                    } else if (coluna === 'valorBrutoReceber') {
+                        valor = formatarMoeda(venda.valorReceber);
+                        totalValorBrutoReceber += venda.valorReceber;
+                    } else if (coluna === 'data') {
+                        valor = venda.data;
+                    }
+
+                    td.textContent = valor;
+                    row.appendChild(td);
+                });
+                tbody.appendChild(row);
+            });
+
+            // Atualizar totais no rodapé da tabela
+            const tfoot = document.querySelector('#tabelaRelatorio tfoot');
+            tfoot.innerHTML = `
+                <tr>
+                    <td colspan="${colunasSelecionadas.length - 2}" style="text-align: right;"><strong>Total da Comissão:</strong></td>
+                    <td>${formatarMoeda(totalComissao)}</td>
+                    <td colspan="2" style="text-align: right;"><strong>Total Valor Bruto a Receber:</strong></td>
+                    <td>${formatarMoeda(totalValorBrutoReceber)}</td>
+                </tr>
+            `;
+
+            // Habilitar arrastar e soltar nas colunas
+            const tabelaRelatorio = document.getElementById('tabelaRelatorio');
+            Sortable.create(tabelaRelatorio.querySelector('thead tr'), {
+                animation: 150,
+                onEnd: function (evt) {
+                    const colunasSelecionadas = Array.from(evt.from.children).map(th => th.id.replace('coluna-', ''));
+                    const novasColunas = colunasSelecionadas.map(coluna => colunas[coluna]);
+                    const novasVendasFiltradas = vendasFiltradas.map(venda => {
+                        const novaVenda = {};
+                        colunasSelecionadas.forEach(coluna => {
+                            novaVenda[coluna] = venda[coluna];
+                        });
+                        return novaVenda;
+                    });
+
+                    // Atualizar a tabela com as novas colunas
+                    const tbody = tabelaRelatorio.querySelector('tbody');
+                    tbody.innerHTML = '';
+
+                    novasVendasFiltradas.forEach(venda => {
+                        const row = document.createElement('tr');
+                        colunasSelecionadas.forEach(coluna => {
+                            const td = document.createElement('td');
+                            td.textContent = venda[coluna];
+                            row.appendChild(td);
+                        });
+                        tbody.appendChild(row);
+                    });
+                }
+            });
+        }
+
+        // Função para exportar relatório em Excel
+        function exportarRelatorioExcel() {
+            const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
+            const colunas = {
+                data: 'Data da Venda',
+                vendedor: 'Nome do Vendedor',
+                servico: 'Serviço Vendido',
+                tipoComissao: 'Tipo de Comissão',
+                nomeCliente: 'Nome do Cliente',
+                empresaParceira: 'Empresa Parceira',
+                comissao: 'Valor da Comissão',
+                percentualComissao: 'Variável da Comissão',
+                valorBrutoReceber: 'Valor Bruto a Receber'
+            };
+
+            const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
+            const data = [];
+
+            document.querySelectorAll('#tabelaRelatorio tbody tr').forEach(row => {
+                const rowData = {};
+                row.querySelectorAll('td').forEach((cell, index) => {
+                    rowData[headers[index]] = cell.textContent;
+                });
+                data.push(rowData);
+            });
+
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Relatório de Vendas');
+            XLSX.writeFile(wb, 'relatorio_vendas.xlsx');
+        }
+
+        // Função para formatar valores monetários
+        function formatarMoeda(valor) {
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+        }
+
+        // Função para atualizar o dashboard
+        function atualizarDashboard() {
+            const mesSelecionado = parseInt(document.getElementById('mesFiltro').value);
+            const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
+
+            // Filtrar vendas do mês atual
+            const vendasMesAtual = dados.vendas.filter(venda => {
+                const dataVenda = new Date(venda.data.split('/').reverse().join('-'));
+                return dataVenda.getMonth() === mesSelecionado && dataVenda.getFullYear() === anoSelecionado;
+            });
+
+            // Filtrar vendas do mês anterior
+            const mesAnterior = mesSelecionado === 0 ? 11 : mesSelecionado - 1; // Se o mês atual for janeiro (0), o anterior é dezembro (11)
+            const anoAnterior = mesSelecionado === 0 ? anoSelecionado - 1 : anoSelecionado;
+            const vendasMesAnterior = dados.vendas.filter(venda => {
+                const dataVenda = new Date(venda.data.split('/').reverse().join('-'));
+                return dataVenda.getMonth() === mesAnterior && dataVenda.getFullYear() === anoAnterior;
+            });
+
+            // Calcular totais do mês atual
+            const totalVendasMesAtual = vendasMesAtual.reduce((total, venda) => total + venda.valorVenda, 0);
+            const totalComissoesMesAtual = vendasMesAtual.reduce((total, venda) => total + venda.valorReceber, 0);
+
+            // Calcular totais do mês anterior
+            const totalVendasMesAnterior = vendasMesAnterior.reduce((total, venda) => total + venda.valorVenda, 0);
+            const totalComissoesMesAnterior = vendasMesAnterior.reduce((total, venda) => total + venda.valorReceber, 0);
+
+            // Calcular porcentagens de crescimento
+            const crescimentoVendas = totalVendasMesAnterior !== 0 ?
+                ((totalVendasMesAtual - totalVendasMesAnterior) / totalVendasMesAnterior) * 100 : 0;
+            const crescimentoComissoes = totalComissoesMesAnterior !== 0 ?
+                ((totalComissoesMesAtual - totalComissoesMesAnterior) / totalComissoesMesAnterior) * 100 : 0;
+
+            // Atualizar os textos
+            document.getElementById('totalVendasDash').textContent = formatarMoeda(totalVendasMesAtual);
+            document.getElementById('totalComissoesDash').textContent = formatarMoeda(totalComissoesMesAtual);
+
+            const statChangeVendas = document.querySelector('#dashboard .stat-card:nth-child(1) .stat-change');
+            const statChangeComissoes = document.querySelector('#dashboard .stat-card:nth-child(2) .stat-change');
+
+            statChangeVendas.innerHTML = `
+                <span>${crescimentoVendas >= 0 ? '↑' : '↓'} ${Math.abs(crescimentoVendas).toFixed(2)}%</span>
+                <span>vs. último mês</span>
+            `;
+            statChangeVendas.className = `stat-change ${crescimentoVendas >= 0 ? 'positive' : 'negative'}`;
+
+            statChangeComissoes.innerHTML = `
+                <span>${crescimentoComissoes >= 0 ? '↑' : '↓'} ${Math.abs(crescimentoComissoes).toFixed(2)}%</span>
+                <span>vs. último mês</span>
+            `;
+            statChangeComissoes.className = `stat-change ${crescimentoComissoes >= 0 ? 'positive' : 'negative'}`;
+
+            // Atualizar outras métricas e gráficos
+            atualizarTotalClientes(vendasMesAtual);
+            atualizarTicketMedio(vendasMesAtual);
+            atualizarGraficoVendasPorServico(vendasMesAtual);
+            atualizarGraficoDesempenhoVendedores(vendasMesAtual);
+            atualizarGraficoVendasPorCategoria(vendasMesAtual);
+        }
+
+        // Função para atualizar o total de vendas
+        function atualizarTotalVendas(vendasFiltradas) {
+            const totalVendas = vendasFiltradas.reduce((total, venda) => total + venda.valorVenda, 0);
+            document.getElementById('totalVendasDash').textContent = formatarMoeda(totalVendas);
+        }
+
+        // Função para atualizar o total de comissões
+        function atualizarComissoes(vendasFiltradas) {
+            const totalComissoes = vendasFiltradas.reduce((total, venda) => total + venda.valorReceber, 0);
+            document.getElementById('totalComissoesDash').textContent = formatarMoeda(totalComissoes);
+        }
+
+        // Função para calcular o total de clientes atendidos
+        function atualizarTotalClientes(vendasFiltradas) {
+            const clientesUnicos = new Set(vendasFiltradas.map(venda => venda.nomeCliente));
+            document.getElementById('totalClientes').textContent = clientesUnicos.size;
+        }
+
+        // Função para calcular o ticket médio por venda
+        function atualizarTicketMedio(vendasFiltradas) {
+            const totalVendas = vendasFiltradas.reduce((total, venda) => total + venda.valorVenda, 0);
+            const ticketMedio = vendasFiltradas.length > 0 ? totalVendas / vendasFiltradas.length : 0;
+            document.getElementById('ticketMedio').textContent = formatarMoeda(ticketMedio);
+        }
+
+        // Função para calcular a conversão de vendas por vendedor
+        function atualizarConversaoVendas(vendasFiltradas) {
+            const vendedores = dados.vendedores.map(vendedor => vendedor.nome);
+            const conversao = vendedores.map(vendedor => {
+                const vendasVendedor = vendasFiltradas.filter(venda => venda.vendedor === vendedor);
+                const clientesUnicos = new Set(vendasVendedor.map(venda => venda.nomeCliente));
+                return {
+                    vendedor,
+                    conversao: clientesUnicos.size > 0 ? (vendasVendedor.length / clientesUnicos.size) * 100 : 0
+                };
+            });
+
+            const conversaoMedia = conversao.reduce((total, item) => total + item.conversao, 0) / conversao.length;
+            document.getElementById('conversaoVendas').textContent = `${conversaoMedia.toFixed(2)}%`;
+        }
+
+        // Função para atualizar o gráfico de vendas por serviço
+        function atualizarGraficoVendasPorServico(vendasFiltradas) {
+            const servicosCadastrados = dados.servicos.map(servico => servico.nome);
+            const vendasPorServico = servicosCadastrados.map(servico => {
+                return vendasFiltradas.filter(venda => venda.servico === servico).length;
+            });
+
+            vendasServicoChart.data.labels = servicosCadastrados;
+            vendasServicoChart.data.datasets[0].data = vendasPorServico;
+            vendasServicoChart.update();
+        }
+
+        // Função para atualizar o gráfico de desempenho dos vendedores
+        function atualizarGraficoDesempenhoVendedores(vendasFiltradas) {
+            const vendedores = dados.vendedores.map(vendedor => vendedor.nome);
+            const cores = ['#4f46e5', '#ef4444', '#22c55e', '#f59e0b', '#3b82f6']; // Cores para cada vendedor
+
+            const datasets = vendedores.map((vendedor, index) => {
+                const vendasVendedor = vendasFiltradas.filter(venda => venda.vendedor === vendedor);
+                const totalVendas = vendasVendedor.reduce((total, venda) => total + venda.valorVenda, 0);
+
+                return {
+                    label: vendedor,
+                    data: [totalVendas],
+                    borderColor: cores[index],
+                    fill: false
+                };
+            });
+
+            desempenhoVendedoresChart.data.labels = ['Total de Vendas'];
+            desempenhoVendedoresChart.data.datasets = datasets;
+            desempenhoVendedoresChart.update();
+        }
+
+        // Função para atualizar o gráfico de vendas por categoria de serviço
+        function atualizarGraficoVendasPorCategoria(vendasFiltradas) {
+            const categorias = [...new Set(dados.servicos.map(servico => servico.categoria))];
+            const vendasPorCategoria = categorias.map(categoria => {
+                return vendasFiltradas.filter(venda => {
+                    const servico = dados.servicos.find(s => s.nome === venda.servico);
+                    return servico.categoria === categoria;
+                }).length;
+            });
+
+            vendasCategoriaChart.data.labels = categorias;
+            vendasCategoriaChart.data.datasets[0].data = vendasPorCategoria;
+            vendasCategoriaChart.update();
+        }
+
+        // Inicialização dos gráficos
+        const vendasServicoChart = new Chart(document.getElementById('vendasServicoChart'), {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Vendas',
+                    data: [],
+                    backgroundColor: 'rgba(79, 70, 229, 0.2)',
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const desempenhoVendedoresChart = new Chart(document.getElementById('desempenhoVendedoresChart'), {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: []
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+
+        const vendasCategoriaChart = new Chart(document.getElementById('vendasCategoriaChart'), {
+            type: 'pie',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Vendas por Categoria',
+                    data: [],
+                    backgroundColor: ['#4f46e5', '#ef4444', '#22c55e', '#f59e0b', '#3b82f6'],
+                }]
+            },
+            options: {
+                responsive: true,
+            }
+        });
+
+        // Formatação automática do campo de telefone
+        document.getElementById('telefoneVendedor').addEventListener('input', function (e) {
+            let telefone = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+            if (telefone.length > 0) {
+                telefone = `(${telefone.substring(0, 2)}) ${telefone.substring(2, 7)}-${telefone.substring(7, 11)}`;
+            }
+            e.target.value = telefone;
+        });
+
+        // Atualização do tema com base na cor selecionada
+        function atualizarTema() {
+            const corPrimaria = document.getElementById('corPrimaria').value;
+            const corSecundaria = document.getElementById('corSecundaria').value;
+
+            document.documentElement.style.setProperty('--primary', corPrimaria);
+            document.documentElement.style.setProperty('--primary-light', `${corPrimaria}99`);
+            document.documentElement.style.setProperty('--primary-dark', `${corPrimaria}cc`);
+            document.documentElement.style.setProperty('--secondary', corSecundaria);
+        }
+
+        // Restaurar tema padrão
+        function restaurarTemaPadrao() {
+            document.getElementById('corPrimaria').value = '#4f46e5';
+            document.getElementById('corSecundaria').value = '#64748b';
+            atualizarTema();
+        }
+    </script>
 </body>
 </html>
