@@ -490,136 +490,40 @@ function formatarDataInput(input) {
     input.value = valor;
 }
 
-// Função para ordenar a tabela por coluna
-function ordenarTabela(coluna, ordem) {
-    const tbody = document.querySelector('#tabelaRelatorio tbody');
-    const linhas = Array.from(tbody.querySelectorAll('tr'));
-
-    linhas.sort((a, b) => {
-        const valorA = a.querySelector(`td:nth-child(${coluna + 1})`).textContent;
-        const valorB = b.querySelector(`td:nth-child(${coluna + 1})`).textContent;
-
-        if (!isNaN(valorA) && !isNaN(valorB)) {
-            return ordem === 'asc' ? parseFloat(valorA.replace(/[^0-9,]/g, '').replace(',', '.')) - parseFloat(valorB.replace(/[^0-9,]/g, '').replace(',', '.')) :
-                parseFloat(valorB.replace(/[^0-9,]/g, '').replace(',', '.')) - parseFloat(valorA.replace(/[^0-9,]/g, '').replace(',', '.'));
-        } else {
-            return ordem === 'asc' ? valorA.localeCompare(valorB) : valorB.localeCompare(valorA);
-        }
-    });
-
-    tbody.innerHTML = '';
-    linhas.forEach(linha => tbody.appendChild(linha));
+// Função para formatar o campo "Comissão" como porcentagem
+function formatarPorcentagem(e) {
+    let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+    valor = (Number(valor) / 100).toFixed(2); // Formata com duas casas decimais
+    e.target.value = valor ? `${valor}%` : ''; // Adiciona o símbolo "%"
 }
 
-// Adiciona evento de clique nas colunas para ordenação
-document.addEventListener('click', function (e) {
-    if (e.target.tagName === 'TH') {
-        const coluna = Array.from(e.target.parentNode.children).indexOf(e.target);
-        const ordemAtual = e.target.getAttribute('data-ordem') || 'asc';
-        const novaOrdem = ordemAtual === 'asc' ? 'desc' : 'asc';
+// Função para formatar o campo "Comissão" como moeda (R$)
+function formatarMoedaInput(e) {
+    let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+    valor = (Number(valor) / 100).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
+    e.target.value = valor;
+}
 
-        // Remove a ordenação de outras colunas
-        document.querySelectorAll('#tabelaRelatorio th').forEach(th => th.removeAttribute('data-ordem'));
+// Função para atualizar o campo "Comissão" com base no tipo de comissão
+document.getElementById('servicoVenda').addEventListener('change', function () {
+    const servicoId = this.value;
+    const servico = dados.servicos.find(s => s.id == servicoId);
+    const comissaoInput = document.getElementById('comissao');
 
-        // Define a nova ordem
-        e.target.setAttribute('data-ordem', novaOrdem);
-        ordenarTabela(coluna, novaOrdem);
+    if (servico) {
+        if (servico.tipoComissao === 'porcentagem') {
+            comissaoInput.placeholder = '0,00%';
+            comissaoInput.addEventListener('input', formatarPorcentagem);
+        } else {
+            comissaoInput.placeholder = 'R$ 0,00';
+            comissaoInput.removeEventListener('input', formatarPorcentagem);
+            comissaoInput.addEventListener('input', formatarMoedaInput);
+        }
     }
 });
-
-// Função para filtrar e gerar o relatório
-function filtrarRelatorio() {
-    const dataInicial = document.getElementById('dataInicial').value;
-    const dataFinal = document.getElementById('dataFinal').value;
-    const vendedorId = document.getElementById('filtroVendedor').value;
-    const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
-
-    const vendasFiltradas = dados.vendas.filter(venda => {
-        const dataVenda = new Date(venda.data.split('/').reverse().join('-'));
-        const dataInicialFiltro = new Date(dataInicial.split('/').reverse().join('-'));
-        const dataFinalFiltro = new Date(dataFinal.split('/').reverse().join('-'));
-
-        const filtroData = (!dataInicial || dataVenda >= dataInicialFiltro) && (!dataFinal || dataVenda <= dataFinalFiltro);
-        const filtroVendedor = !vendedorId || venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
-
-        return filtroData && filtroVendedor;
-    });
-
-    const colunas = {
-        data: 'Data da Venda',
-        vendedor: 'Nome do Vendedor',
-        servico: 'Serviço Vendido',
-        tipoComissao: 'Tipo de Comissão',
-        nomeCliente: 'Nome do Cliente',
-        empresaParceira: 'Empresa Parceira',
-        comissao: 'Valor da Comissão',
-        percentualComissao: 'Variável da Comissão',
-        valorBrutoReceber: 'Valor Bruto a Receber'
-    };
-
-    const thead = document.querySelector('#tabelaRelatorio thead');
-    const tbody = document.querySelector('#tabelaRelatorio tbody');
-    const tfoot = document.querySelector('#tabelaRelatorio tfoot');
-
-    thead.innerHTML = '';
-    tbody.innerHTML = '';
-    tfoot.innerHTML = '';
-
-    const headerRow = document.createElement('tr');
-    colunasSelecionadas.forEach(coluna => {
-        const th = document.createElement('th');
-        th.textContent = colunas[coluna];
-        headerRow.appendChild(th);
-    });
-    thead.appendChild(headerRow);
-
-    let totalComissao = 0;
-    let totalValorBrutoReceber = 0;
-
-    vendasFiltradas.forEach(venda => {
-        const row = document.createElement('tr');
-        colunasSelecionadas.forEach(coluna => {
-            const td = document.createElement('td');
-            let valor = venda[coluna];
-
-            if (coluna === 'percentualComissao') {
-                const servico = dados.servicos.find(s => s.nome === venda.servico);
-                if (servico.tipoComissao === 'porcentagem') {
-                    valor = `${venda.comissao}%`;
-                } else if (servico.tipoComissao === 'fixa') {
-                    valor = formatarMoeda(venda.comissao);
-                }
-            } else if (coluna === 'comissao') {
-                const servico = dados.servicos.find(s => s.nome === venda.servico);
-                if (servico.tipoComissao === 'porcentagem') {
-                    valor = formatarMoeda(venda.valorReceber * (venda.comissao / 100));
-                } else if (servico.tipoComissao === 'fixa') {
-                    valor = formatarMoeda(venda.comissao);
-                }
-                totalComissao += parseFloat(valor.replace(/[^0-9,]/g, '').replace(',', '.'));
-            } else if (coluna === 'valorBrutoReceber') {
-                valor = formatarMoeda(venda.valorReceber);
-                totalValorBrutoReceber += venda.valorReceber;
-            } else if (coluna === 'data') {
-                valor = venda.data;
-            }
-
-            td.textContent = valor;
-            row.appendChild(td);
-        });
-        tbody.appendChild(row);
-    });
-
-    // Atualizar totais no rodapé da tabela
-    tfoot.innerHTML = `
-        <tr>
-            <td colspan="${colunasSelecionadas.length - 2}" style="text-align: right;"><strong>Total da Comissão:</strong></td>
-            <td>${formatarMoeda(totalComissao)}</td>
-            <td colspan="2" style="text-align: right;"><strong>Total Valor Bruto a Receber:</strong></td>
-            <td>${formatarMoeda(totalValorBrutoReceber)}</td>
-        </tr>
-    `;
-}
 
 // Função para formatar valores monetários
 function formatarMoeda(valor) {
