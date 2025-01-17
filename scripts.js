@@ -1,636 +1,333 @@
-const { jsPDF } = window.jspdf;
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Gestão de Vendas</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="dashboard-header">
+            <h1 class="dashboard-title">Dashboard de Gestão de Vendas</h1>
+            <nav class="navigation">
+                <button class="nav-button active" onclick="showTab('dashboard')">Dashboard</button>
+                <button class="nav-button" onclick="showTab('cadastros')">Cadastros</button>
+                <button class="nav-button" onclick="showTab('vendas')">Vendas</button>
+                <button class="nav-button" onclick="showTab('relatorios')">Relatórios</button>
+            </nav>
+        </header>
 
-let dados = {
-    vendas: [],
-    vendedores: [],
-    servicos: [],
-    empresasParceiras: []
-};
+        <!-- Dashboard -->
+        <div id="dashboard" class="tab-content active">
+            <div class="filtro-data">
+                <label for="mesFiltro">Selecione o mês:</label>
+                <select id="mesFiltro" onchange="atualizarDashboard()">
+                    <option value="0">Janeiro</option>
+                    <option value="1">Fevereiro</option>
+                    <option value="2">Março</option>
+                    <option value="3">Abril</option>
+                    <option value="4">Maio</option>
+                    <option value="5">Junho</option>
+                    <option value="6">Julho</option>
+                    <option value="7">Agosto</option>
+                    <option value="8">Setembro</option>
+                    <option value="9">Outubro</option>
+                    <option value="10">Novembro</option>
+                    <option value="11">Dezembro</option>
+                </select>
 
-// Função para alternar entre as abas
-function showTab(tabId) {
-    const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => tab.classList.remove('active'));
+                <label for="anoFiltro">Selecione o ano:</label>
+                <select id="anoFiltro" onchange="atualizarDashboard()">
+                    <!-- Os anos serão preenchidos dinamicamente via JavaScript -->
+                </select>
+            </div>
 
-    document.getElementById(tabId).classList.add('active');
-
-    const buttons = document.querySelectorAll('.nav-button');
-    buttons.forEach(button => button.classList.remove('active'));
-    document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
-}
-
-// Inicializa a aba "Dashboard" como ativa ao carregar a página
-document.addEventListener('DOMContentLoaded', function () {
-    showTab('dashboard');
-    preencherAnos();
-    atualizarOpcoesVendedores();
-    atualizarOpcoesServicos();
-    atualizarOpcoesEmpresas();
-});
-
-// Função para preencher o seletor de anos
-function preencherAnos() {
-    const selectAno = document.getElementById('anoFiltro');
-    selectAno.innerHTML = '';
-
-    // Extrair anos únicos das vendas
-    const anosUnicos = [...new Set(dados.vendas.map(venda => new Date(venda.data.split('/').reverse().join('-')).getFullYear()))];
-    anosUnicos.sort((a, b) => b - a); // Ordenar do ano mais recente para o mais antigo
-
-    // Adicionar opções ao seletor
-    anosUnicos.forEach(ano => {
-        const option = document.createElement('option');
-        option.value = ano;
-        option.textContent = ano;
-        selectAno.appendChild(option);
-    });
-
-    // Selecionar o ano atual por padrão
-    const anoAtual = new Date().getFullYear();
-    selectAno.value = anoAtual;
-}
-
-// Função para atualizar as opções de vendedores
-function atualizarOpcoesVendedores() {
-    const selectVendedor = document.getElementById('vendedorVenda');
-    selectVendedor.innerHTML = '<option value="">Selecione um vendedor</option>';
-    dados.vendedores.forEach(vendedor => {
-        const option = document.createElement('option');
-        option.value = vendedor.id;
-        option.textContent = vendedor.nome;
-        selectVendedor.appendChild(option);
-    });
-
-    const filtroVendedor = document.getElementById('filtroVendedor');
-    filtroVendedor.innerHTML = '<option value="">Todos</option>';
-    dados.vendedores.forEach(vendedor => {
-        const option = document.createElement('option');
-        option.value = vendedor.id;
-        option.textContent = vendedor.nome;
-        filtroVendedor.appendChild(option);
-    });
-}
-
-// Função para atualizar as opções de serviços
-function atualizarOpcoesServicos() {
-    const selectServico = document.getElementById('servicoVenda');
-    selectServico.innerHTML = '<option value="">Selecione um serviço</option>';
-    dados.servicos.forEach(servico => {
-        const option = document.createElement('option');
-        option.value = servico.id;
-        option.textContent = servico.nome;
-        selectServico.appendChild(option);
-    });
-}
-
-// Função para atualizar as opções de empresas parceiras
-function atualizarOpcoesEmpresas() {
-    const selectEmpresa = document.getElementById('empresaParceira');
-    selectEmpresa.innerHTML = '<option value="">Selecione uma empresa parceira</option>';
-    dados.empresasParceiras.forEach(empresa => {
-        const option = document.createElement('option');
-        option.value = empresa.id;
-        option.textContent = empresa.nome;
-        selectEmpresa.appendChild(option);
-    });
-}
-
-// Função para cadastrar vendedor
-document.getElementById('vendedorForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const nomeVendedor = document.getElementById('nomeVendedor').value;
-    const emailVendedor = document.getElementById('emailVendedor').value;
-    const telefoneVendedor = document.getElementById('telefoneVendedor').value;
-
-    const novoVendedor = {
-        id: dados.vendedores.length + 1,
-        nome: nomeVendedor,
-        email: emailVendedor,
-        telefone: telefoneVendedor
-    };
-
-    dados.vendedores.push(novoVendedor);
-    atualizarListaVendedores();
-    atualizarOpcoesVendedores();
-    alert('Vendedor cadastrado com sucesso!');
-    limparCamposVendedor();
-});
-
-// Função para limpar campos do formulário de vendedor
-function limparCamposVendedor() {
-    document.getElementById('nomeVendedor').value = '';
-    document.getElementById('emailVendedor').value = '';
-    document.getElementById('telefoneVendedor').value = '';
-}
-
-// Função para atualizar a lista de vendedores
-function atualizarListaVendedores() {
-    const listaVendedores = document.getElementById('vendedoresList');
-    listaVendedores.innerHTML = '';
-
-    dados.vendedores.forEach(vendedor => {
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.innerHTML = `
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <strong>${vendedor.nome}</strong><br>
-                    <small>${vendedor.email} - ${vendedor.telefone}</small>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-title">Total de Vendas</div>
+                    <div class="stat-value" id="totalVendasDash">R$ 0,00</div>
+                    <div class="stat-change positive">
+                        <span>↑ 12%</span>
+                        <span>vs. último mês</span>
+                    </div>
                 </div>
-                <div>
-                    <button class="btn btn-sm btn-secondary" onclick="editarVendedor(${vendedor.id})">Editar</button>
-                    <button class="btn btn-sm btn-danger" onclick="excluirVendedor(${vendedor.id})">Excluir</button>
+                <div class="stat-card">
+                    <div class="stat-title">Comissões</div>
+                    <div class="stat-value" id="totalComissoesDash">R$ 0,00</div>
+                    <div class="stat-change positive">
+                        <span>↑ 8%</span>
+                        <span>vs. último mês</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Clientes Atendidos</div>
+                    <div class="stat-value" id="totalClientes">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-title">Ticket Médio</div>
+                    <div class="stat-value" id="ticketMedio">R$ 0,00</div>
                 </div>
             </div>
-        `;
-        listaVendedores.appendChild(li);
-    });
-}
 
-// Função para editar vendedor
-function editarVendedor(id) {
-    const vendedor = dados.vendedores.find(v => v.id === id);
-    if (vendedor) {
-        const listaVendedores = document.getElementById('vendedoresList');
-        listaVendedores.innerHTML = '';
-
-        dados.vendedores.forEach(v => {
-            const li = document.createElement('li');
-            li.className = 'list-group-item';
-
-            if (v.id === id) {
-                li.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <input type="text" id="editNomeVendedor" value="${v.nome}" class="form-input">
-                            <input type="email" id="editEmailVendedor" value="${v.email}" class="form-input">
-                            <input type="tel" id="editTelefoneVendedor" value="${v.telefone}" class="form-input">
-                        </div>
-                        <div>
-                            <button class="btn btn-sm btn-success" onclick="salvarEdicaoVendedor(${v.id})">Salvar</button>
-                            <button class="btn btn-sm btn-danger" onclick="cancelarEdicao()">Cancelar</button>
+            <div class="grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Vendas por Serviço</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="vendasServicoChart"></canvas>
                         </div>
                     </div>
-                `;
-            } else {
-                li.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>${v.nome}</strong><br>
-                            <small>${v.email} - ${v.telefone}</small>
-                        </div>
-                        <div>
-                            <button class="btn btn-sm btn-secondary" onclick="editarVendedor(${v.id})">Editar</button>
-                            <button class="btn btn-sm btn-danger" onclick="excluirVendedor(${v.id})">Excluir</button>
-                        </div>
-                    </div>
-                `;
-            }
-            listaVendedores.appendChild(li);
-        });
-    }
-}
-
-// Função para salvar a edição do vendedor
-function salvarEdicaoVendedor(id) {
-    const vendedor = dados.vendedores.find(v => v.id === id);
-    if (vendedor) {
-        vendedor.nome = document.getElementById('editNomeVendedor').value;
-        vendedor.email = document.getElementById('editEmailVendedor').value;
-        vendedor.telefone = document.getElementById('editTelefoneVendedor').value;
-        atualizarListaVendedores();
-        alert('Vendedor atualizado com sucesso!');
-    }
-}
-
-// Função para cancelar a edição
-function cancelarEdicao() {
-    atualizarListaVendedores();
-}
-
-// Função para excluir vendedor
-function excluirVendedor(id) {
-    dados.vendedores = dados.vendedores.filter(v => v.id !== id);
-    atualizarListaVendedores();
-    atualizarOpcoesVendedores();
-    alert('Vendedor excluído com sucesso!');
-}
-
-// Função para cadastrar serviço
-document.getElementById('servicoForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const nomeServico = document.getElementById('nomeServico').value;
-    const categoriaServico = document.getElementById('categoriaServico').value;
-    const tipoComissao = document.getElementById('tipoComissao').value;
-
-    const novoServico = {
-        id: dados.servicos.length + 1,
-        nome: nomeServico,
-        categoria: categoriaServico,
-        tipoComissao: tipoComissao
-    };
-
-    dados.servicos.push(novoServico);
-    atualizarListaServicos();
-    atualizarOpcoesServicos();
-    alert('Serviço cadastrado com sucesso!');
-    limparCamposServico();
-});
-
-// Função para limpar campos do formulário de serviço
-function limparCamposServico() {
-    document.getElementById('nomeServico').value = '';
-    document.getElementById('categoriaServico').value = '';
-    document.getElementById('tipoComissao').value = 'fixa';
-}
-
-// Função para atualizar a lista de serviços
-function atualizarListaServicos() {
-    const listaServicos = document.getElementById('servicosList');
-    listaServicos.innerHTML = '';
-
-    dados.servicos.forEach(servico => {
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.innerHTML = `
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <strong>${servico.nome}</strong><br>
-                    <small>Categoria: ${servico.categoria} - Tipo de Comissão: ${servico.tipoComissao}</small>
                 </div>
-                <div>
-                    <button class="btn btn-sm btn-secondary" onclick="editarServico(${servico.id})">Editar</button>
-                    <button class="btn btn-sm btn-danger" onclick="excluirServico(${servico.id})">Excluir</button>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Desempenho dos Vendedores</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="desempenhoVendedoresChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Vendas por Categoria de Serviço</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="vendasCategoriaChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
-        `;
-        listaServicos.appendChild(li);
-    });
-}
 
-// Função para editar serviço
-function editarServico(id) {
-    const servico = dados.servicos.find(s => s.id === id);
-    if (servico) {
-        const listaServicos = document.getElementById('servicosList');
-        listaServicos.innerHTML = '';
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Personalizar Tema</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Cor Primária</label>
+                        <input type="color" id="corPrimaria" value="#4f46e5" onchange="atualizarTema()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cor Secundária</label>
+                        <input type="color" id="corSecundaria" value="#64748b" onchange="atualizarTema()">
+                    </div>
+                    <button class="btn btn-secondary" onclick="restaurarTemaPadrao()">Restaurar Cores Padrão</button>
+                </div>
+            </div>
+        </div>
 
-        dados.servicos.forEach(s => {
-            const li = document.createElement('li');
-            li.className = 'list-group-item';
+        <!-- Cadastros -->
+        <div id="cadastros" class="tab-content">
+            <div class="grid">
+                <!-- Cadastro de Vendedor -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Cadastro de Vendedor</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="vendedorForm">
+                            <div class="form-group">
+                                <label class="form-label">Nome do Vendedor</label>
+                                <input type="text" id="nomeVendedor" class="form-input" placeholder="Digite o nome do vendedor" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" id="emailVendedor" class="form-input" placeholder="Digite o email do vendedor" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Telefone</label>
+                                <input type="tel" id="telefoneVendedor" class="form-input" placeholder="(XX) XXXXX-XXXX">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cadastrar Vendedor</button>
+                        </form>
+                        <div id="listaVendedores" class="mt-4">
+                            <h3>Vendedores Cadastrados</h3>
+                            <input type="text" id="filtroVendedores" placeholder="Pesquisar vendedor..." class="form-input">
+                            <ul id="vendedoresList" class="list-group"></ul>
+                        </div>
+                    </div>
+                </div>
 
-            if (s.id === id) {
-                li.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <input type="text" id="editNomeServico" value="${s.nome}" class="form-input">
-                            <input type="text" id="editCategoriaServico" value="${s.categoria}" class="form-input">
-                            <select id="editTipoComissao" class="form-select">
-                                <option value="fixa" ${s.tipoComissao === 'fixa' ? 'selected' : ''}>Fixa</option>
-                                <option value="porcentagem" ${s.tipoComissao === 'porcentagem' ? 'selected' : ''}>Porcentagem</option>
+                <!-- Cadastro de Serviço -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Cadastro de Serviço</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="servicoForm">
+                            <div class="form-group">
+                                <label class="form-label">Nome do Serviço</label>
+                                <input type="text" id="nomeServico" class="form-input" placeholder="Digite o nome do serviço" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Categoria</label>
+                                <input type="text" id="categoriaServico" class="form-input" placeholder="Digite a categoria do serviço" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tipo de Comissão</label>
+                                <select id="tipoComissao" class="form-select" required>
+                                    <option value="fixa">Fixa</option>
+                                    <option value="porcentagem">Porcentagem</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cadastrar Serviço</button>
+                        </form>
+                        <div id="listaServicos" class="mt-4">
+                            <h3>Serviços Cadastrados</h3>
+                            <input type="text" id="filtroServicos" placeholder="Pesquisar serviço..." class="form-input">
+                            <ul id="servicosList" class="list-group"></ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cadastro de Empresa Parceira -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Cadastro de Empresa Parceira</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="empresaForm">
+                            <div class="form-group">
+                                <label class="form-label">Nome da Empresa</label>
+                                <input type="text" id="nomeEmpresa" class="form-input" placeholder="Digite o nome da empresa" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cadastrar Empresa</button>
+                        </form>
+                        <div id="listaEmpresas" class="mt-4">
+                            <h3>Empresas Parceiras Cadastradas</h3>
+                            <input type="text" id="filtroEmpresas" placeholder="Pesquisar empresa..." class="form-input">
+                            <ul id="empresasList" class="list-group"></ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vendas -->
+        <div id="vendas" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Registrar Venda</h2>
+                </div>
+                <div class="card-body">
+                    <form id="vendaForm">
+                        <div class="form-group">
+                            <label class="form-label">Vendedor</label>
+                            <select id="vendedorVenda" class="form-select" required>
+                                <option value="">Selecione um vendedor</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
                             </select>
                         </div>
-                        <div>
-                            <button class="btn btn-sm btn-success" onclick="salvarEdicaoServico(${s.id})">Salvar</button>
-                            <button class="btn btn-sm btn-danger" onclick="cancelarEdicao()">Cancelar</button>
+                        <div class="form-group">
+                            <label class="form-label">Serviço</label>
+                            <select id="servicoVenda" class="form-select" required onchange="atualizarTipoComissao()">
+                                <option value="">Selecione um serviço</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                            <small id="tipoComissaoInfo" class="form-text"></small>
                         </div>
-                    </div>
-                `;
-            } else {
-                li.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>${s.nome}</strong><br>
-                            <small>Categoria: ${s.categoria} - Tipo de Comissão: ${s.tipoComissao}</small>
+                        <div class="form-group">
+                            <label class="form-label">Data da Venda</label>
+                            <input type="text" id="dataVenda" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)" required>
                         </div>
-                        <div>
-                            <button class="btn btn-sm btn-secondary" onclick="editarServico(${s.id})">Editar</button>
-                            <button class="btn btn-sm btn-danger" onclick="excluirServico(${s.id})">Excluir</button>
+                        <div class="form-group">
+                            <label class="form-label">Nome do Cliente</label>
+                            <input type="text" id="nomeCliente" class="form-input" placeholder="Digite o nome do cliente" required>
                         </div>
-                    </div>
-                `;
-            }
-            listaServicos.appendChild(li);
-        });
-    }
-}
-
-// Função para salvar a edição do serviço
-function salvarEdicaoServico(id) {
-    const servico = dados.servicos.find(s => s.id === id);
-    if (servico) {
-        servico.nome = document.getElementById('editNomeServico').value;
-        servico.categoria = document.getElementById('editCategoriaServico').value;
-        servico.tipoComissao = document.getElementById('editTipoComissao').value;
-        atualizarListaServicos();
-        alert('Serviço atualizado com sucesso!');
-    }
-}
-
-// Função para excluir serviço
-function excluirServico(id) {
-    dados.servicos = dados.servicos.filter(s => s.id !== id);
-    atualizarListaServicos();
-    atualizarOpcoesServicos();
-    alert('Serviço excluído com sucesso!');
-}
-
-// Função para cadastrar empresa parceira
-document.getElementById('empresaForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const nomeEmpresa = document.getElementById('nomeEmpresa').value;
-
-    const novaEmpresa = {
-        id: dados.empresasParceiras.length + 1,
-        nome: nomeEmpresa
-    };
-
-    dados.empresasParceiras.push(novaEmpresa);
-    atualizarListaEmpresas();
-    atualizarOpcoesEmpresas();
-    alert('Empresa cadastrada com sucesso!');
-    limparCamposEmpresa();
-});
-
-// Função para limpar campos do formulário de empresa
-function limparCamposEmpresa() {
-    document.getElementById('nomeEmpresa').value = '';
-}
-
-// Função para atualizar a lista de empresas parceiras
-function atualizarListaEmpresas() {
-    const listaEmpresas = document.getElementById('empresasList');
-    listaEmpresas.innerHTML = '';
-
-    dados.empresasParceiras.forEach(empresa => {
-        const li = document.createElement('li');
-        li.className = 'list-group-item';
-        li.innerHTML = `
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <strong>${empresa.nome}</strong>
-                </div>
-                <div>
-                    <button class="btn btn-sm btn-secondary" onclick="editarEmpresa(${empresa.id})">Editar</button>
-                    <button class="btn btn-sm btn-danger" onclick="excluirEmpresa(${empresa.id})">Excluir</button>
+                        <div class="form-group">
+                            <label class="form-label">Empresa Parceira</label>
+                            <select id="empresaParceira" class="form-select" required>
+                                <option value="">Selecione uma empresa parceira</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Valor da Venda</label>
+                            <input type="text" id="valorVenda" class="form-input" placeholder="R$ 0,00" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Valor a Receber</label>
+                            <input type="text" id="valorReceber" class="form-input" placeholder="R$ 0,00" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Comissão</label>
+                            <small id="tipoComissaoInfo" class="form-text"></small>
+                            <input type="text" id="comissao" class="form-input" placeholder="0,00" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Registrar Venda</button>
+                    </form>
                 </div>
             </div>
-        `;
-        listaEmpresas.appendChild(li);
-    });
-}
+        </div>
 
-// Função para editar empresa parceira
-function editarEmpresa(id) {
-    const empresa = dados.empresasParceiras.find(e => e.id === id);
-    if (empresa) {
-        const listaEmpresas = document.getElementById('empresasList');
-        listaEmpresas.innerHTML = '';
-
-        dados.empresasParceiras.forEach(e => {
-            const li = document.createElement('li');
-            li.className = 'list-group-item';
-
-            if (e.id === id) {
-                li.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <input type="text" id="editNomeEmpresa" value="${e.nome}" class="form-input">
+        <!-- Relatórios -->
+        <div id="relatorios" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Relatório de Vendas</h2>
+                    <button class="btn btn-secondary" onclick="exportarRelatorioExcel()">Exportar Excel</button>
+                </div>
+                <div class="card-body">
+                    <div class="filters">
+                        <div class="form-group">
+                            <label class="form-label">Data Inicial</label>
+                            <input type="text" id="dataInicial" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
                         </div>
-                        <div>
-                            <button class="btn btn-sm btn-success" onclick="salvarEdicaoEmpresa(${e.id})">Salvar</button>
-                            <button class="btn btn-sm btn-danger" onclick="cancelarEdicao()">Cancelar</button>
+                        <div class="form-group">
+                            <label class="form-label">Data Final</label>
+                            <input type="text" id="dataFinal" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Vendedor</label>
+                            <select id="filtroVendedor" class="form-select">
+                                <option value="">Todos</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Colunas</label>
+                            <small class="form-text">(Pressione Ctrl para selecionar mais de um item)</small>
+                            <select id="filtroColunas" class="form-select" multiple>
+                                <option value="data" selected>Data da Venda</option>
+                                <option value="vendedor" selected>Nome do Vendedor</option>
+                                <option value="servico" selected>Serviço Vendido</option>
+                                <option value="tipoComissao" selected>Tipo de Comissão</option>
+                                <option value="nomeCliente" selected>Nome do Cliente</option>
+                                <option value="empresaParceira" selected>Empresa Parceira</option>
+                                <option value="comissao" selected>Valor da Comissão</option>
+                                <option value="percentualComissao" selected>Variável da Comissão</option>
+                                <option value="valorBrutoReceber" selected>Valor Bruto a Receber</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="filtrarRelatorio()">Gerar</button>
                     </div>
-                `;
-            } else {
-                li.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>${e.nome}</strong>
-                        </div>
-                        <div>
-                            <button class="btn btn-sm btn-secondary" onclick="editarEmpresa(${e.id})">Editar</button>
-                            <button class="btn btn-sm btn-danger" onclick="excluirEmpresa(${e.id})">Excluir</button>
-                        </div>
-                    </div>
-                `;
-            }
-            listaEmpresas.appendChild(li);
-        });
-    }
-}
+                    <table id="tabelaRelatorio">
+                        <thead>
+                            <!-- As colunas serão preenchidas dinamicamente via JavaScript -->
+                        </thead>
+                        <tbody>
+                            <!-- As linhas da tabela serão preenchidas dinamicamente via JavaScript -->
+                        </tbody>
+                        <tfoot>
+                            <!-- O rodapé será preenchido dinamicamente via JavaScript -->
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
 
-// Função para salvar a edição da empresa
-function salvarEdicaoEmpresa(id) {
-    const empresa = dados.empresasParceiras.find(e => e.id === id);
-    if (empresa) {
-        empresa.nome = document.getElementById('editNomeEmpresa').value;
-        atualizarListaEmpresas();
-        alert('Empresa atualizada com sucesso!');
-    }
-}
-
-// Função para excluir empresa parceira
-function excluirEmpresa(id) {
-    dados.empresasParceiras = dados.empresasParceiras.filter(e => e.id !== id);
-    atualizarListaEmpresas();
-    atualizarOpcoesEmpresas();
-    alert('Empresa excluída com sucesso!');
-}
-
-// Função para registrar venda
-document.getElementById('vendaForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const vendedorId = document.getElementById('vendedorVenda').value;
-    const servicoId = document.getElementById('servicoVenda').value;
-    const dataVenda = document.getElementById('dataVenda').value;
-    const nomeCliente = document.getElementById('nomeCliente').value;
-    const empresaParceiraId = document.getElementById('empresaParceira').value;
-    const valorVenda = parseFloat(document.getElementById('valorVenda').value.replace(/[^0-9,]/g, '').replace(',', '.'));
-    const valorReceber = parseFloat(document.getElementById('valorReceber').value.replace(/[^0-9,]/g, '').replace(',', '.'));
-    const comissao = parseFloat(document.getElementById('comissao').value.replace(/[^0-9,]/g, '').replace(',', '.'));
-
-    const vendedor = dados.vendedores.find(v => v.id == vendedorId);
-    const servico = dados.servicos.find(s => s.id == servicoId);
-    const empresaParceira = dados.empresasParceiras.find(e => e.id == empresaParceiraId);
-
-    if (!vendedor || !servico || !empresaParceira) {
-        alert('Por favor, selecione um vendedor, serviço e empresa parceira válidos.');
-        return;
-    }
-
-    const novaVenda = {
-        id: dados.vendas.length + 1,
-        vendedor: vendedor.nome,
-        servico: servico.nome,
-        data: dataVenda,
-        nomeCliente: nomeCliente,
-        empresaParceira: empresaParceira.nome,
-        valorVenda: valorVenda,
-        valorReceber: valorReceber,
-        comissao: comissao,
-        tipoComissao: servico.tipoComissao
-    };
-
-    dados.vendas.push(novaVenda);
-    alert('Venda registrada com sucesso!');
-    atualizarDashboard();
-});
-
-// Função para formatar automaticamente a data (dd/mm/aaaa)
-function formatarDataInput(input) {
-    let valor = input.value.replace(/\D/g, ''); // Remove tudo que não for número
-    if (valor.length > 2) {
-        valor = valor.replace(/^(\d{2})(\d{0,2})/, '$1/$2'); // Adiciona barra após o dia
-    }
-    if (valor.length > 5) {
-        valor = valor.replace(/^(\d{2})\/(\d{2})(\d{0,4})/, '$1/$2/$3'); // Adiciona barra após o mês
-    }
-    input.value = valor;
-}
-
-// Função para formatar o campo "Comissão" como porcentagem
-function formatarPorcentagem(e) {
-    let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
-    valor = (Number(valor) / 100).toFixed(2); // Formata com duas casas decimais
-    e.target.value = valor ? `${valor}%` : ''; // Adiciona o símbolo "%"
-}
-
-// Função para formatar o campo "Comissão" como moeda (R$)
-function formatarMoedaInput(e) {
-    let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
-    valor = (Number(valor) / 100).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    });
-    e.target.value = valor;
-}
-
-// Função para atualizar o campo "Comissão" com base no tipo de comissão
-document.getElementById('servicoVenda').addEventListener('change', function () {
-    const servicoId = this.value;
-    const servico = dados.servicos.find(s => s.id == servicoId);
-    const comissaoInput = document.getElementById('comissao');
-
-    if (servico) {
-        if (servico.tipoComissao === 'porcentagem') {
-            comissaoInput.placeholder = '0,00%';
-            comissaoInput.addEventListener('input', formatarPorcentagem);
-        } else {
-            comissaoInput.placeholder = 'R$ 0,00';
-            comissaoInput.removeEventListener('input', formatarPorcentagem);
-            comissaoInput.addEventListener('input', formatarMoedaInput);
-        }
-    }
-});
-
-// Função para formatar valores monetários
-function formatarMoeda(valor) {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
-}
-
-// Função para exportar relatório em Excel
-function exportarRelatorioExcel() {
-    const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
-    const colunas = {
-        data: 'Data da Venda',
-        vendedor: 'Nome do Vendedor',
-        servico: 'Serviço Vendido',
-        tipoComissao: 'Tipo de Comissão',
-        nomeCliente: 'Nome do Cliente',
-        empresaParceira: 'Empresa Parceira',
-        comissao: 'Valor da Comissão',
-        percentualComissao: 'Variável da Comissão',
-        valorBrutoReceber: 'Valor Bruto a Receber'
-    };
-
-    const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
-    const data = [];
-
-    document.querySelectorAll('#tabelaRelatorio tbody tr').forEach(row => {
-        const rowData = {};
-        row.querySelectorAll('td').forEach((cell, index) => {
-            rowData[headers[index]] = cell.textContent;
-        });
-        data.push(rowData);
-    });
-
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Relatório de Vendas');
-    XLSX.writeFile(wb, 'relatorio_vendas.xlsx');
-}
-
-// Função para atualizar o tipo de comissão ao selecionar um serviço
-function atualizarTipoComissao() {
-    const servicoId = document.getElementById('servicoVenda').value;
-    const servico = dados.servicos.find(s => s.id == servicoId);
-
-    if (servico) {
-        const tipoComissaoInfo = document.getElementById('tipoComissaoInfo');
-        tipoComissaoInfo.textContent = `Tipo de Comissão: ${servico.tipoComissao === 'fixa' ? 'Fixa' : 'Porcentagem'}`;
-    } else {
-        document.getElementById('tipoComissaoInfo').textContent = '';
-    }
-}
-
-// Formatação automática do campo "Valor da Venda"
-document.getElementById('valorVenda').addEventListener('input', function (e) {
-    let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
-    valor = (Number(valor) / 100).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    });
-    e.target.value = valor;
-});
-
-// Formatação automática do campo "Valor a Receber"
-document.getElementById('valorReceber').addEventListener('input', function (e) {
-    let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
-    valor = (Number(valor) / 100).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    });
-    e.target.value = valor;
-});
-
-// Formatação automática do campo "Comissão"
-document.getElementById('comissao').addEventListener('input', function (e) {
-    let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
-    valor = (Number(valor) / 100).toLocaleString('pt-BR', {
-        style: 'currency',
-        currency: 'BRL'
-    });
-    e.target.value = valor;
-});
-
-// Atualizar o campo de data para o formato dd/mm/aaaa
-document.getElementById('dataVenda').addEventListener('change', function (e) {
-    const dataFormatada = formatarData(e.target.value);
-    e.target.value = dataFormatada;
-});
-
-// Função para formatar a data no padrão dd/mm/aaaa
-function formatarData(data) {
-    const [ano, mes, dia] = data.split('-');
-    return `${dia}/${mes}/${ano}`;
-}
-
-// Função para atualizar o tema com base na cor selecionada
-function atualizarTema() {
-    const corPrimaria = document.getElementById('corPrimaria').value;
-    const corSecundaria = document.getElementById('corSecundaria').value;
-
-    document.documentElement.style.setProperty('--primary', corPrimaria);
-    document.documentElement.style.setProperty('--primary-light', `${corPrimaria}99`);
-    document.documentElement.style.setProperty('--primary-dark', `${corPrimaria}cc`);
-    document.documentElement.style.setProperty('--secondary', corSecundaria);
-}
-
-// Restaurar tema padrão
-function restaurarTemaPadrao() {
-    document.getElementById('corPrimaria').value = '#4f46e5';
-    document.getElementById('corSecundaria').value = '#64748b';
-    atualizarTema();
-}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="scripts.js"></script>
+</body>
+</html>
