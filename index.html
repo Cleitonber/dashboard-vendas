@@ -480,7 +480,7 @@
                             </div>
                             <div class="form-group">
                                 <label class="form-label">Telefone</label>
-                                <input type="tel" id="telefoneVendedor" class="form-input" placeholder="(XX) XXXXX-XXXX">
+                                <input type="tel" id="telefoneVendedor" class="form-input" placeholder="(XX) XXXXX-XXXX" oninput="formatarTelefone(this)">
                             </div>
                             <button type="submit" class="btn btn-primary">Cadastrar Vendedor</button>
                         </form>
@@ -572,7 +572,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Data da Venda</label>
-                            <input type="date" id="dataVenda" class="form-input" required>
+                            <input type="text" id="dataVenda" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Nome do Cliente</label>
@@ -587,16 +587,16 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Valor da Venda</label>
-                            <input type="text" id="valorVenda" class="form-input" placeholder="R$ 0,00" required>
+                            <input type="text" id="valorVenda" class="form-input" placeholder="R$ 0,00" required oninput="formatarMoeda(this)">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Valor a Receber</label>
-                            <input type="text" id="valorReceber" class="form-input" placeholder="R$ 0,00" required>
+                            <input type="text" id="valorReceber" class="form-input" placeholder="R$ 0,00" required oninput="formatarMoeda(this)">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Comissão</label>
                             <small id="tipoComissaoInfo" class="form-text"></small>
-                            <input type="text" id="comissao" class="form-input" placeholder="0,00" required>
+                            <input type="text" id="comissao" class="form-input" placeholder="0,00" required oninput="formatarComissao(this)">
                         </div>
                         <button type="submit" class="btn btn-primary">Registrar Venda</button>
                     </form>
@@ -1158,140 +1158,49 @@
             input.value = valor;
         }
 
-        // Função para ordenar a tabela por coluna
-        function ordenarTabela(coluna, ordem) {
-            const tbody = document.querySelector('#tabelaRelatorio tbody');
-            const linhas = Array.from(tbody.querySelectorAll('tr'));
-
-            linhas.sort((a, b) => {
-                const valorA = a.querySelector(`td:nth-child(${coluna + 1})`).textContent;
-                const valorB = b.querySelector(`td:nth-child(${coluna + 1})`).textContent;
-
-                if (!isNaN(valorA) && !isNaN(valorB)) {
-                    return ordem === 'asc' ? parseFloat(valorA.replace(/[^0-9,]/g, '').replace(',', '.')) - parseFloat(valorB.replace(/[^0-9,]/g, '').replace(',', '.')) :
-                        parseFloat(valorB.replace(/[^0-9,]/g, '').replace(',', '.')) - parseFloat(valorA.replace(/[^0-9,]/g, '').replace(',', '.'));
-                } else {
-                    return ordem === 'asc' ? valorA.localeCompare(valorB) : valorB.localeCompare(valorA);
-                }
-            });
-
-            tbody.innerHTML = '';
-            linhas.forEach(linha => tbody.appendChild(linha));
+        // Função para formatar o telefone no padrão (XX) XXXXX-XXXX
+        function formatarTelefone(input) {
+            let telefone = input.value.replace(/\D/g, ''); // Remove tudo que não for número
+            if (telefone.length > 0) {
+                telefone = `(${telefone.substring(0, 2)}) ${telefone.substring(2, 7)}-${telefone.substring(7, 11)}`;
+            }
+            input.value = telefone;
         }
 
-        // Adiciona evento de clique nas colunas para ordenação
-        document.addEventListener('click', function (e) {
-            if (e.target.tagName === 'TH') {
-                const coluna = Array.from(e.target.parentNode.children).indexOf(e.target);
-                const ordemAtual = e.target.getAttribute('data-ordem') || 'asc';
-                const novaOrdem = ordemAtual === 'asc' ? 'desc' : 'asc';
+        // Função para formatar o campo de comissão
+        function formatarComissao(input) {
+            const servicoId = document.getElementById('servicoVenda').value;
+            const servico = dados.servicos.find(s => s.id == servicoId);
 
-                // Remove a ordenação de outras colunas
-                document.querySelectorAll('#tabelaRelatorio th').forEach(th => th.removeAttribute('data-ordem'));
-
-                // Define a nova ordem
-                e.target.setAttribute('data-ordem', novaOrdem);
-                ordenarTabela(coluna, novaOrdem);
+            if (servico) {
+                if (servico.tipoComissao === 'fixa') {
+                    // Formata como moeda (R$)
+                    let valor = input.value.replace(/\D/g, '');
+                    valor = (Number(valor) / 100).toLocaleString('pt-BR', {
+                        style: 'currency',
+                        currency: 'BRL'
+                    });
+                    input.value = valor;
+                } else if (servico.tipoComissao === 'porcentagem') {
+                    // Formata como porcentagem (%)
+                    let valor = input.value.replace(/\D/g, '');
+                    valor = (Number(valor) / 100).toLocaleString('pt-BR', {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2
+                    });
+                    input.value = valor + '%';
+                }
             }
-        });
-
-        // Função para filtrar e gerar o relatório
-        function filtrarRelatorio() {
-            const dataInicial = document.getElementById('dataInicial').value;
-            const dataFinal = document.getElementById('dataFinal').value;
-            const vendedorId = document.getElementById('filtroVendedor').value;
-            const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
-
-            const vendasFiltradas = dados.vendas.filter(venda => {
-                const dataVenda = new Date(venda.data.split('/').reverse().join('-'));
-                const dataInicialFiltro = new Date(dataInicial.split('/').reverse().join('-'));
-                const dataFinalFiltro = new Date(dataFinal.split('/').reverse().join('-'));
-
-                const filtroData = (!dataInicial || dataVenda >= dataInicialFiltro) && (!dataFinal || dataVenda <= dataFinalFiltro);
-                const filtroVendedor = !vendedorId || venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
-
-                return filtroData && filtroVendedor;
-            });
-
-            const colunas = {
-                data: 'Data da Venda',
-                vendedor: 'Nome do Vendedor',
-                servico: 'Serviço Vendido',
-                tipoComissao: 'Tipo de Comissão',
-                nomeCliente: 'Nome do Cliente',
-                empresaParceira: 'Empresa Parceira',
-                comissao: 'Valor da Comissão',
-                percentualComissao: 'Variável da Comissão',
-                valorBrutoReceber: 'Valor Bruto a Receber'
-            };
-
-            const thead = document.querySelector('#tabelaRelatorio thead');
-            const tbody = document.querySelector('#tabelaRelatorio tbody');
-            const tfoot = document.querySelector('#tabelaRelatorio tfoot');
-
-            thead.innerHTML = '';
-            tbody.innerHTML = '';
-            tfoot.innerHTML = '';
-
-            const headerRow = document.createElement('tr');
-            colunasSelecionadas.forEach(coluna => {
-                const th = document.createElement('th');
-                th.textContent = colunas[coluna];
-                headerRow.appendChild(th);
-            });
-            thead.appendChild(headerRow);
-
-            let totalComissao = 0;
-            let totalValorBrutoReceber = 0;
-
-            vendasFiltradas.forEach(venda => {
-                const row = document.createElement('tr');
-                colunasSelecionadas.forEach(coluna => {
-                    const td = document.createElement('td');
-                    let valor = venda[coluna];
-
-                    if (coluna === 'percentualComissao') {
-                        const servico = dados.servicos.find(s => s.nome === venda.servico);
-                        if (servico.tipoComissao === 'porcentagem') {
-                            valor = `${venda.comissao}%`;
-                        } else if (servico.tipoComissao === 'fixa') {
-                            valor = formatarMoeda(venda.comissao);
-                        }
-                    } else if (coluna === 'comissao') {
-                        const servico = dados.servicos.find(s => s.nome === venda.servico);
-                        if (servico.tipoComissao === 'porcentagem') {
-                            valor = formatarMoeda(venda.valorReceber * (venda.comissao / 100));
-                        } else if (servico.tipoComissao === 'fixa') {
-                            valor = formatarMoeda(venda.comissao);
-                        }
-                        totalComissao += parseFloat(valor.replace(/[^0-9,]/g, '').replace(',', '.'));
-                    } else if (coluna === 'valorBrutoReceber') {
-                        valor = formatarMoeda(venda.valorReceber);
-                        totalValorBrutoReceber += venda.valorReceber;
-                    } else if (coluna === 'data') {
-                        valor = venda.data;
-                    }
-
-                    td.textContent = valor;
-                    row.appendChild(td);
-                });
-                tbody.appendChild(row);
-            });
-
-            // Atualizar totais no rodapé da tabela
-            tfoot.innerHTML = `
-                <tr>
-                    <td colspan="${colunasSelecionadas.length - 2}" style="text-align: right;"><strong>Total da Comissão:</strong></td>
-                    <td>${formatarMoeda(totalComissao)}</td>
-                    <td colspan="2" style="text-align: right;"><strong>Total Valor Bruto a Receber:</strong></td>
-                    <td>${formatarMoeda(totalValorBrutoReceber)}</td>
-                </tr>
-            `;
         }
 
         // Função para formatar valores monetários
-        function formatarMoeda(valor) {
-            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
+        function formatarMoeda(input) {
+            let valor = input.value.replace(/\D/g, ''); // Remove tudo que não for número
+            valor = (Number(valor) / 100).toLocaleString('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            });
+            input.value = valor;
         }
 
         // Função para exportar relatório em Excel
@@ -1337,48 +1246,6 @@
             } else {
                 document.getElementById('tipoComissaoInfo').textContent = '';
             }
-        }
-
-        // Formatação automática do campo "Valor da Venda"
-        document.getElementById('valorVenda').addEventListener('input', function (e) {
-            let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
-            valor = (Number(valor) / 100).toLocaleString('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-            });
-            e.target.value = valor;
-        });
-
-        // Formatação automática do campo "Valor a Receber"
-        document.getElementById('valorReceber').addEventListener('input', function (e) {
-            let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
-            valor = (Number(valor) / 100).toLocaleString('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-            });
-            e.target.value = valor;
-        });
-
-        // Formatação automática do campo "Comissão"
-        document.getElementById('comissao').addEventListener('input', function (e) {
-            let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
-            valor = (Number(valor) / 100).toLocaleString('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-            });
-            e.target.value = valor;
-        });
-
-        // Atualizar o campo de data para o formato dd/mm/aaaa
-        document.getElementById('dataVenda').addEventListener('change', function (e) {
-            const dataFormatada = formatarData(e.target.value);
-            e.target.value = dataFormatada;
-        });
-
-        // Função para formatar a data no padrão dd/mm/aaaa
-        function formatarData(data) {
-            const [ano, mes, dia] = data.split('-');
-            return `${dia}/${mes}/${ano}`;
         }
 
         // Função para atualizar o tema com base na cor selecionada
