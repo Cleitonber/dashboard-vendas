@@ -273,6 +273,7 @@ th {
     background: #f8fafc;
     font-weight: 500;
     color: var(--text-light);
+    cursor: pointer;
 }
 
 .filters {
