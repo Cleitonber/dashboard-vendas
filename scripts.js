@@ -26,41 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
     atualizarOpcoesVendedores();
     atualizarOpcoesServicos();
     atualizarOpcoesEmpresas();
-
-    // Adicionar máscara de data
-    document.getElementById('dataVenda').addEventListener('input', function (e) {
-        let data = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
-        if (data.length > 2) {
-            data = data.substring(0, 2) + '/' + data.substring(2); // Adiciona barra após o dia
-        }
-        if (data.length > 5) {
-            data = data.substring(0, 5) + '/' + data.substring(5, 9); // Adiciona barra após o mês
-        }
-        e.target.value = data; // Atualiza o valor do campo
-    });
-
-    // Adicionar máscara de valor monetário
-    formatarMoedaInput(document.getElementById('valorVenda'));
-    formatarMoedaInput(document.getElementById('valorReceber'));
-
-    // Adicionar máscara de comissão
-    document.getElementById('servicoVenda').addEventListener('change', function (e) {
-        const servicoId = e.target.value;
-        const servico = dados.servicos.find(s => s.id == servicoId);
-        const comissaoInput = document.getElementById('comissao');
-
-        if (servico) {
-            if (servico.tipoComissao === 'fixa') {
-                comissaoInput.placeholder = 'R$ 0,00';
-                comissaoInput.removeEventListener('input', formatarPorcentagem);
-                comissaoInput.addEventListener('input', formatarMoeda);
-            } else if (servico.tipoComissao === 'porcentagem') {
-                comissaoInput.placeholder = '0%';
-                comissaoInput.removeEventListener('input', formatarMoeda);
-                comissaoInput.addEventListener('input', formatarPorcentagem);
-            }
-        }
-    });
 });
 
 // Função para preencher o seletor de anos
@@ -537,6 +502,7 @@ function filtrarRelatorio() {
     colunasSelecionadas.forEach(coluna => {
         const th = document.createElement('th');
         th.textContent = colunas[coluna];
+        th.id = `coluna-${coluna}`; // Adiciona um ID único para cada célula do cabeçalho
         headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -588,62 +554,37 @@ function filtrarRelatorio() {
             <td>${formatarMoeda(totalValorBrutoReceber)}</td>
         </tr>
     `;
-}
 
-// Função para exportar relatório em PDF
-function exportarRelatorioPDF() {
-    const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
-    const colunas = {
-        data: 'Data da Venda',
-        vendedor: 'Nome do Vendedor',
-        servico: 'Serviço Vendido',
-        tipoComissao: 'Tipo de Comissão',
-        nomeCliente: 'Nome do Cliente',
-        empresaParceira: 'Empresa Parceira',
-        comissao: 'Valor da Comissão',
-        percentualComissao: 'Variável da Comissão',
-        valorBrutoReceber: 'Valor Bruto a Receber'
-    };
+    // Habilitar arrastar e soltar nas colunas
+    const tabelaRelatorio = document.getElementById('tabelaRelatorio');
+    Sortable.create(tabelaRelatorio.querySelector('thead tr'), {
+        animation: 150,
+        onEnd: function (evt) {
+            const colunasSelecionadas = Array.from(evt.from.children).map(th => th.id.replace('coluna-', ''));
+            const novasColunas = colunasSelecionadas.map(coluna => colunas[coluna]);
+            const novasVendasFiltradas = vendasFiltradas.map(venda => {
+                const novaVenda = {};
+                colunasSelecionadas.forEach(coluna => {
+                    novaVenda[coluna] = venda[coluna];
+                });
+                return novaVenda;
+            });
 
-    const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
-    const data = [];
+            // Atualizar a tabela com as novas colunas
+            const tbody = tabelaRelatorio.querySelector('tbody');
+            tbody.innerHTML = '';
 
-    document.querySelectorAll('#tabelaRelatorio tbody tr').forEach(row => {
-        const rowData = [];
-        row.querySelectorAll('td').forEach(cell => {
-            rowData.push(cell.textContent);
-        });
-        data.push(rowData);
-    });
-
-    const doc = new jsPDF({
-        orientation: 'landscape',
-        unit: 'mm',
-        format: 'a4'
-    });
-
-    // Adicionar título ao PDF
-    doc.setFontSize(16);
-    doc.text('Relatório de Vendas', 14, 20);
-
-    // Adicionar tabela ao PDF
-    doc.autoTable({
-        head: [headers],
-        body: data,
-        startY: 25,
-        theme: 'grid',
-        styles: {
-            fontSize: 10,
-            cellPadding: 3,
-        },
-        headStyles: {
-            fillColor: [79, 70, 229],
-            textColor: [255, 255, 255]
+            novasVendasFiltradas.forEach(venda => {
+                const row = document.createElement('tr');
+                colunasSelecionadas.forEach(coluna => {
+                    const td = document.createElement('td');
+                    td.textContent = venda[coluna];
+                    row.appendChild(td);
+                });
+                tbody.appendChild(row);
+            });
         }
     });
-
-    // Abrir o PDF automaticamente para salvar
-    doc.save('relatorio_vendas.pdf');
 }
 
 // Função para exportar relatório em Excel
@@ -910,23 +851,4 @@ function restaurarTemaPadrao() {
     document.getElementById('corPrimaria').value = '#4f46e5';
     document.getElementById('corSecundaria').value = '#64748b';
     atualizarTema();
-}
-
-// Função para formatar valores monetários
-function formatarMoedaInput(input) {
-    input.addEventListener('input', function (e) {
-        let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
-        valor = (Number(valor) / 100).toLocaleString('pt-BR', { // Formata como moeda
-            style: 'currency',
-            currency: 'BRL'
-        });
-        e.target.value = valor; // Atualiza o valor do campo
-    });
-}
-
-// Função para formatar porcentagem
-function formatarPorcentagem(e) {
-    let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
-    valor = valor.substring(0, 3); // Limita a 3 dígitos
-    e.target.value = valor ? `${valor}%` : ''; // Adiciona o símbolo "%"
 }
