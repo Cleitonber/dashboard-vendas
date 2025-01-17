@@ -113,7 +113,15 @@ document.getElementById('vendedorForm').addEventListener('submit', function (e) 
     atualizarListaVendedores();
     atualizarOpcoesVendedores();
     alert('Vendedor cadastrado com sucesso!');
+    limparCamposVendedor();
 });
+
+// Função para limpar campos do formulário de vendedor
+function limparCamposVendedor() {
+    document.getElementById('nomeVendedor').value = '';
+    document.getElementById('emailVendedor').value = '';
+    document.getElementById('telefoneVendedor').value = '';
+}
 
 // Função para atualizar a lista de vendedores
 function atualizarListaVendedores() {
@@ -226,7 +234,15 @@ document.getElementById('servicoForm').addEventListener('submit', function (e) {
     atualizarListaServicos();
     atualizarOpcoesServicos();
     alert('Serviço cadastrado com sucesso!');
+    limparCamposServico();
 });
+
+// Função para limpar campos do formulário de serviço
+function limparCamposServico() {
+    document.getElementById('nomeServico').value = '';
+    document.getElementById('categoriaServico').value = '';
+    document.getElementById('tipoComissao').value = 'fixa';
+}
 
 // Função para atualizar a lista de serviços
 function atualizarListaServicos() {
@@ -323,19 +339,23 @@ function excluirServico(id) {
 document.getElementById('empresaForm').addEventListener('submit', function (e) {
     e.preventDefault();
     const nomeEmpresa = document.getElementById('nomeEmpresa').value;
-    const categoriaEmpresa = document.getElementById('categoriaEmpresa').value;
 
     const novaEmpresa = {
         id: dados.empresasParceiras.length + 1,
-        nome: nomeEmpresa,
-        categoria: categoriaEmpresa
+        nome: nomeEmpresa
     };
 
     dados.empresasParceiras.push(novaEmpresa);
     atualizarListaEmpresas();
     atualizarOpcoesEmpresas();
     alert('Empresa cadastrada com sucesso!');
+    limparCamposEmpresa();
 });
+
+// Função para limpar campos do formulário de empresa
+function limparCamposEmpresa() {
+    document.getElementById('nomeEmpresa').value = '';
+}
 
 // Função para atualizar a lista de empresas parceiras
 function atualizarListaEmpresas() {
@@ -348,8 +368,7 @@ function atualizarListaEmpresas() {
         li.innerHTML = `
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <strong>${empresa.nome}</strong><br>
-                    <small>Categoria: ${empresa.categoria}</small>
+                    <strong>${empresa.nome}</strong>
                 </div>
                 <div>
                     <button class="btn btn-sm btn-secondary" onclick="editarEmpresa(${empresa.id})">Editar</button>
@@ -377,7 +396,6 @@ function editarEmpresa(id) {
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
                             <input type="text" id="editNomeEmpresa" value="${e.nome}" class="form-input">
-                            <input type="text" id="editCategoriaEmpresa" value="${e.categoria}" class="form-input">
                         </div>
                         <div>
                             <button class="btn btn-sm btn-success" onclick="salvarEdicaoEmpresa(${e.id})">Salvar</button>
@@ -389,8 +407,7 @@ function editarEmpresa(id) {
                 li.innerHTML = `
                     <div class="d-flex justify-content-between align-items-center">
                         <div>
-                            <strong>${e.nome}</strong><br>
-                            <small>Categoria: ${e.categoria}</small>
+                            <strong>${e.nome}</strong>
                         </div>
                         <div>
                             <button class="btn btn-sm btn-secondary" onclick="editarEmpresa(${e.id})">Editar</button>
@@ -409,7 +426,6 @@ function salvarEdicaoEmpresa(id) {
     const empresa = dados.empresasParceiras.find(e => e.id === id);
     if (empresa) {
         empresa.nome = document.getElementById('editNomeEmpresa').value;
-        empresa.categoria = document.getElementById('editCategoriaEmpresa').value;
         atualizarListaEmpresas();
         alert('Empresa atualizada com sucesso!');
     }
@@ -462,7 +478,56 @@ document.getElementById('vendaForm').addEventListener('submit', function (e) {
     atualizarDashboard();
 });
 
-// Função para filtrar relatório
+// Função para formatar automaticamente a data (dd/mm/aaaa)
+function formatarDataInput(input) {
+    let valor = input.value.replace(/\D/g, ''); // Remove tudo que não for número
+    if (valor.length > 2) {
+        valor = valor.replace(/^(\d{2})(\d{0,2})/, '$1/$2'); // Adiciona barra após o dia
+    }
+    if (valor.length > 5) {
+        valor = valor.replace(/^(\d{2})\/(\d{2})(\d{0,4})/, '$1/$2/$3'); // Adiciona barra após o mês
+    }
+    input.value = valor;
+}
+
+// Função para ordenar a tabela por coluna
+function ordenarTabela(coluna, ordem) {
+    const tbody = document.querySelector('#tabelaRelatorio tbody');
+    const linhas = Array.from(tbody.querySelectorAll('tr'));
+
+    linhas.sort((a, b) => {
+        const valorA = a.querySelector(`td:nth-child(${coluna + 1})`).textContent;
+        const valorB = b.querySelector(`td:nth-child(${coluna + 1})`).textContent;
+
+        if (!isNaN(valorA) && !isNaN(valorB)) {
+            return ordem === 'asc' ? parseFloat(valorA.replace(/[^0-9,]/g, '').replace(',', '.')) - parseFloat(valorB.replace(/[^0-9,]/g, '').replace(',', '.')) :
+                parseFloat(valorB.replace(/[^0-9,]/g, '').replace(',', '.')) - parseFloat(valorA.replace(/[^0-9,]/g, '').replace(',', '.'));
+        } else {
+            return ordem === 'asc' ? valorA.localeCompare(valorB) : valorB.localeCompare(valorA);
+        }
+    });
+
+    tbody.innerHTML = '';
+    linhas.forEach(linha => tbody.appendChild(linha));
+}
+
+// Adiciona evento de clique nas colunas para ordenação
+document.addEventListener('click', function (e) {
+    if (e.target.tagName === 'TH') {
+        const coluna = Array.from(e.target.parentNode.children).indexOf(e.target);
+        const ordemAtual = e.target.getAttribute('data-ordem') || 'asc';
+        const novaOrdem = ordemAtual === 'asc' ? 'desc' : 'asc';
+
+        // Remove a ordenação de outras colunas
+        document.querySelectorAll('#tabelaRelatorio th').forEach(th => th.removeAttribute('data-ordem'));
+
+        // Define a nova ordem
+        e.target.setAttribute('data-ordem', novaOrdem);
+        ordenarTabela(coluna, novaOrdem);
+    }
+});
+
+// Função para filtrar e gerar o relatório
 function filtrarRelatorio() {
     const dataInicial = document.getElementById('dataInicial').value;
     const dataFinal = document.getElementById('dataFinal').value;
@@ -494,15 +559,16 @@ function filtrarRelatorio() {
 
     const thead = document.querySelector('#tabelaRelatorio thead');
     const tbody = document.querySelector('#tabelaRelatorio tbody');
+    const tfoot = document.querySelector('#tabelaRelatorio tfoot');
 
     thead.innerHTML = '';
     tbody.innerHTML = '';
+    tfoot.innerHTML = '';
 
     const headerRow = document.createElement('tr');
     colunasSelecionadas.forEach(coluna => {
         const th = document.createElement('th');
         th.textContent = colunas[coluna];
-        th.id = `coluna-${coluna}`; // Adiciona um ID único para cada célula do cabeçalho
         headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -545,7 +611,6 @@ function filtrarRelatorio() {
     });
 
     // Atualizar totais no rodapé da tabela
-    const tfoot = document.querySelector('#tabelaRelatorio tfoot');
     tfoot.innerHTML = `
         <tr>
             <td colspan="${colunasSelecionadas.length - 2}" style="text-align: right;"><strong>Total da Comissão:</strong></td>
@@ -554,37 +619,11 @@ function filtrarRelatorio() {
             <td>${formatarMoeda(totalValorBrutoReceber)}</td>
         </tr>
     `;
+}
 
-    // Habilitar arrastar e soltar nas colunas
-    const tabelaRelatorio = document.getElementById('tabelaRelatorio');
-    Sortable.create(tabelaRelatorio.querySelector('thead tr'), {
-        animation: 150,
-        onEnd: function (evt) {
-            const colunasSelecionadas = Array.from(evt.from.children).map(th => th.id.replace('coluna-', ''));
-            const novasColunas = colunasSelecionadas.map(coluna => colunas[coluna]);
-            const novasVendasFiltradas = vendasFiltradas.map(venda => {
-                const novaVenda = {};
-                colunasSelecionadas.forEach(coluna => {
-                    novaVenda[coluna] = venda[coluna];
-                });
-                return novaVenda;
-            });
-
-            // Atualizar a tabela com as novas colunas
-            const tbody = tabelaRelatorio.querySelector('tbody');
-            tbody.innerHTML = '';
-
-            novasVendasFiltradas.forEach(venda => {
-                const row = document.createElement('tr');
-                colunasSelecionadas.forEach(coluna => {
-                    const td = document.createElement('td');
-                    td.textContent = venda[coluna];
-                    row.appendChild(td);
-                });
-                tbody.appendChild(row);
-            });
-        }
-    });
+// Função para formatar valores monetários
+function formatarMoeda(valor) {
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
 }
 
 // Função para exportar relatório em Excel
@@ -619,223 +658,62 @@ function exportarRelatorioExcel() {
     XLSX.writeFile(wb, 'relatorio_vendas.xlsx');
 }
 
-// Função para formatar valores monetários
-function formatarMoeda(valor) {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
-}
+// Função para atualizar o tipo de comissão ao selecionar um serviço
+function atualizarTipoComissao() {
+    const servicoId = document.getElementById('servicoVenda').value;
+    const servico = dados.servicos.find(s => s.id == servicoId);
 
-// Função para atualizar o dashboard
-function atualizarDashboard() {
-    const mesSelecionado = parseInt(document.getElementById('mesFiltro').value);
-    const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
-
-    // Filtrar vendas do mês atual
-    const vendasMesAtual = dados.vendas.filter(venda => {
-        const dataVenda = new Date(venda.data.split('/').reverse().join('-'));
-        return dataVenda.getMonth() === mesSelecionado && dataVenda.getFullYear() === anoSelecionado;
-    });
-
-    // Filtrar vendas do mês anterior
-    const mesAnterior = mesSelecionado === 0 ? 11 : mesSelecionado - 1; // Se o mês atual for janeiro (0), o anterior é dezembro (11)
-    const anoAnterior = mesSelecionado === 0 ? anoSelecionado - 1 : anoSelecionado;
-    const vendasMesAnterior = dados.vendas.filter(venda => {
-        const dataVenda = new Date(venda.data.split('/').reverse().join('-'));
-        return dataVenda.getMonth() === mesAnterior && dataVenda.getFullYear() === anoAnterior;
-    });
-
-    // Calcular totais do mês atual
-    const totalVendasMesAtual = vendasMesAtual.reduce((total, venda) => total + venda.valorVenda, 0);
-    const totalComissoesMesAtual = vendasMesAtual.reduce((total, venda) => total + venda.valorReceber, 0);
-
-    // Calcular totais do mês anterior
-    const totalVendasMesAnterior = vendasMesAnterior.reduce((total, venda) => total + venda.valorVenda, 0);
-    const totalComissoesMesAnterior = vendasMesAnterior.reduce((total, venda) => total + venda.valorReceber, 0);
-
-    // Calcular porcentagens de crescimento
-    const crescimentoVendas = totalVendasMesAnterior !== 0 ?
-        ((totalVendasMesAtual - totalVendasMesAnterior) / totalVendasMesAnterior) * 100 : 0;
-    const crescimentoComissoes = totalComissoesMesAnterior !== 0 ?
-        ((totalComissoesMesAtual - totalComissoesMesAnterior) / totalComissoesMesAnterior) * 100 : 0;
-
-    // Atualizar os textos
-    document.getElementById('totalVendasDash').textContent = formatarMoeda(totalVendasMesAtual);
-    document.getElementById('totalComissoesDash').textContent = formatarMoeda(totalComissoesMesAtual);
-
-    const statChangeVendas = document.querySelector('#dashboard .stat-card:nth-child(1) .stat-change');
-    const statChangeComissoes = document.querySelector('#dashboard .stat-card:nth-child(2) .stat-change');
-
-    statChangeVendas.innerHTML = `
-        <span>${crescimentoVendas >= 0 ? '↑' : '↓'} ${Math.abs(crescimentoVendas).toFixed(2)}%</span>
-        <span>vs. último mês</span>
-    `;
-    statChangeVendas.className = `stat-change ${crescimentoVendas >= 0 ? 'positive' : 'negative'}`;
-
-    statChangeComissoes.innerHTML = `
-        <span>${crescimentoComissoes >= 0 ? '↑' : '↓'} ${Math.abs(crescimentoComissoes).toFixed(2)}%</span>
-        <span>vs. último mês</span>
-    `;
-    statChangeComissoes.className = `stat-change ${crescimentoComissoes >= 0 ? 'positive' : 'negative'}`;
-
-    // Atualizar outras métricas e gráficos
-    atualizarTotalClientes(vendasMesAtual);
-    atualizarTicketMedio(vendasMesAtual);
-    atualizarGraficoVendasPorServico(vendasMesAtual);
-    atualizarGraficoDesempenhoVendedores(vendasMesAtual);
-    atualizarGraficoVendasPorCategoria(vendasMesAtual);
-}
-
-// Função para atualizar o total de vendas
-function atualizarTotalVendas(vendasFiltradas) {
-    const totalVendas = vendasFiltradas.reduce((total, venda) => total + venda.valorVenda, 0);
-    document.getElementById('totalVendasDash').textContent = formatarMoeda(totalVendas);
-}
-
-// Função para atualizar o total de comissões
-function atualizarComissoes(vendasFiltradas) {
-    const totalComissoes = vendasFiltradas.reduce((total, venda) => total + venda.valorReceber, 0);
-    document.getElementById('totalComissoesDash').textContent = formatarMoeda(totalComissoes);
-}
-
-// Função para calcular o total de clientes atendidos
-function atualizarTotalClientes(vendasFiltradas) {
-    const clientesUnicos = new Set(vendasFiltradas.map(venda => venda.nomeCliente));
-    document.getElementById('totalClientes').textContent = clientesUnicos.size;
-}
-
-// Função para calcular o ticket médio por venda
-function atualizarTicketMedio(vendasFiltradas) {
-    const totalVendas = vendasFiltradas.reduce((total, venda) => total + venda.valorVenda, 0);
-    const ticketMedio = vendasFiltradas.length > 0 ? totalVendas / vendasFiltradas.length : 0;
-    document.getElementById('ticketMedio').textContent = formatarMoeda(ticketMedio);
-}
-
-// Função para calcular a conversão de vendas por vendedor
-function atualizarConversaoVendas(vendasFiltradas) {
-    const vendedores = dados.vendedores.map(vendedor => vendedor.nome);
-    const conversao = vendedores.map(vendedor => {
-        const vendasVendedor = vendasFiltradas.filter(venda => venda.vendedor === vendedor);
-        const clientesUnicos = new Set(vendasVendedor.map(venda => venda.nomeCliente));
-        return {
-            vendedor,
-            conversao: clientesUnicos.size > 0 ? (vendasVendedor.length / clientesUnicos.size) * 100 : 0
-        };
-    });
-
-    const conversaoMedia = conversao.reduce((total, item) => total + item.conversao, 0) / conversao.length;
-    document.getElementById('conversaoVendas').textContent = `${conversaoMedia.toFixed(2)}%`;
-}
-
-// Função para atualizar o gráfico de vendas por serviço
-function atualizarGraficoVendasPorServico(vendasFiltradas) {
-    const servicosCadastrados = dados.servicos.map(servico => servico.nome);
-    const vendasPorServico = servicosCadastrados.map(servico => {
-        return vendasFiltradas.filter(venda => venda.servico === servico).length;
-    });
-
-    vendasServicoChart.data.labels = servicosCadastrados;
-    vendasServicoChart.data.datasets[0].data = vendasPorServico;
-    vendasServicoChart.update();
-}
-
-// Função para atualizar o gráfico de desempenho dos vendedores
-function atualizarGraficoDesempenhoVendedores(vendasFiltradas) {
-    const vendedores = dados.vendedores.map(vendedor => vendedor.nome);
-    const cores = ['#4f46e5', '#ef4444', '#22c55e', '#f59e0b', '#3b82f6']; // Cores para cada vendedor
-
-    const datasets = vendedores.map((vendedor, index) => {
-        const vendasVendedor = vendasFiltradas.filter(venda => venda.vendedor === vendedor);
-        const totalVendas = vendasVendedor.reduce((total, venda) => total + venda.valorVenda, 0);
-
-        return {
-            label: vendedor,
-            data: [totalVendas],
-            borderColor: cores[index],
-            fill: false
-        };
-    });
-
-    desempenhoVendedoresChart.data.labels = ['Total de Vendas'];
-    desempenhoVendedoresChart.data.datasets = datasets;
-    desempenhoVendedoresChart.update();
-}
-
-// Função para atualizar o gráfico de vendas por categoria de serviço
-function atualizarGraficoVendasPorCategoria(vendasFiltradas) {
-    const categorias = [...new Set(dados.servicos.map(servico => servico.categoria))];
-    const vendasPorCategoria = categorias.map(categoria => {
-        return vendasFiltradas.filter(venda => {
-            const servico = dados.servicos.find(s => s.nome === venda.servico);
-            return servico.categoria === categoria;
-        }).length;
-    });
-
-    vendasCategoriaChart.data.labels = categorias;
-    vendasCategoriaChart.data.datasets[0].data = vendasPorCategoria;
-    vendasCategoriaChart.update();
-}
-
-// Inicialização dos gráficos
-const vendasServicoChart = new Chart(document.getElementById('vendasServicoChart'), {
-    type: 'bar',
-    data: {
-        labels: [],
-        datasets: [{
-            label: 'Vendas',
-            data: [],
-            backgroundColor: 'rgba(79, 70, 229, 0.2)',
-            borderColor: 'rgba(79, 70, 229, 1)',
-            borderWidth: 1
-        }]
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
+    if (servico) {
+        const tipoComissaoInfo = document.getElementById('tipoComissaoInfo');
+        tipoComissaoInfo.textContent = `Tipo de Comissão: ${servico.tipoComissao === 'fixa' ? 'Fixa' : 'Porcentagem'}`;
+    } else {
+        document.getElementById('tipoComissaoInfo').textContent = '';
     }
+}
+
+// Formatação automática do campo "Valor da Venda"
+document.getElementById('valorVenda').addEventListener('input', function (e) {
+    let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+    valor = (Number(valor) / 100).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
+    e.target.value = valor;
 });
 
-const desempenhoVendedoresChart = new Chart(document.getElementById('desempenhoVendedoresChart'), {
-    type: 'line',
-    data: {
-        labels: [],
-        datasets: []
-    },
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true
-            }
-        }
-    }
+// Formatação automática do campo "Valor a Receber"
+document.getElementById('valorReceber').addEventListener('input', function (e) {
+    let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+    valor = (Number(valor) / 100).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
+    e.target.value = valor;
 });
 
-const vendasCategoriaChart = new Chart(document.getElementById('vendasCategoriaChart'), {
-    type: 'pie',
-    data: {
-        labels: [],
-        datasets: [{
-            label: 'Vendas por Categoria',
-            data: [],
-            backgroundColor: ['#4f46e5', '#ef4444', '#22c55e', '#f59e0b', '#3b82f6'],
-        }]
-    },
-    options: {
-        responsive: true,
-    }
+// Formatação automática do campo "Comissão"
+document.getElementById('comissao').addEventListener('input', function (e) {
+    let valor = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
+    valor = (Number(valor) / 100).toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
+    e.target.value = valor;
 });
 
-// Formatação automática do campo de telefone
-document.getElementById('telefoneVendedor').addEventListener('input', function (e) {
-    let telefone = e.target.value.replace(/\D/g, ''); // Remove tudo que não for número
-    if (telefone.length > 0) {
-        telefone = `(${telefone.substring(0, 2)}) ${telefone.substring(2, 7)}-${telefone.substring(7, 11)}`;
-    }
-    e.target.value = telefone;
+// Atualizar o campo de data para o formato dd/mm/aaaa
+document.getElementById('dataVenda').addEventListener('change', function (e) {
+    const dataFormatada = formatarData(e.target.value);
+    e.target.value = dataFormatada;
 });
 
-// Atualização do tema com base na cor selecionada
+// Função para formatar a data no padrão dd/mm/aaaa
+function formatarData(data) {
+    const [ano, mes, dia] = data.split('-');
+    return `${dia}/${mes}/${ano}`;
+}
+
+// Função para atualizar o tema com base na cor selecionada
 function atualizarTema() {
     const corPrimaria = document.getElementById('corPrimaria').value;
     const corSecundaria = document.getElementById('corSecundaria').value;
