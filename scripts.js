@@ -614,6 +614,7 @@ function exportarRelatorioExcel() {
 }
 
 // Função para exportar relatório em PDF
+/*
 function exportarRelatorioPDF() {
     const doc = new jsPDF();
     const tabela = document.getElementById('tabelaRelatorio');
@@ -632,7 +633,30 @@ function exportarRelatorioPDF() {
 
     doc.save('relatorio_vendas.pdf');
 }
+*/
+function exportarRelatorioPDF() {
+    // Cria um novo documento PDF
+    const doc = new jspdf.jsPDF();
 
+    // Obtém os dados da tabela
+    const tabela = document.getElementById('tabelaRelatorio');
+    const headers = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent);
+    const rows = Array.from(tabela.querySelectorAll('tbody tr')).map(tr =>
+        Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
+    );
+
+    // Adiciona a tabela ao PDF
+    doc.autoTable({
+        head: [headers], // Cabeçalho da tabela
+        body: rows,      // Dados da tabela
+        theme: 'grid',   // Tema da tabela
+        styles: { fontSize: 10 }, // Tamanho da fonte
+        headStyles: { fillColor: [79, 70, 229] } // Cor de fundo do cabeçalho
+    });
+
+    // Salva o PDF com o nome "relatorio_vendas.pdf"
+    doc.save('relatorio_vendas.pdf');
+}
 // Função para atualizar o tipo de comissão ao selecionar um serviço
 function atualizarTipoComissao() {
     const servicoId = document.getElementById('servicoVenda').value;
