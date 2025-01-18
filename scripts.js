@@ -475,8 +475,22 @@ document.getElementById('vendaForm').addEventListener('submit', function (e) {
 
     dados.vendas.push(novaVenda);
     alert('Venda registrada com sucesso!');
+    limparCamposVenda();
     atualizarDashboard();
 });
+
+// Função para limpar os campos do formulário de venda
+function limparCamposVenda() {
+    document.getElementById('vendedorVenda').value = '';
+    document.getElementById('servicoVenda').value = '';
+    document.getElementById('dataVenda').value = '';
+    document.getElementById('nomeCliente').value = '';
+    document.getElementById('empresaParceira').value = '';
+    document.getElementById('valorVenda').value = '';
+    document.getElementById('valorReceber').value = '';
+    document.getElementById('comissao').value = '';
+    document.getElementById('tipoComissaoInfo').textContent = '';
+}
 
 // Função para formatar automaticamente a data (dd/mm/aaaa)
 function formatarDataInput(input) {
@@ -596,4 +610,112 @@ function restaurarTemaPadrao() {
     document.getElementById('corPrimaria').value = '#4f46e5';
     document.getElementById('corSecundaria').value = '#64748b';
     atualizarTema();
+}
+
+// Função para filtrar e gerar o relatório
+function filtrarRelatorio() {
+    const dataInicial = document.getElementById('dataInicial').value;
+    const dataFinal = document.getElementById('dataFinal').value;
+    const vendedorId = document.getElementById('filtroVendedor').value;
+    const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
+
+    // Converter datas para o formato Date
+    const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
+    const dataFinalObj = dataFinal ? new Date(dataFinal.split('/').reverse().join('-')) : null;
+
+    // Filtrar vendas
+    const vendasFiltradas = dados.vendas.filter(venda => {
+        const dataVendaObj = new Date(venda.data.split('/').reverse().join('-'));
+
+        // Filtro por data
+        const filtroData = (!dataInicialObj || dataVendaObj >= dataInicialObj) &&
+                           (!dataFinalObj || dataVendaObj <= dataFinalObj);
+
+        // Filtro por vendedor
+        const filtroVendedor = !vendedorId || venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
+
+        return filtroData && filtroVendedor;
+    });
+
+    // Gerar colunas da tabela
+    const colunas = {
+        data: 'Data da Venda',
+        vendedor: 'Nome do Vendedor',
+        servico: 'Serviço Vendido',
+        tipoComissao: 'Tipo de Comissão',
+        nomeCliente: 'Nome do Cliente',
+        empresaParceira: 'Empresa Parceira',
+        comissao: 'Valor da Comissão',
+        percentualComissao: 'Variável da Comissão',
+        valorBrutoReceber: 'Valor Bruto a Receber'
+    };
+
+    const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
+
+    // Criar cabeçalho da tabela
+    const thead = document.querySelector('#tabelaRelatorio thead');
+    thead.innerHTML = '';
+
+    const headerRow = document.createElement('tr');
+    headers.forEach(header => {
+        const th = document.createElement('th');
+        th.textContent = header;
+        th.onclick = () => ordenarTabela(header); // Adicionar função de ordenação
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+
+    // Criar corpo da tabela
+    const tbody = document.querySelector('#tabelaRelatorio tbody');
+    tbody.innerHTML = '';
+
+    vendasFiltradas.forEach(venda => {
+        const row = document.createElement('tr');
+        colunasSelecionadas.forEach(coluna => {
+            const cell = document.createElement('td');
+            cell.textContent = venda[coluna] || '-';
+            row.appendChild(cell);
+        });
+        tbody.appendChild(row);
+    });
+
+    // Calcular totais
+    const totalComissao = vendasFiltradas.reduce((total, venda) => total + (venda.comissao || 0), 0);
+    const totalValorBruto = vendasFiltradas.reduce((total, venda) => total + (venda.valorBrutoReceber || 0), 0);
+
+    // Atualizar totais no rodapé
+    const tfoot = document.querySelector('#tabelaRelatorio tfoot');
+    tfoot.innerHTML = `
+        <tr>
+            <td colspan="${colunasSelecionadas.length - 2}" style="text-align: right;"><strong>Totais:</strong></td>
+            <td><strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
+            <td><strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
+        </tr>
+    `;
+}
+
+// Função para ordenar a tabela
+function ordenarTabela(coluna) {
+    const tbody = document.querySelector('#tabelaRelatorio tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    // Determinar a direção da ordenação
+    const direcao = tbody.getAttribute('data-ordenacao') === 'asc' ? 'desc' : 'asc';
+    tbody.setAttribute('data-ordenacao', direcao);
+
+    // Ordenar as linhas
+    rows.sort((a, b) => {
+        const valorA = a.querySelector(`td:nth-child(${headers.indexOf(coluna) + 1})`).textContent;
+        const valorB = b.querySelector(`td:nth-child(${headers.indexOf(coluna) + 1})`).textContent;
+
+        if (direcao === 'asc') {
+            return valorA.localeCompare(valorB, undefined, { numeric: true });
+        } else {
+            return valorB.localeCompare(valorA, undefined, { numeric: true });
+        }
+    });
+
+    // Reinserir as linhas ordenadas
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
 }
