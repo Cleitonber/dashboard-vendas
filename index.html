@@ -20,195 +20,12 @@
 
         <!-- Dashboard -->
         <div id="dashboard" class="tab-content active">
-            <div class="filtro-data">
-                <label for="mesFiltro">Selecione o mês:</label>
-                <select id="mesFiltro" onchange="atualizarDashboard()">
-                    <option value="0">Janeiro</option>
-                    <option value="1">Fevereiro</option>
-                    <option value="2">Março</option>
-                    <option value="3">Abril</option>
-                    <option value="4">Maio</option>
-                    <option value="5">Junho</option>
-                    <option value="6">Julho</option>
-                    <option value="7">Agosto</option>
-                    <option value="8">Setembro</option>
-                    <option value="9">Outubro</option>
-                    <option value="10">Novembro</option>
-                    <option value="11">Dezembro</option>
-                </select>
-
-                <label for="anoFiltro">Selecione o ano:</label>
-                <select id="anoFiltro" onchange="atualizarDashboard()">
-                    <!-- Os anos serão preenchidos dinamicamente via JavaScript -->
-                </select>
-            </div>
-
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-title">Total de Vendas</div>
-                    <div class="stat-value" id="totalVendasDash">R$ 0,00</div>
-                    <div class="stat-change positive">
-                        <span>↑ 12%</span>
-                        <span>vs. último mês</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-title">Comissões</div>
-                    <div class="stat-value" id="totalComissoesDash">R$ 0,00</div>
-                    <div class="stat-change positive">
-                        <span>↑ 8%</span>
-                        <span>vs. último mês</span>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-title">Clientes Atendidos</div>
-                    <div class="stat-value" id="totalClientes">0</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-title">Ticket Médio</div>
-                    <div class="stat-value" id="ticketMedio">R$ 0,00</div>
-                </div>
-            </div>
-
-            <div class="grid">
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Vendas por Serviço</h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="vendasServicoChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Desempenho dos Vendedores</h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="desempenhoVendedoresChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Vendas por Categoria de Serviço</h2>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="vendasCategoriaChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Personalizar Tema</h2>
-                </div>
-                <div class="card-body">
-                    <div class="form-group">
-                        <label class="form-label">Cor Primária</label>
-                        <input type="color" id="corPrimaria" value="#4f46e5" onchange="atualizarTema()">
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Cor Secundária</label>
-                        <input type="color" id="corSecundaria" value="#64748b" onchange="atualizarTema()">
-                    </div>
-                    <button class="btn btn-secondary" onclick="restaurarTemaPadrao()">Restaurar Cores Padrão</button>
-                </div>
-            </div>
+            <!-- Conteúdo do Dashboard -->
         </div>
 
         <!-- Cadastros -->
         <div id="cadastros" class="tab-content">
-            <div class="grid">
-                <!-- Cadastro de Vendedor -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Cadastro de Vendedor</h2>
-                    </div>
-                    <div class="card-body">
-                        <form id="vendedorForm">
-                            <div class="form-group">
-                                <label class="form-label">Nome do Vendedor</label>
-                                <input type="text" id="nomeVendedor" class="form-input" placeholder="Digite o nome do vendedor" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Email</label>
-                                <input type="email" id="emailVendedor" class="form-input" placeholder="Digite o email do vendedor" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Telefone</label>
-                                <input type="tel" id="telefoneVendedor" class="form-input" placeholder="(XX) XXXXX-XXXX" oninput="formatarTelefone(this)">
-                            </div>
-                            <button type="submit" class="btn btn-primary">Cadastrar Vendedor</button>
-                        </form>
-                        <div id="listaVendedores" class="mt-4">
-                            <h3>Vendedores Cadastrados</h3>
-                            <input type="text" id="filtroVendedores" placeholder="Pesquisar vendedor..." class="form-input">
-                            <ul id="vendedoresList" class="list-group"></ul>
-                            <div id="controlesPaginacao" class="d-flex justify-content-between align-items-center mt-3"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Cadastro de Serviço -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Cadastro de Serviço</h2>
-                    </div>
-                    <div class="card-body">
-                        <form id="servicoForm">
-                            <div class="form-group">
-                                <label class="form-label">Nome do Serviço</label>
-                                <input type="text" id="nomeServico" class="form-input" placeholder="Digite o nome do serviço" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Categoria</label>
-                                <input type="text" id="categoriaServico" class="form-input" placeholder="Digite a categoria do serviço" required>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label">Tipo de Comissão</label>
-                                <select id="tipoComissao" class="form-select" required>
-                                    <option value="fixa">Fixa</option>
-                                    <option value="porcentagem">Porcentagem</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Cadastrar Serviço</button>
-                        </form>
-                        <div id="listaServicos" class="mt-4">
-                            <h3>Serviços Cadastrados</h3>
-                            <input type="text" id="filtroServicos" placeholder="Pesquisar serviço..." class="form-input">
-                            <ul id="servicosList" class="list-group"></ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Cadastro de Empresa Parceira -->
-                <div class="card">
-                    <div class="card-header">
-                        <h2 class="card-title">Cadastro de Empresa Parceira</h2>
-                    </div>
-                    <div class="card-body">
-                        <form id="empresaForm">
-                            <div class="form-group">
-                                <label class="form-label">Nome da Empresa</label>
-                                <input type="text" id="nomeEmpresa" class="form-input" placeholder="Digite o nome da empresa" required>
-                            </div>
-                            <button type="submit" class="btn btn-primary">Cadastrar Empresa</button>
-                        </form>
-                        <div id="listaEmpresas" class="mt-4">
-                            <h3>Empresas Parceiras Cadastradas</h3>
-                            <input type="text" id="filtroEmpresas" placeholder="Pesquisar empresa..." class="form-input">
-                            <ul id="empresasList" class="list-group"></ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Conteúdo de Cadastros -->
         </div>
 
         <!-- Vendas -->
@@ -219,210 +36,130 @@
                 </div>
                 <div class="card-body">
                     <form id="vendaForm">
-  <div class="form-group">
-    <label for="vendedorVenda">Vendedor:</label>
-    <select id="vendedorVenda" class="form-select" required>
-      <option value="">Selecione um vendedor</option>
-      <!-- Opções serão preenchidas dinamicamente -->
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="servicoVenda">Serviço:</label>
-    <select id="servicoVenda" class="form-select" required>
-      <option value="">Selecione um serviço</option>
-      <!-- Opções serão preenchidas dinamicamente -->
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="dataVenda">Data da Venda:</label>
-    <input type="text" id="dataVenda" class="form-input" placeholder="DD/MM/AAAA" required>
-  </div>
-  <div class="form-group">
-    <label for="nomeCliente">Nome do Cliente:</label>
-    <input type="text" id="nomeCliente" class="form-input" placeholder="Digite o nome do cliente" required>
-  </div>
-  <div class="form-group">
-    <label for="empresaParceira">Empresa Parceira:</label>
-    <select id="empresaParceira" class="form-select" required>
-      <option value="">Selecione uma empresa parceira</option>
-      <!-- Opções serão preenchidas dinamicamente -->
-    </select>
-  </div>
-  <div class="form-group">
-    <label for="valorVenda">Valor da Venda:</label>
-    <input type="text" id="valorVenda" class="form-input" placeholder="R$ 0,00" required>
-  </div>
-  <div class="form-group">
-    <label for="valorReceber">Valor a Receber:</label>
-    <input type="text" id="valorReceber" class="form-input" placeholder="R$ 0,00" required>
-  </div>
-  <div class="form-group">
-    <label for="comissao">Comissão:</label>
-    <input type="text" id="comissao" class="form-input" placeholder="0,00" required>
-  </div>
-  <button type="submit" class="btn btn-primary">Registrar Venda</button>
-</form>
+                        <div class="form-group">
+                            <label class="form-label">Vendedor</label>
+                            <select id="vendedorVenda" class="form-select" required>
+                                <option value="">Selecione um vendedor</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Serviço</label>
+                            <select id="servicoVenda" class="form-select" required>
+                                <option value="">Selecione um serviço</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Data da Venda</label>
+                            <input type="text" id="dataVenda" class="form-input" placeholder="DD/MM/AAAA" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Nome do Cliente</label>
+                            <input type="text" id="nomeCliente" class="form-input" placeholder="Digite o nome do cliente" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Empresa Parceira</label>
+                            <select id="empresaParceira" class="form-select" required>
+                                <option value="">Selecione uma empresa parceira</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Valor da Venda</label>
+                            <input type="text" id="valorVenda" class="form-input" placeholder="R$ 0,00" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Valor a Receber</label>
+                            <input type="text" id="valorReceber" class="form-input" placeholder="R$ 0,00" required>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Comissão</label>
+                            <input type="text" id="comissao" class="form-input" placeholder="0,00" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Registrar Venda</button>
+                    </form>
                 </div>
             </div>
         </div>
 
         <!-- Relatórios -->
         <div id="relatorios" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Relatório de Vendas</h2>
-                    <div>
-                        <button class="btn btn-secondary" onclick="exportarRelatorioExcel()">Exportar Excel</button>
-                        <button class="btn btn-secondary" onclick="exportarRelatorioPDF()">Exportar PDF</button>
-                    </div>
-                </div>
-                <div class="card-body">
-                    <div class="filters">
-                        <div class="form-group">
-                            <label class="form-label">Data Inicial</label>
-                            <input type="text" id="dataInicial" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Data Final</label>
-                            <input type="text" id="dataFinal" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Vendedor</label>
-                            <select id="filtroVendedor" class="form-select">
-                                <option value="">Todos</option>
-                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Colunas</label>
-                            <small class="form-text">(Pressione Ctrl para selecionar mais de um item)</small>
-                            <select id="filtroColunas" class="form-select" multiple>
-                                <option value="data" selected>Data da Venda</option>
-                                <option value="vendedor" selected>Nome do Vendedor</option>
-                                <option value="servico" selected>Serviço Vendido</option>
-                                <option value="tipoComissao" selected>Tipo de Comissão</option>
-                                <option value="nomeCliente" selected>Nome do Cliente</option>
-                                <option value="empresaParceira" selected>Empresa Parceira</option>
-                                <option value="comissao" selected>Valor da Comissão</option>
-                                <option value="percentualComissao" selected>Variável da Comissão</option>
-                                <option value="valorBrutoReceber" selected>Valor Bruto a Receber</option>
-                            </select>
-                        </div>
-                        <button class="btn btn-primary" onclick="filtrarRelatorio()">Gerar</button>
-                    </div>
-                    <table id="tabelaRelatorio">
-                        <thead>
-                            <!-- As colunas serão preenchidas dinamicamente via JavaScript -->
-                        </thead>
-                        <tbody>
-                            <!-- As linhas da tabela serão preenchidas dinamicamente via JavaScript -->
-                        </tbody>
-                        <tfoot>
-                            <!-- O rodapé será preenchido dinamicamente via JavaScript -->
-                        </tfoot>
-                    </table>
-                </div>
-            </div>
+            <!-- Conteúdo de Relatórios -->
         </div>
     </div>
 
-    <!-- Spinner de Carregamento -->
-    <div id="loadingSpinner" class="d-none">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Carregando...</span>
-        </div>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.24/jspdf.plugin.autotable.min.js"></script>
-    <!--
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <script src="scripts.js"></script>
+    <!-- Scripts do Firebase e integração com o formulário -->
     <script type="module">
-  // Importações do Firebase
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-  import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+        // Importações do Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
 
-  // Configuração do Firebase (substitua com suas credenciais)
-  const firebaseConfig = {
-    apiKey: "AIzaSyBjTJBsddXjGr3Fpb5YsLs7PbCOZQN3fQU",
-    authDomain: "dashboard-vendas-dfa67.firebaseapp.com",
-    projectId: "dashboard-vendas-dfa67",
-    storageBucket: "dashboard-vendas-dfa67.firebasestorage.app",
-    messagingSenderId: "817829195288",
-    appId: "1:817829195288:web:1f95eac6d60573d6a2dd6d",
-    measurementId: "G-YXPS1SKYMM"
-  };
+        // Configuração do Firebase (substitua com suas credenciais)
+        const firebaseConfig = {
+            apiKey: "AIzaSyBjTJBsddXjGr3Fpb5YsLs7PbCOZQN3fQU",
+            authDomain: "dashboard-vendas-dfa67.firebaseapp.com",
+            projectId: "dashboard-vendas-dfa67",
+            storageBucket: "dashboard-vendas-dfa67.firebasestorage.app",
+            messagingSenderId: "817829195288",
+            appId: "1:817829195288:web:1f95eac6d60573d6a2dd6d",
+            measurementId: "G-YXPS1SKYMM"
+        };
 
-  // Inicializa o Firebase
-  const app = initializeApp(firebaseConfig);
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
 
-  // Inicializa o Realtime Database
-  const database = getDatabase(app);
-</script>
+        // Inicializa o Realtime Database
+        const database = getDatabase(app);
 
-    // Função para registrar uma venda no Firebase
-function registrarVenda(venda) {
-  const vendasRef = ref(database, 'vendas');
-  push(vendasRef, venda)
-    .then(() => {
-      alert('Venda registrada com sucesso!');
-      limparCamposVenda(); // Limpa os campos do formulário após o registro
-    })
-    .catch((error) => {
-      console.error('Erro ao registrar venda:', error);
-      alert('Erro ao registrar venda. Tente novamente.');
-    });
-}
+        // Função para registrar uma venda no Firebase
+        function registrarVenda(venda) {
+            const vendasRef = ref(database, 'vendas');
+            push(vendasRef, venda)
+                .then(() => {
+                    alert('Venda registrada com sucesso!');
+                    limparCamposVenda(); // Limpa os campos do formulário após o registro
+                })
+                .catch((error) => {
+                    console.error('Erro ao registrar venda:', error);
+                    alert('Erro ao registrar venda. Tente novamente.');
+                });
+        }
 
-// Função para limpar os campos do formulário de venda
-function limparCamposVenda() {
-  document.getElementById('vendedorVenda').value = '';
-  document.getElementById('servicoVenda').value = '';
-  document.getElementById('dataVenda').value = '';
-  document.getElementById('nomeCliente').value = '';
-  document.getElementById('empresaParceira').value = '';
-  document.getElementById('valorVenda').value = '';
-  document.getElementById('valorReceber').value = '';
-  document.getElementById('comissao').value = '';
-}
+        // Função para limpar os campos do formulário de venda
+        function limparCamposVenda() {
+            document.getElementById('vendedorVenda').value = '';
+            document.getElementById('servicoVenda').value = '';
+            document.getElementById('dataVenda').value = '';
+            document.getElementById('nomeCliente').value = '';
+            document.getElementById('empresaParceira').value = '';
+            document.getElementById('valorVenda').value = '';
+            document.getElementById('valorReceber').value = '';
+            document.getElementById('comissao').value = '';
+        }
 
-// Captura o envio do formulário de venda
-document.getElementById('vendaForm').addEventListener('submit', function (e) {
-  e.preventDefault(); // Impede o recarregamento da página
+        // Captura o envio do formulário de venda
+        document.getElementById('vendaForm').addEventListener('submit', function (e) {
+            e.preventDefault(); // Impede o recarregamento da página
 
-  // Cria um objeto com os dados da venda
-  const venda = {
-    vendedor: document.getElementById('vendedorVenda').value,
-    servico: document.getElementById('servicoVenda').value,
-    data: document.getElementById('dataVenda').value,
-    nomeCliente: document.getElementById('nomeCliente').value,
-    empresaParceira: document.getElementById('empresaParceira').value,
-    valorVenda: parseFloat(document.getElementById('valorVenda').value.replace(/[^0-9,]/g, '').replace(',', '.')),
-    valorReceber: parseFloat(document.getElementById('valorReceber').value.replace(/[^0-9,]/g, '').replace(',', '.')),
-    comissao: parseFloat(document.getElementById('comissao').value.replace(/[^0-9,]/g, '').replace(',', '.'))
-  };
+            // Cria um objeto com os dados da venda
+            const venda = {
+                vendedor: document.getElementById('vendedorVenda').value,
+                servico: document.getElementById('servicoVenda').value,
+                data: document.getElementById('dataVenda').value,
+                nomeCliente: document.getElementById('nomeCliente').value,
+                empresaParceira: document.getElementById('empresaParceira').value,
+                valorVenda: parseFloat(document.getElementById('valorVenda').value.replace(/[^0-9,]/g, '').replace(',', '.')),
+                valorReceber: parseFloat(document.getElementById('valorReceber').value.replace(/[^0-9,]/g, '').replace(',', '.')),
+                comissao: parseFloat(document.getElementById('comissao').value.replace(/[^0-9,]/g, '').replace(',', '.'))
+            };
 
-  // Registra a venda no Firebase
-  registrarVenda(venda);
-});
+            // Registra a venda no Firebase
+            registrarVenda(venda);
+        });
+    </script>
 
-    // Função para buscar vendas do Firebase
-function buscarVendas() {
-  const vendasRef = ref(database, 'vendas');
-  onValue(vendasRef, (snapshot) => {
-    const vendas = snapshot.val();
-    console.log('Vendas encontradas:', vendas);
-    // Aqui você pode atualizar a interface com as vendas recuperadas
-  });
-}
-
-// Buscar vendas ao carregar a página
-buscarVendas();
-    
+    <!-- Scripts do projeto -->
+    <script src="scripts.js"></script>
 </body>
 </html>
