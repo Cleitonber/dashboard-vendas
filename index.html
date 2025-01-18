@@ -344,5 +344,27 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="scripts.js"></script>
+    <script type="module">
+  // Importações do Firebase
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+  import { getDatabase, ref, push, onValue } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+
+  // Configuração do Firebase (substitua com suas credenciais)
+  const firebaseConfig = {
+    apiKey: "AIzaSyBjTJBsddXjGr3Fpb5YsLs7PbCOZQN3fQU",
+    authDomain: "dashboard-vendas-dfa67.firebaseapp.com",
+    projectId: "dashboard-vendas-dfa67",
+    storageBucket: "dashboard-vendas-dfa67.firebasestorage.app",
+    messagingSenderId: "817829195288",
+    appId: "1:817829195288:web:1f95eac6d60573d6a2dd6d",
+    measurementId: "G-YXPS1SKYMM"
+  };
+
+  // Inicializa o Firebase
+  const app = initializeApp(firebaseConfig);
+
+  // Inicializa o Realtime Database
+  const database = getDatabase(app);
+</script>
 </body>
 </html>
