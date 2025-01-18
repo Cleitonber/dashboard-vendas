@@ -1,3 +1,33 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyBjTJBsddXjGr3Fpb5YsLs7PbCOZQN3fQU",
+  authDomain: "dashboard-vendas-dfa67.firebaseapp.com",
+  databaseURL: "https://dashboard-vendas-dfa67.firebaseio.com",
+  projectId: "dashboard-vendas-dfa67",
+  storageBucket: "dashboard-vendas-dfa67.firebasestorage.app",
+  messagingSenderId: "817829195288",
+  appId: "1:817829195288:web:1f95eac6d60573d6a2dd6d"
+};
+firebase.initializeApp(firebaseConfig);
+
+const database = firebase.database();
+
+// Exemplo: Inserir dados no banco de dados
+function registrarVenda(nomeCliente, valorVenda) {
+  database.ref('vendas').push({
+    nome_cliente: nomeCliente,
+    valor_venda: valorVenda
+  });
+}
+
+// Exemplo: Buscar todas as vendas
+function buscarVendas() {
+  database.ref('vendas').on('value', (snapshot) => {
+    const vendas = snapshot.val();
+    console.log('Vendas encontradas:', vendas);
+  });
+}
+
+
 const { jsPDF } = window.jspdf;
 
 let dados = {
