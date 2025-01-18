@@ -7,6 +7,9 @@ let dados = {
     empresasParceiras: []
 };
 
+let paginaAtualVendedores = 1;
+const itensPorPagina = 5;
+
 // Função para alternar entre as abas
 function showTab(tabId) {
     const tabs = document.querySelectorAll('.tab-content');
@@ -26,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function () {
     atualizarOpcoesVendedores();
     atualizarOpcoesServicos();
     atualizarOpcoesEmpresas();
+    inicializarGraficos();
 });
 
 // Função para preencher o seletor de anos
@@ -124,11 +128,15 @@ function limparCamposVendedor() {
 }
 
 // Função para atualizar a lista de vendedores
-function atualizarListaVendedores() {
+function atualizarListaVendedores(vendedores = dados.vendedores) {
     const listaVendedores = document.getElementById('vendedoresList');
     listaVendedores.innerHTML = '';
 
-    dados.vendedores.forEach(vendedor => {
+    const inicio = (paginaAtualVendedores - 1) * itensPorPagina;
+    const fim = inicio + itensPorPagina;
+    const vendedoresPaginados = vendedores.slice(inicio, fim);
+
+    vendedoresPaginados.forEach(vendedor => {
         const li = document.createElement('li');
         li.className = 'list-group-item';
         li.innerHTML = `
@@ -145,6 +153,20 @@ function atualizarListaVendedores() {
         `;
         listaVendedores.appendChild(li);
     });
+
+    // Atualizar controles de paginação
+    const totalPaginas = Math.ceil(vendedores.length / itensPorPagina);
+    document.getElementById('controlesPaginacao').innerHTML = `
+        <button class="btn btn-secondary" onclick="mudarPaginaVendedores(-1)" ${paginaAtualVendedores === 1 ? 'disabled' : ''}>Anterior</button>
+        <span>Página ${paginaAtualVendedores} de ${totalPaginas}</span>
+        <button class="btn btn-secondary" onclick="mudarPaginaVendedores(1)" ${paginaAtualVendedores === totalPaginas ? 'disabled' : ''}>Próxima</button>
+    `;
+}
+
+// Função para mudar a página de vendedores
+function mudarPaginaVendedores(direcao) {
+    paginaAtualVendedores += direcao;
+    atualizarListaVendedores();
 }
 
 // Função para editar vendedor
@@ -210,10 +232,12 @@ function cancelarEdicao() {
 
 // Função para excluir vendedor
 function excluirVendedor(id) {
-    dados.vendedores = dados.vendedores.filter(v => v.id !== id);
-    atualizarListaVendedores();
-    atualizarOpcoesVendedores();
-    alert('Vendedor excluído com sucesso!');
+    if (confirm('Tem certeza que deseja excluir este vendedor?')) {
+        dados.vendedores = dados.vendedores.filter(v => v.id !== id);
+        atualizarListaVendedores();
+        atualizarOpcoesVendedores();
+        alert('Vendedor excluído com sucesso!');
+    }
 }
 
 // Função para cadastrar serviço
@@ -329,10 +353,12 @@ function salvarEdicaoServico(id) {
 
 // Função para excluir serviço
 function excluirServico(id) {
-    dados.servicos = dados.servicos.filter(s => s.id !== id);
-    atualizarListaServicos();
-    atualizarOpcoesServicos();
-    alert('Serviço excluído com sucesso!');
+    if (confirm('Tem certeza que deseja excluir este serviço?')) {
+        dados.servicos = dados.servicos.filter(s => s.id !== id);
+        atualizarListaServicos();
+        atualizarOpcoesServicos();
+        alert('Serviço excluído com sucesso!');
+    }
 }
 
 // Função para cadastrar empresa parceira
@@ -433,10 +459,12 @@ function salvarEdicaoEmpresa(id) {
 
 // Função para excluir empresa parceira
 function excluirEmpresa(id) {
-    dados.empresasParceiras = dados.empresasParceiras.filter(e => e.id !== id);
-    atualizarListaEmpresas();
-    atualizarOpcoesEmpresas();
-    alert('Empresa excluída com sucesso!');
+    if (confirm('Tem certeza que deseja excluir esta empresa?')) {
+        dados.empresasParceiras = dados.empresasParceiras.filter(e => e.id !== id);
+        atualizarListaEmpresas();
+        atualizarOpcoesEmpresas();
+        alert('Empresa excluída com sucesso!');
+    }
 }
 
 // Função para registrar venda
@@ -551,34 +579,38 @@ function formatarMoeda(input) {
 
 // Função para exportar relatório em Excel
 function exportarRelatorioExcel() {
-    const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
-    const colunas = {
-        data: 'Data da Venda',
-        vendedor: 'Nome do Vendedor',
-        servico: 'Serviço Vendido',
-        tipoComissao: 'Tipo de Comissão',
-        nomeCliente: 'Nome do Cliente',
-        empresaParceira: 'Empresa Parceira',
-        comissao: 'Valor da Comissão',
-        percentualComissao: 'Variável da Comissão',
-        valorBrutoReceber: 'Valor Bruto a Receber'
-    };
+    mostrarSpinner();
+    setTimeout(() => {
+        const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
+        const colunas = {
+            data: 'Data da Venda',
+            vendedor: 'Nome do Vendedor',
+            servico: 'Serviço Vendido',
+            tipoComissao: 'Tipo de Comissão',
+            nomeCliente: 'Nome do Cliente',
+            empresaParceira: 'Empresa Parceira',
+            comissao: 'Valor da Comissão',
+            percentualComissao: 'Variável da Comissão',
+            valorBrutoReceber: 'Valor Bruto a Receber'
+        };
 
-    const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
-    const data = [];
+        const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
+        const data = [];
 
-    document.querySelectorAll('#tabelaRelatorio tbody tr').forEach(row => {
-        const rowData = {};
-        row.querySelectorAll('td').forEach((cell, index) => {
-            rowData[headers[index]] = cell.textContent;
+        document.querySelectorAll('#tabelaRelatorio tbody tr').forEach(row => {
+            const rowData = {};
+            row.querySelectorAll('td').forEach((cell, index) => {
+                rowData[headers[index]] = cell.textContent;
+            });
+            data.push(rowData);
         });
-        data.push(rowData);
-    });
 
-    const ws = XLSX.utils.json_to_sheet(data);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, 'Relatório de Vendas');
-    XLSX.writeFile(wb, 'relatorio_vendas.xlsx');
+        const ws = XLSX.utils.json_to_sheet(data);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, 'Relatório de Vendas');
+        XLSX.writeFile(wb, 'relatorio_vendas.xlsx');
+        esconderSpinner();
+    }, 2000);
 }
 
 // Função para atualizar o tipo de comissão ao selecionar um serviço
@@ -718,4 +750,123 @@ function ordenarTabela(coluna) {
     // Reinserir as linhas ordenadas
     tbody.innerHTML = '';
     rows.forEach(row => tbody.appendChild(row));
+}
+
+// Função para mostrar o spinner de carregamento
+function mostrarSpinner() {
+    document.getElementById('loadingSpinner').classList.remove('d-none');
+}
+
+// Função para esconder o spinner de carregamento
+function esconderSpinner() {
+    document.getElementById('loadingSpinner').classList.add('d-none');
+}
+
+// Inicializar gráficos
+function inicializarGraficos() {
+    const ctxVendasServico = document.getElementById('vendasServicoChart').getContext('2d');
+    const ctxDesempenhoVendedores = document.getElementById('desempenhoVendedoresChart').getContext('2d');
+    const ctxVendasCategoria = document.getElementById('vendasCategoriaChart').getContext('2d');
+
+    // Gráfico de Vendas por Serviço
+    new Chart(ctxVendasServico, {
+        type: 'bar',
+        data: {
+            labels: ['Serviço A', 'Serviço B', 'Serviço C'],
+            datasets: [{
+                label: 'Vendas',
+                data: [1200, 1900, 800],
+                backgroundColor: 'rgba(79, 70, 229, 0.6)',
+                borderColor: 'rgba(79, 70, 229, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            }
+        }
+    });
+
+    // Gráfico de Desempenho dos Vendedores
+    new Chart(ctxDesempenhoVendedores, {
+        type: 'line',
+        data: {
+            labels: ['Vendedor 1', 'Vendedor 2', 'Vendedor 3'],
+            datasets: [{
+                label: 'Vendas',
+                data: [1500, 2200, 1800],
+                borderColor: 'rgba(239, 68, 68, 1)',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            }
+        }
+    });
+
+    // Gráfico de Vendas por Categoria
+    new Chart(ctxVendasCategoria, {
+        type: 'pie',
+        data: {
+            labels: ['Categoria A', 'Categoria B', 'Categoria C'],
+            datasets: [{
+                label: 'Vendas',
+                data: [300, 500, 200],
+                backgroundColor: [
+                    'rgba(79, 70, 229, 0.6)',
+                    'rgba(239, 68, 68, 0.6)',
+                    'rgba(34, 197, 94, 0.6)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            }
+        }
+    });
 }
