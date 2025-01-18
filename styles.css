@@ -276,6 +276,10 @@ th {
     cursor: pointer;
 }
 
+th:active {
+    cursor: grabbing;
+}
+
 .filters {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
