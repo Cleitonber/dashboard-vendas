@@ -613,6 +613,26 @@ function exportarRelatorioExcel() {
     }, 2000);
 }
 
+// Função para exportar relatório em PDF
+function exportarRelatorioPDF() {
+    const doc = new jsPDF();
+    const tabela = document.getElementById('tabelaRelatorio');
+    const headers = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent);
+    const rows = Array.from(tabela.querySelectorAll('tbody tr')).map(tr =>
+        Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
+    );
+
+    doc.autoTable({
+        head: [headers],
+        body: rows,
+        theme: 'grid',
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [79, 70, 229] }
+    });
+
+    doc.save('relatorio_vendas.pdf');
+}
+
 // Função para atualizar o tipo de comissão ao selecionar um serviço
 function atualizarTipoComissao() {
     const servicoId = document.getElementById('servicoVenda').value;
@@ -689,10 +709,10 @@ function filtrarRelatorio() {
     thead.innerHTML = '';
 
     const headerRow = document.createElement('tr');
-    headers.forEach(header => {
+    headers.forEach((header, index) => {
         const th = document.createElement('th');
         th.textContent = header;
-        th.onclick = () => ordenarTabela(header); // Adicionar função de ordenação
+        th.onclick = () => ordenarTabela(index); // Adicionar função de ordenação
         headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -701,19 +721,63 @@ function filtrarRelatorio() {
     const tbody = document.querySelector('#tabelaRelatorio tbody');
     tbody.innerHTML = '';
 
+    let totalComissao = 0;
+    let totalValorBruto = 0;
+
     vendasFiltradas.forEach(venda => {
         const row = document.createElement('tr');
         colunasSelecionadas.forEach(coluna => {
             const cell = document.createElement('td');
-            cell.textContent = venda[coluna] || '-';
+            let valor = '';
+
+            switch (coluna) {
+                case 'data':
+                    valor = venda.data;
+                    break;
+                case 'vendedor':
+                    valor = venda.vendedor;
+                    break;
+                case 'servico':
+                    valor = venda.servico;
+                    break;
+                case 'tipoComissao':
+                    valor = venda.tipoComissao === 'fixa' ? 'Fixa' : 'Porcentagem';
+                    break;
+                case 'nomeCliente':
+                    valor = venda.nomeCliente;
+                    break;
+                case 'empresaParceira':
+                    valor = venda.empresaParceira;
+                    break;
+                case 'comissao':
+                    if (venda.tipoComissao === 'fixa') {
+                        valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                        totalComissao += venda.comissao;
+                    } else {
+                        const comissao = (venda.valorReceber * venda.comissao) / 100;
+                        valor = comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                        totalComissao += comissao;
+                    }
+                    break;
+                case 'percentualComissao':
+                    if (venda.tipoComissao === 'fixa') {
+                        valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    } else {
+                        valor = `${venda.comissao}%`;
+                    }
+                    break;
+                case 'valorBrutoReceber':
+                    valor = venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    totalValorBruto += venda.valorReceber;
+                    break;
+                default:
+                    valor = '-';
+            }
+            cell.textContent = valor;
             row.appendChild(cell);
         });
         tbody.appendChild(row);
     });
-
-    // Calcular totais
-    const totalComissao = vendasFiltradas.reduce((total, venda) => total + (venda.comissao || 0), 0);
-    const totalValorBruto = vendasFiltradas.reduce((total, venda) => total + (venda.valorBrutoReceber || 0), 0);
 
     // Atualizar totais no rodapé
     const tfoot = document.querySelector('#tabelaRelatorio tfoot');
@@ -737,8 +801,8 @@ function ordenarTabela(coluna) {
 
     // Ordenar as linhas
     rows.sort((a, b) => {
-        const valorA = a.querySelector(`td:nth-child(${headers.indexOf(coluna) + 1})`).textContent;
-        const valorB = b.querySelector(`td:nth-child(${headers.indexOf(coluna) + 1})`).textContent;
+        const valorA = a.querySelector(`td:nth-child(${coluna + 1})`).textContent;
+        const valorB = b.querySelector(`td:nth-child(${coluna + 1})`).textContent;
 
         if (direcao === 'asc') {
             return valorA.localeCompare(valorB, undefined, { numeric: true });
