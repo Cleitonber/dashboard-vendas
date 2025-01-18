@@ -151,6 +151,7 @@
                             <h3>Vendedores Cadastrados</h3>
                             <input type="text" id="filtroVendedores" placeholder="Pesquisar vendedor..." class="form-input">
                             <ul id="vendedoresList" class="list-group"></ul>
+                            <div id="controlesPaginacao" class="d-flex justify-content-between align-items-center mt-3"></div>
                         </div>
                     </div>
                 </div>
@@ -321,6 +322,13 @@
                     </table>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Spinner de Carregamento -->
+    <div id="loadingSpinner" class="d-none">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Carregando...</span>
         </div>
     </div>
 
