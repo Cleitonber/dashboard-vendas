@@ -8,6 +8,9 @@ let dados = {
 };
 
 let paginaAtualVendedores = 1;
+let paginaAtualServicos = 1;
+let paginaAtualEmpresas = 1;
+let paginaAtualVendas = 1;
 const itensPorPagina = 5;
 
 // Função para alternar entre as abas
@@ -30,7 +33,6 @@ document.addEventListener('DOMContentLoaded', function () {
     atualizarOpcoesServicos();
     atualizarOpcoesEmpresas();
     inicializarGraficos();
-    listarVendas();
 });
 
 // Função para preencher o seletor de anos
@@ -133,6 +135,7 @@ function atualizarListaVendedores(vendedores = dados.vendedores) {
     const listaVendedores = document.getElementById('vendedoresList');
     listaVendedores.innerHTML = '';
 
+    const itensPorPagina = parseInt(document.getElementById('itensPorPaginaVendedores').value);
     const inicio = (paginaAtualVendedores - 1) * itensPorPagina;
     const fim = inicio + itensPorPagina;
     const vendedoresPaginados = vendedores.slice(inicio, fim);
@@ -157,7 +160,7 @@ function atualizarListaVendedores(vendedores = dados.vendedores) {
 
     // Atualizar controles de paginação
     const totalPaginas = Math.ceil(vendedores.length / itensPorPagina);
-    document.getElementById('controlesPaginacao').innerHTML = `
+    document.getElementById('controlesPaginacaoVendedores').innerHTML = `
         <button class="btn btn-secondary" onclick="mudarPaginaVendedores(-1)" ${paginaAtualVendedores === 1 ? 'disabled' : ''}>Anterior</button>
         <span>Página ${paginaAtualVendedores} de ${totalPaginas}</span>
         <button class="btn btn-secondary" onclick="mudarPaginaVendedores(1)" ${paginaAtualVendedores === totalPaginas ? 'disabled' : ''}>Próxima</button>
@@ -274,7 +277,12 @@ function atualizarListaServicos() {
     const listaServicos = document.getElementById('servicosList');
     listaServicos.innerHTML = '';
 
-    dados.servicos.forEach(servico => {
+    const itensPorPagina = parseInt(document.getElementById('itensPorPaginaServicos').value);
+    const inicio = (paginaAtualServicos - 1) * itensPorPagina;
+    const fim = inicio + itensPorPagina;
+    const servicosPaginados = dados.servicos.slice(inicio, fim);
+
+    servicosPaginados.forEach(servico => {
         const li = document.createElement('li');
         li.className = 'list-group-item';
         li.innerHTML = `
@@ -291,6 +299,20 @@ function atualizarListaServicos() {
         `;
         listaServicos.appendChild(li);
     });
+
+    // Atualizar controles de paginação
+    const totalPaginas = Math.ceil(dados.servicos.length / itensPorPagina);
+    document.getElementById('controlesPaginacaoServicos').innerHTML = `
+        <button class="btn btn-secondary" onclick="mudarPaginaServicos(-1)" ${paginaAtualServicos === 1 ? 'disabled' : ''}>Anterior</button>
+        <span>Página ${paginaAtualServicos} de ${totalPaginas}</span>
+        <button class="btn btn-secondary" onclick="mudarPaginaServicos(1)" ${paginaAtualServicos === totalPaginas ? 'disabled' : ''}>Próxima</button>
+    `;
+}
+
+// Função para mudar a página de serviços
+function mudarPaginaServicos(direcao) {
+    paginaAtualServicos += direcao;
+    atualizarListaServicos();
 }
 
 // Função para editar serviço
@@ -389,7 +411,12 @@ function atualizarListaEmpresas() {
     const listaEmpresas = document.getElementById('empresasList');
     listaEmpresas.innerHTML = '';
 
-    dados.empresasParceiras.forEach(empresa => {
+    const itensPorPagina = parseInt(document.getElementById('itensPorPaginaEmpresas').value);
+    const inicio = (paginaAtualEmpresas - 1) * itensPorPagina;
+    const fim = inicio + itensPorPagina;
+    const empresasPaginadas = dados.empresasParceiras.slice(inicio, fim);
+
+    empresasPaginadas.forEach(empresa => {
         const li = document.createElement('li');
         li.className = 'list-group-item';
         li.innerHTML = `
@@ -405,6 +432,20 @@ function atualizarListaEmpresas() {
         `;
         listaEmpresas.appendChild(li);
     });
+
+    // Atualizar controles de paginação
+    const totalPaginas = Math.ceil(dados.empresasParceiras.length / itensPorPagina);
+    document.getElementById('controlesPaginacaoEmpresas').innerHTML = `
+        <button class="btn btn-secondary" onclick="mudarPaginaEmpresas(-1)" ${paginaAtualEmpresas === 1 ? 'disabled' : ''}>Anterior</button>
+        <span>Página ${paginaAtualEmpresas} de ${totalPaginas}</span>
+        <button class="btn btn-secondary" onclick="mudarPaginaEmpresas(1)" ${paginaAtualEmpresas === totalPaginas ? 'disabled' : ''}>Próxima</button>
+    `;
+}
+
+// Função para mudar a página de empresas
+function mudarPaginaEmpresas(direcao) {
+    paginaAtualEmpresas += direcao;
+    atualizarListaEmpresas();
 }
 
 // Função para editar empresa parceira
@@ -942,7 +983,12 @@ function listarVendas(vendas = dados.vendas) {
     const tbody = document.querySelector('#tabelaVendas tbody');
     tbody.innerHTML = '';
 
-    vendas.forEach(venda => {
+    const itensPorPagina = parseInt(document.getElementById('itensPorPaginaVendas').value);
+    const inicio = (paginaAtualVendas - 1) * itensPorPagina;
+    const fim = inicio + itensPorPagina;
+    const vendasPaginadas = vendas.slice(inicio, fim);
+
+    vendasPaginadas.forEach(venda => {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${venda.data}</td>
@@ -960,6 +1006,20 @@ function listarVendas(vendas = dados.vendas) {
         `;
         tbody.appendChild(row);
     });
+
+    // Atualizar controles de paginação
+    const totalPaginas = Math.ceil(vendas.length / itensPorPagina);
+    document.getElementById('controlesPaginacaoVendas').innerHTML = `
+        <button class="btn btn-secondary" onclick="mudarPaginaVendas(-1)" ${paginaAtualVendas === 1 ? 'disabled' : ''}>Anterior</button>
+        <span>Página ${paginaAtualVendas} de ${totalPaginas}</span>
+        <button class="btn btn-secondary" onclick="mudarPaginaVendas(1)" ${paginaAtualVendas === totalPaginas ? 'disabled' : ''}>Próxima</button>
+    `;
+}
+
+// Função para mudar a página de vendas
+function mudarPaginaVendas(direcao) {
+    paginaAtualVendas += direcao;
+    listarVendas();
 }
 
 // Função para filtrar as vendas por período
