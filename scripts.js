@@ -4,6 +4,71 @@ const supabaseUrl = 'https://znsgmnzpbrwfibxqyeki.supabase.co'
 const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpuc2dtbnpwYnJ3ZmlieHF5ZWtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcyNTA5MDIsImV4cCI6MjA1MjgyNjkwMn0.AOAKjkKsD7eyDVPnTkQcx4ZRr2r1lmGmpW0JmgkHLJ0'
 const supabase = createClient(supabaseUrl, supabaseKey)
 
+// Função para cadastrar vendedor
+async function addSeller(nome, email, telefone) {
+    const { data, error } = await supabase
+        .from('vendedores')
+        .insert([{ nome, email, telefone }])
+        .select();
+
+    if (error) {
+        console.error('Erro ao cadastrar vendedor:', error);
+        return null;
+    }
+
+    return data[0];
+}
+
+// Função para buscar vendedores
+async function getSellers() {
+    const { data, error } = await supabase
+        .from('vendedores')
+        .select('*');
+
+    if (error) {
+        console.error('Erro ao buscar vendedores:', error);
+        return [];
+    }
+
+    return data;
+}
+
+// Função para exibir vendedores na lista
+async function exibirVendedores() {
+    const listaVendedores = document.getElementById('listaVendedores');
+    listaVendedores.innerHTML = ''; // Limpa a lista
+
+    const vendedores = await getSellers();
+    vendedores.forEach(vendedor => {
+        const li = document.createElement('li');
+        li.textContent = `${vendedor.nome} - ${vendedor.email} - ${vendedor.telefone}`;
+        listaVendedores.appendChild(li);
+    });
+}
+
+// Evento de submit do formulário
+document.getElementById('vendedorForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); // Evita o recarregamento da página
+
+    // Pega os valores do formulário
+    const nome = document.getElementById('nomeVendedor').value;
+    const email = document.getElementById('emailVendedor').value;
+    const telefone = document.getElementById('telefoneVendedor').value;
+
+    // Cadastra o vendedor
+    await addSeller(nome, email, telefone);
+
+    // Atualiza a lista de vendedores
+    exibirVendedores();
+
+    // Limpa o formulário
+    document.getElementById('vendedorForm').reset();
+});
+
+// Exibe os vendedores ao carregar a página
+exibirVendedores();
+
+
 const { jsPDF } = window.jspdf;
 
 let dados = {
