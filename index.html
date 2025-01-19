@@ -228,14 +228,15 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Serviço</label>
-                            <select id="servicoVenda" class="form-select" required>
+                            <select id="servicoVenda" class="form-select" required onchange="atualizarTipoComissao()">
                                 <option value="">Selecione um serviço</option>
                                 <!-- As opções serão preenchidas dinamicamente via JavaScript -->
                             </select>
+                            <small id="tipoComissaoInfo" class="form-text"></small>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Data da Venda</label>
-                            <input type="text" id="dataVenda" class="form-input" placeholder="DD/MM/AAAA" required>
+                            <input type="text" id="dataVenda" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Nome do Cliente</label>
@@ -250,15 +251,16 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Valor da Venda</label>
-                            <input type="text" id="valorVenda" class="form-input" placeholder="R$ 0,00" required>
+                            <input type="text" id="valorVenda" class="form-input" placeholder="R$ 0,00" required oninput="formatarMoeda(this)">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Valor a Receber</label>
-                            <input type="text" id="valorReceber" class="form-input" placeholder="R$ 0,00" required>
+                            <input type="text" id="valorReceber" class="form-input" placeholder="R$ 0,00" required oninput="formatarMoeda(this)">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Comissão</label>
-                            <input type="text" id="comissao" class="form-input" placeholder="0,00" required>
+                            <small id="tipoComissaoInfo" class="form-text"></small>
+                            <input type="text" id="comissao" class="form-input" placeholder="0,00" required oninput="formatarComissao(this)">
                         </div>
                         <button type="submit" class="btn btn-primary">Registrar Venda</button>
                     </form>
@@ -280,11 +282,11 @@
                     <div class="filters">
                         <div class="form-group">
                             <label class="form-label">Data Inicial</label>
-                            <input type="text" id="dataInicial" class="form-input" placeholder="DD/MM/AAAA">
+                            <input type="text" id="dataInicial" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Data Final</label>
-                            <input type="text" id="dataFinal" class="form-input" placeholder="DD/MM/AAAA">
+                            <input type="text" id="dataFinal" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Vendedor</label>
@@ -326,77 +328,21 @@
         </div>
     </div>
 
-    <!-- Scripts do Firebase e integração com o formulário -->
-    <script type="module">
-        // Importações do Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
-        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+    <!-- Spinner de Carregamento -->
+    <div id="loadingSpinner" class="d-none">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+    </div>
 
-        // Configuração do Firebase (substitua com suas credenciais)
-        const firebaseConfig = {
-            apiKey: "AIzaSyBjTJBsddXjGr3Fpb5YsLs7PbCOZQN3fQU",
-            authDomain: "dashboard-vendas-dfa67.firebaseapp.com",
-            projectId: "dashboard-vendas-dfa67",
-            storageBucket: "dashboard-vendas-dfa67.firebasestorage.app",
-            messagingSenderId: "817829195288",
-            appId: "1:817829195288:web:1f95eac6d60573d6a2dd6d",
-            measurementId: "G-YXPS1SKYMM"
-        };
-
-        // Inicializa o Firebase
-        const app = initializeApp(firebaseConfig);
-
-        // Inicializa o Realtime Database
-        const database = getDatabase(app);
-
-        // Função para registrar uma venda no Firebase
-        function registrarVenda(venda) {
-            const vendasRef = ref(database, 'vendas');
-            push(vendasRef, venda)
-                .then(() => {
-                    alert('Venda registrada com sucesso!');
-                    limparCamposVenda(); // Limpa os campos do formulário após o registro
-                })
-                .catch((error) => {
-                    console.error('Erro ao registrar venda:', error);
-                    alert('Erro ao registrar venda. Tente novamente.');
-                });
-        }
-
-        // Função para limpar os campos do formulário de venda
-        function limparCamposVenda() {
-            document.getElementById('vendedorVenda').value = '';
-            document.getElementById('servicoVenda').value = '';
-            document.getElementById('dataVenda').value = '';
-            document.getElementById('nomeCliente').value = '';
-            document.getElementById('empresaParceira').value = '';
-            document.getElementById('valorVenda').value = '';
-            document.getElementById('valorReceber').value = '';
-            document.getElementById('comissao').value = '';
-        }
-
-        // Captura o envio do formulário de venda
-        document.getElementById('vendaForm').addEventListener('submit', function (e) {
-            e.preventDefault(); // Impede o recarregamento da página
-
-            // Cria um objeto com os dados da venda
-            const venda = {
-                vendedor: document.getElementById('vendedorVenda').value,
-                servico: document.getElementById('servicoVenda').value,
-                data: document.getElementById('dataVenda').value,
-                nomeCliente: document.getElementById('nomeCliente').value,
-                empresaParceira: document.getElementById('empresaParceira').value,
-                valorVenda: parseFloat(document.getElementById('valorVenda').value.replace(/[^0-9,]/g, '').replace(',', '.')),
-                valorReceber: parseFloat(document.getElementById('valorReceber').value.replace(/[^0-9,]/g, '').replace(',', '.')),
-                comissao: parseFloat(document.getElementById('comissao').value.replace(/[^0-9,]/g, '').replace(',', '.'))
-            };
-
-            // Registra a venda no Firebase
-            registrarVenda(venda);
-        });
-    </script>
-
-    <!-- Scripts do projeto -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.24/jspdf.plugin.autotable.min.js"></script>
+    <!--
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="scripts.js"></script>
 </body>
 </html>
