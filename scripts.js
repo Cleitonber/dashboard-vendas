@@ -12,7 +12,9 @@ const firebaseConfig = {
 };
 
 // Inicialize o Firebase
-const app = firebase.initializeApp(firebaseConfig);
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+}
 const database = firebase.database(); // Variável global para o banco de dados
 
 let dados = {
