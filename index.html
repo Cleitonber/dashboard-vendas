@@ -266,6 +266,44 @@
                     </form>
                 </div>
             </div>
+
+            <!-- Listagem de Vendas -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Listagem de Vendas</h2>
+                </div>
+                <div class="card-body">
+                    <div class="filters">
+                        <div class="form-group">
+                            <label class="form-label">Data Inicial</label>
+                            <input type="text" id="filtroDataInicial" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Data Final</label>
+                            <input type="text" id="filtroDataFinal" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
+                        </div>
+                        <button class="btn btn-primary" onclick="filtrarVendas()">Filtrar</button>
+                    </div>
+                    <table id="tabelaVendas">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Vendedor</th>
+                                <th>Serviço</th>
+                                <th>Cliente</th>
+                                <th>Empresa Parceira</th>
+                                <th>Valor Venda</th>
+                                <th>Valor Receber</th>
+                                <th>Comissão</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- As linhas serão preenchidas dinamicamente via JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
 
         <!-- Relatórios -->
@@ -337,10 +375,7 @@
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.24/jspdf.plugin.autotable.min.js"></script>
-    <!--
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.24/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="scripts.js"></script>
