@@ -1,22 +1,5 @@
 const { jsPDF } = window.jspdf;
 
-// Configuração do Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyBjTJBsddXjGr3Fpb5YsLs7PbCOZQN3fQU",
-  authDomain: "dashboard-vendas-dfa67.firebaseapp.com",
-  projectId: "dashboard-vendas-dfa67",
-  storageBucket: "dashboard-vendas-dfa67.appspot.com",
-  messagingSenderId: "817829195288",
-  appId: "1:817829195288:web:1f95eac6d60573d6a2dd6d",
-  measurementId: "G-YXPS1SKYMM"
-};
-
-// Inicialize o Firebase
-if (!firebase.apps.length) {
-  firebase.initializeApp(firebaseConfig);
-}
-const database = firebase.database(); // Variável global para o banco de dados
-
 let dados = {
     vendas: [],
     vendedores: [],
@@ -47,7 +30,6 @@ document.addEventListener('DOMContentLoaded', function () {
     atualizarOpcoesServicos();
     atualizarOpcoesEmpresas();
     inicializarGraficos();
-    carregarVendas(); // Carrega as vendas ao iniciar o dashboard
 });
 
 // Função para preencher o seletor de anos
@@ -507,6 +489,7 @@ document.getElementById('vendaForm').addEventListener('submit', function (e) {
     }
 
     const novaVenda = {
+        id: dados.vendas.length + 1,
         vendedor: vendedor.nome,
         servico: servico.nome,
         data: dataVenda,
@@ -518,17 +501,10 @@ document.getElementById('vendaForm').addEventListener('submit', function (e) {
         tipoComissao: servico.tipoComissao
     };
 
-    // Salvar a venda no Firebase
-    database.ref('vendas').push(novaVenda)
-        .then(() => {
-            alert('Venda registrada com sucesso!');
-            limparCamposVenda();
-            carregarVendas(); // Atualiza a lista de vendas
-        })
-        .catch((error) => {
-            console.error('Erro ao salvar venda:', error);
-            alert('Erro ao salvar venda. Verifique o console para mais detalhes.');
-        });
+    dados.vendas.push(novaVenda);
+    alert('Venda registrada com sucesso!');
+    limparCamposVenda();
+    atualizarDashboard();
 });
 
 // Função para limpar os campos do formulário de venda
@@ -638,6 +614,7 @@ function exportarRelatorioExcel() {
 }
 
 // Função para exportar relatório em PDF
+/*
 function exportarRelatorioPDF() {
     const doc = new jsPDF();
     const tabela = document.getElementById('tabelaRelatorio');
@@ -656,7 +633,30 @@ function exportarRelatorioPDF() {
 
     doc.save('relatorio_vendas.pdf');
 }
+*/
+function exportarRelatorioPDF() {
+    // Cria um novo documento PDF
+    const doc = new jspdf.jsPDF();
 
+    // Obtém os dados da tabela
+    const tabela = document.getElementById('tabelaRelatorio');
+    const headers = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent);
+    const rows = Array.from(tabela.querySelectorAll('tbody tr')).map(tr =>
+        Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
+    );
+
+    // Adiciona a tabela ao PDF
+    doc.autoTable({
+        head: [headers], // Cabeçalho da tabela
+        body: rows,      // Dados da tabela
+        theme: 'grid',   // Tema da tabela
+        styles: { fontSize: 10 }, // Tamanho da fonte
+        headStyles: { fillColor: [79, 70, 229] } // Cor de fundo do cabeçalho
+    });
+
+    // Salva o PDF com o nome "relatorio_vendas.pdf"
+    doc.save('relatorio_vendas.pdf');
+}
 // Função para atualizar o tipo de comissão ao selecionar um serviço
 function atualizarTipoComissao() {
     const servicoId = document.getElementById('servicoVenda').value;
@@ -957,30 +957,4 @@ function inicializarGraficos() {
             }
         }
     });
-}
-
-// Função para carregar vendas do Firebase
-function carregarVendas() {
-    database.ref('vendas').on('value', (snapshot) => {
-        const vendas = [];
-        snapshot.forEach((childSnapshot) => {
-            vendas.push(childSnapshot.val());
-        });
-
-        // Atualiza o dashboard com as vendas carregadas
-        atualizarDashboard(vendas);
-    });
-}
-
-// Função para atualizar o dashboard com as vendas
-function atualizarDashboard(vendas) {
-    const totalVendas = vendas.reduce((total, venda) => total + venda.valorVenda, 0);
-    const totalComissoes = vendas.reduce((total, venda) => total + (venda.tipoComissao === 'fixa' ? venda.comissao : (venda.valorReceber * venda.comissao) / 100), 0);
-    const totalClientes = new Set(vendas.map(venda => venda.nomeCliente)).size;
-    const ticketMedio = totalVendas / vendas.length || 0;
-
-    document.getElementById('totalVendasDash').textContent = totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    document.getElementById('totalComissoesDash').textContent = totalComissoes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    document.getElementById('totalClientes').textContent = totalClientes;
-    document.getElementById('ticketMedio').textContent = ticketMedio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
