@@ -334,7 +334,24 @@
             <span class="visually-hidden">Carregando...</span>
         </div>
     </div>
+<script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.1.0/firebase-database.js"></script>
+<script>
+  // Configuração do Firebase com os dados fornecidos
+  const firebaseConfig = {
+    apiKey: "AIzaSyBjTJBsddXjGr3Fpb5YsLs7PbCOZQN3fQU",
+    authDomain: "dashboard-vendas-dfa67.firebaseapp.com",
+    projectId: "dashboard-vendas-dfa67",
+    storageBucket: "dashboard-vendas-dfa67.appspot.com",
+    messagingSenderId: "817829195288",
+    appId: "1:817829195288:web:1f95eac6d60573d6a2dd6d",
+    measurementId: "G-YXPS1SKYMM"
+  };
 
+  // Inicialize o Firebase
+  const app = firebase.initializeApp(firebaseConfig);
+  const database = firebase.database();
+</script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.24/jspdf.plugin.autotable.min.js"></script>
