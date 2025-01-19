@@ -469,42 +469,49 @@ function excluirEmpresa(id) {
 
 // Função para registrar venda
 document.getElementById('vendaForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const vendedorId = document.getElementById('vendedorVenda').value;
-    const servicoId = document.getElementById('servicoVenda').value;
-    const dataVenda = document.getElementById('dataVenda').value;
-    const nomeCliente = document.getElementById('nomeCliente').value;
-    const empresaParceiraId = document.getElementById('empresaParceira').value;
-    const valorVenda = parseFloat(document.getElementById('valorVenda').value.replace(/[^0-9,]/g, '').replace(',', '.'));
-    const valorReceber = parseFloat(document.getElementById('valorReceber').value.replace(/[^0-9,]/g, '').replace(',', '.'));
-    const comissao = parseFloat(document.getElementById('comissao').value.replace(/[^0-9,]/g, '').replace(',', '.'));
+  e.preventDefault();
 
-    const vendedor = dados.vendedores.find(v => v.id == vendedorId);
-    const servico = dados.servicos.find(s => s.id == servicoId);
-    const empresaParceira = dados.empresasParceiras.find(e => e.id == empresaParceiraId);
+  const vendedorId = document.getElementById('vendedorVenda').value;
+  const servicoId = document.getElementById('servicoVenda').value;
+  const dataVenda = document.getElementById('dataVenda').value;
+  const nomeCliente = document.getElementById('nomeCliente').value;
+  const empresaParceiraId = document.getElementById('empresaParceira').value;
+  const valorVenda = parseFloat(document.getElementById('valorVenda').value.replace(/[^0-9,]/g, '').replace(',', '.'));
+  const valorReceber = parseFloat(document.getElementById('valorReceber').value.replace(/[^0-9,]/g, '').replace(',', '.'));
+  const comissao = parseFloat(document.getElementById('comissao').value.replace(/[^0-9,]/g, '').replace(',', '.'));
 
-    if (!vendedor || !servico || !empresaParceira) {
-        alert('Por favor, selecione um vendedor, serviço e empresa parceira válidos.');
-        return;
-    }
+  const vendedor = dados.vendedores.find(v => v.id == vendedorId);
+  const servico = dados.servicos.find(s => s.id == servicoId);
+  const empresaParceira = dados.empresasParceiras.find(e => e.id == empresaParceiraId);
 
-    const novaVenda = {
-        id: dados.vendas.length + 1,
-        vendedor: vendedor.nome,
-        servico: servico.nome,
-        data: dataVenda,
-        nomeCliente: nomeCliente,
-        empresaParceira: empresaParceira.nome,
-        valorVenda: valorVenda,
-        valorReceber: valorReceber,
-        comissao: comissao,
-        tipoComissao: servico.tipoComissao
-    };
+  if (!vendedor || !servico || !empresaParceira) {
+    alert('Por favor, selecione um vendedor, serviço e empresa parceira válidos.');
+    return;
+  }
 
-    dados.vendas.push(novaVenda);
-    alert('Venda registrada com sucesso!');
-    limparCamposVenda();
-    atualizarDashboard();
+  const novaVenda = {
+    vendedor: vendedor.nome,
+    servico: servico.nome,
+    data: dataVenda,
+    nomeCliente: nomeCliente,
+    empresaParceira: empresaParceira.nome,
+    valorVenda: valorVenda,
+    valorReceber: valorReceber,
+    comissao: comissao,
+    tipoComissao: servico.tipoComissao
+  };
+
+  // Salvar a venda no Firebase
+  database.ref('vendas').push(novaVenda)
+    .then(() => {
+      alert('Venda registrada com sucesso!');
+      limparCamposVenda();
+      carregarVendas(); // Atualiza a lista de vendas
+    })
+    .catch((error) => {
+      console.error('Erro ao salvar venda:', error);
+      alert('Erro ao salvar venda. Verifique o console para mais detalhes.');
+    });
 });
 
 // Função para limpar os campos do formulário de venda
