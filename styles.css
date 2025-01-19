@@ -357,3 +357,50 @@ th:active {
         transform: rotate(360deg);
     }
 }
+
+/* Estilos para a tabela de vendas */
+#tabelaVendas {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+#tabelaVendas th, #tabelaVendas td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+#tabelaVendas th {
+    background: #f8fafc;
+    font-weight: 500;
+    color: var(--text-light);
+    cursor: pointer;
+}
+
+#tabelaVendas th:active {
+    cursor: grabbing;
+}
+
+#tabelaVendas tbody tr:hover {
+    background-color: #f1f5f9;
+}
+
+#tabelaVendas input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    transition: all 0.2s;
+    color: var(--text);
+}
+
+#tabelaVendas input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
