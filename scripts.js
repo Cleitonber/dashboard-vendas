@@ -1,6 +1,3 @@
-// Acesse as funções do Firebase diretamente
-const { db, collection, addDoc, getDocs, updateDoc, doc, deleteDoc } = window.firebase;
-
 const { jsPDF } = window.jspdf;
 
 let dados = {
