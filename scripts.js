@@ -30,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function () {
     atualizarOpcoesServicos();
     atualizarOpcoesEmpresas();
     inicializarGraficos();
+    listarVendas();
 });
 
 // Função para preencher o seletor de anos
@@ -505,6 +506,7 @@ document.getElementById('vendaForm').addEventListener('submit', function (e) {
     alert('Venda registrada com sucesso!');
     limparCamposVenda();
     atualizarDashboard();
+    listarVendas();
 });
 
 // Função para limpar os campos do formulário de venda
@@ -614,7 +616,6 @@ function exportarRelatorioExcel() {
 }
 
 // Função para exportar relatório em PDF
-/*
 function exportarRelatorioPDF() {
     const doc = new jsPDF();
     const tabela = document.getElementById('tabelaRelatorio');
@@ -633,30 +634,7 @@ function exportarRelatorioPDF() {
 
     doc.save('relatorio_vendas.pdf');
 }
-*/
-function exportarRelatorioPDF() {
-    // Cria um novo documento PDF
-    const doc = new jspdf.jsPDF();
 
-    // Obtém os dados da tabela
-    const tabela = document.getElementById('tabelaRelatorio');
-    const headers = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent);
-    const rows = Array.from(tabela.querySelectorAll('tbody tr')).map(tr =>
-        Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
-    );
-
-    // Adiciona a tabela ao PDF
-    doc.autoTable({
-        head: [headers], // Cabeçalho da tabela
-        body: rows,      // Dados da tabela
-        theme: 'grid',   // Tema da tabela
-        styles: { fontSize: 10 }, // Tamanho da fonte
-        headStyles: { fillColor: [79, 70, 229] } // Cor de fundo do cabeçalho
-    });
-
-    // Salva o PDF com o nome "relatorio_vendas.pdf"
-    doc.save('relatorio_vendas.pdf');
-}
 // Função para atualizar o tipo de comissão ao selecionar um serviço
 function atualizarTipoComissao() {
     const servicoId = document.getElementById('servicoVenda').value;
@@ -957,4 +935,127 @@ function inicializarGraficos() {
             }
         }
     });
+}
+
+// Função para listar as vendas
+function listarVendas(vendas = dados.vendas) {
+    const tbody = document.querySelector('#tabelaVendas tbody');
+    tbody.innerHTML = '';
+
+    vendas.forEach(venda => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td>${venda.data}</td>
+            <td>${venda.vendedor}</td>
+            <td>${venda.servico}</td>
+            <td>${venda.nomeCliente}</td>
+            <td>${venda.empresaParceira}</td>
+            <td>${venda.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+            <td>${venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+            <td>${venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+            <td>
+                <button class="btn btn-sm btn-secondary" onclick="editarVenda(${venda.id})">Editar</button>
+                <button class="btn btn-sm btn-danger" onclick="excluirVenda(${venda.id})">Excluir</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+// Função para filtrar as vendas por período
+function filtrarVendas() {
+    const dataInicial = document.getElementById('filtroDataInicial').value;
+    const dataFinal = document.getElementById('filtroDataFinal').value;
+
+    const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
+    const dataFinalObj = dataFinal ? new Date(dataFinal.split('/').reverse().join('-')) : null;
+
+    const vendasFiltradas = dados.vendas.filter(venda => {
+        const dataVendaObj = new Date(venda.data.split('/').reverse().join('-'));
+
+        const filtroData = (!dataInicialObj || dataVendaObj >= dataInicialObj) &&
+                           (!dataFinalObj || dataVendaObj <= dataFinalObj);
+
+        return filtroData;
+    });
+
+    listarVendas(vendasFiltradas);
+}
+
+// Função para editar uma venda
+function editarVenda(id) {
+    const venda = dados.vendas.find(v => v.id === id);
+    if (venda) {
+        const tbody = document.querySelector('#tabelaVendas tbody');
+        tbody.innerHTML = '';
+
+        dados.vendas.forEach(v => {
+            const row = document.createElement('tr');
+            if (v.id === id) {
+                row.innerHTML = `
+                    <td><input type="text" value="${v.data}" oninput="formatarDataInput(this)"></td>
+                    <td><input type="text" value="${v.vendedor}"></td>
+                    <td><input type="text" value="${v.servico}"></td>
+                    <td><input type="text" value="${v.nomeCliente}"></td>
+                    <td><input type="text" value="${v.empresaParceira}"></td>
+                    <td><input type="text" value="${v.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}" oninput="formatarMoeda(this)"></td>
+                    <td><input type="text" value="${v.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}" oninput="formatarMoeda(this)"></td>
+                    <td><input type="text" value="${v.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}" oninput="formatarComissao(this)"></td>
+                    <td>
+                        <button class="btn btn-sm btn-success" onclick="salvarEdicaoVenda(${v.id})">Salvar</button>
+                        <button class="btn btn-sm btn-danger" onclick="cancelarEdicaoVenda()">Cancelar</button>
+                    </td>
+                `;
+            } else {
+                row.innerHTML = `
+                    <td>${v.data}</td>
+                    <td>${v.vendedor}</td>
+                    <td>${v.servico}</td>
+                    <td>${v.nomeCliente}</td>
+                    <td>${v.empresaParceira}</td>
+                    <td>${v.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td>${v.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td>${v.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="editarVenda(${v.id})">Editar</button>
+                        <button class="btn btn-sm btn-danger" onclick="excluirVenda(${v.id})">Excluir</button>
+                    </td>
+                `;
+            }
+            tbody.appendChild(row);
+        });
+    }
+}
+
+// Função para salvar a edição de uma venda
+function salvarEdicaoVenda(id) {
+    const venda = dados.vendas.find(v => v.id === id);
+    if (venda) {
+        const row = document.querySelector(`#tabelaVendas tbody tr:nth-child(${dados.vendas.indexOf(venda) + 1})`);
+        venda.data = row.querySelector('td:nth-child(1) input').value;
+        venda.vendedor = row.querySelector('td:nth-child(2) input').value;
+        venda.servico = row.querySelector('td:nth-child(3) input').value;
+        venda.nomeCliente = row.querySelector('td:nth-child(4) input').value;
+        venda.empresaParceira = row.querySelector('td:nth-child(5) input').value;
+        venda.valorVenda = parseFloat(row.querySelector('td:nth-child(6) input').value.replace(/[^0-9,]/g, '').replace(',', '.'));
+        venda.valorReceber = parseFloat(row.querySelector('td:nth-child(7) input').value.replace(/[^0-9,]/g, '').replace(',', '.'));
+        venda.comissao = parseFloat(row.querySelector('td:nth-child(8) input').value.replace(/[^0-9,]/g, '').replace(',', '.'));
+
+        listarVendas();
+        alert('Venda atualizada com sucesso!');
+    }
+}
+
+// Função para cancelar a edição de uma venda
+function cancelarEdicaoVenda() {
+    listarVendas();
+}
+
+// Função para excluir uma venda
+function excluirVenda(id) {
+    if (confirm('Tem certeza que deseja excluir esta venda?')) {
+        dados.vendas = dados.vendas.filter(v => v.id !== id);
+        listarVendas();
+        alert('Venda excluída com sucesso!');
+    }
 }
