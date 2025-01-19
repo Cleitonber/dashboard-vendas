@@ -1,3 +1,9 @@
+import { createClient } from '@supabase/supabase-js'
+
+const supabaseUrl = 'https://znsgmnzpbrwfibxqyeki.supabase.co'
+const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpuc2dtbnpwYnJ3ZmlieHF5ZWtpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzcyNTA5MDIsImV4cCI6MjA1MjgyNjkwMn0.AOAKjkKsD7eyDVPnTkQcx4ZRr2r1lmGmpW0JmgkHLJ0'
+const supabase = createClient(supabaseUrl, supabaseKey)
+
 const { jsPDF } = window.jspdf;
 
 let dados = {
