@@ -149,9 +149,17 @@
                         </form>
                         <div id="listaVendedores" class="mt-4">
                             <h3>Vendedores Cadastrados</h3>
-                            <input type="text" id="filtroVendedores" placeholder="Pesquisar vendedor..." class="form-input">
+                            <div class="form-group">
+                                <label class="form-label">Itens por página:</label>
+                                <select id="itensPorPaginaVendedores" class="form-select" onchange="atualizarListaVendedores()">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                </select>
+                            </div>
+                            <input type="text" id="filtroVendedores" placeholder="Pesquisar vendedor..." class="form-input" oninput="atualizarListaVendedores()">
                             <ul id="vendedoresList" class="list-group"></ul>
-                            <div id="controlesPaginacao" class="d-flex justify-content-between align-items-center mt-3"></div>
+                            <div id="controlesPaginacaoVendedores" class="d-flex justify-content-between align-items-center mt-3"></div>
                         </div>
                     </div>
                 </div>
@@ -182,8 +190,17 @@
                         </form>
                         <div id="listaServicos" class="mt-4">
                             <h3>Serviços Cadastrados</h3>
-                            <input type="text" id="filtroServicos" placeholder="Pesquisar serviço..." class="form-input">
+                            <div class="form-group">
+                                <label class="form-label">Itens por página:</label>
+                                <select id="itensPorPaginaServicos" class="form-select" onchange="atualizarListaServicos()">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                </select>
+                            </div>
+                            <input type="text" id="filtroServicos" placeholder="Pesquisar serviço..." class="form-input" oninput="atualizarListaServicos()">
                             <ul id="servicosList" class="list-group"></ul>
+                            <div id="controlesPaginacaoServicos" class="d-flex justify-content-between align-items-center mt-3"></div>
                         </div>
                     </div>
                 </div>
@@ -203,8 +220,17 @@
                         </form>
                         <div id="listaEmpresas" class="mt-4">
                             <h3>Empresas Parceiras Cadastradas</h3>
-                            <input type="text" id="filtroEmpresas" placeholder="Pesquisar empresa..." class="form-input">
+                            <div class="form-group">
+                                <label class="form-label">Itens por página:</label>
+                                <select id="itensPorPaginaEmpresas" class="form-select" onchange="atualizarListaEmpresas()">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                </select>
+                            </div>
+                            <input type="text" id="filtroEmpresas" placeholder="Pesquisar empresa..." class="form-input" oninput="atualizarListaEmpresas()">
                             <ul id="empresasList" class="list-group"></ul>
+                            <div id="controlesPaginacaoEmpresas" class="d-flex justify-content-between align-items-center mt-3"></div>
                         </div>
                     </div>
                 </div>
@@ -271,6 +297,7 @@
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">Listagem de Vendas</h2>
+                    <button class="btn btn-primary" onclick="listarVendas()">Listar Vendas</button>
                 </div>
                 <div class="card-body">
                     <div class="filters">
@@ -283,6 +310,14 @@
                             <input type="text" id="filtroDataFinal" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
                         </div>
                         <button class="btn btn-primary" onclick="filtrarVendas()">Filtrar</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Itens por página:</label>
+                        <select id="itensPorPaginaVendas" class="form-select" onchange="listarVendas()">
+                            <option value="5">5</option>
+                            <option value="10">10</option>
+                            <option value="20">20</option>
+                        </select>
                     </div>
                     <table id="tabelaVendas">
                         <thead>
@@ -302,6 +337,7 @@
                             <!-- As linhas serão preenchidas dinamicamente via JavaScript -->
                         </tbody>
                     </table>
+                    <div id="controlesPaginacaoVendas" class="d-flex justify-content-between align-items-center mt-3"></div>
                 </div>
             </div>
         </div>
