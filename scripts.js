@@ -1,5 +1,20 @@
 const { jsPDF } = window.jspdf;
 
+// Configuração do Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyBjTJBsddXjGr3Fpb5YsLs7PbCOZQN3fQU",
+  authDomain: "dashboard-vendas-dfa67.firebaseapp.com",
+  projectId: "dashboard-vendas-dfa67",
+  storageBucket: "dashboard-vendas-dfa67.appspot.com",
+  messagingSenderId: "817829195288",
+  appId: "1:817829195288:web:1f95eac6d60573d6a2dd6d",
+  measurementId: "G-YXPS1SKYMM"
+};
+
+// Inicialize o Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const database = firebase.database(); // Variável global para o banco de dados
+
 let dados = {
     vendas: [],
     vendedores: [],
