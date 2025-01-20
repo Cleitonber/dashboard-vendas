@@ -63,16 +63,28 @@ function atualizarDashboard() {
     const mesSelecionado = parseInt(document.getElementById('mesFiltro').value);
     const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
 
-    console.log('Mês selecionado:', mesSelecionado);
-    console.log('Ano selecionado:', anoSelecionado);
-
     const vendasFiltradas = dados.vendas.filter(venda => {
         const dataVenda = new Date(venda.data.split('/').reverse().join('-'));
         return dataVenda.getMonth() === mesSelecionado && dataVenda.getFullYear() === anoSelecionado;
     });
 
-    console.log('Vendas Filtradas:', vendasFiltradas);
+    // Atualizar gráficos
+    atualizarGraficos(vendasFiltradas);
 
+    // Atualizar estatísticas
+    const totalVendas = vendasFiltradas.reduce((total, venda) => total + venda.valorVenda, 0);
+    const totalComissoes = vendasFiltradas.reduce((total, venda) => total + venda.comissao, 0);
+    const totalClientes = [...new Set(vendasFiltradas.map(venda => venda.nomeCliente))].length;
+    const ticketMedio = totalVendas / vendasFiltradas.length || 0;
+
+    document.getElementById('totalVendasDash').textContent = totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('totalComissoesDash').textContent = totalComissoes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('totalClientes').textContent = totalClientes;
+    document.getElementById('ticketMedio').textContent = ticketMedio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+// Função para atualizar os gráficos
+function atualizarGraficos(vendasFiltradas) {
     // Atualizar gráfico de Vendas por Serviço
     const servicos = [...new Set(dados.servicos.map(servico => servico.nome))];
     const vendasPorServico = servicos.map(servico => {
@@ -102,17 +114,6 @@ function atualizarDashboard() {
     vendasCategoriaChart.data.labels = categorias;
     vendasCategoriaChart.data.datasets[0].data = vendasPorCategoria;
     vendasCategoriaChart.update();
-
-    // Atualizar estatísticas
-    const totalVendas = vendasFiltradas.reduce((total, venda) => total + venda.valorVenda, 0);
-    const totalComissoes = vendasFiltradas.reduce((total, venda) => total + venda.comissao, 0);
-    const totalClientes = [...new Set(vendasFiltradas.map(venda => venda.nomeCliente))].length;
-    const ticketMedio = totalVendas / vendasFiltradas.length || 0;
-
-    document.getElementById('totalVendasDash').textContent = totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    document.getElementById('totalComissoesDash').textContent = totalComissoes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    document.getElementById('totalClientes').textContent = totalClientes;
-    document.getElementById('ticketMedio').textContent = ticketMedio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
 // Função para inicializar os gráficos
@@ -712,6 +713,8 @@ document.getElementById('vendaForm').addEventListener('submit', function (e) {
     dados.vendas.push(novaVenda);
     alert('Venda registrada com sucesso!');
     limparCamposVenda();
+
+    // Atualizar o dashboard após registrar a venda
     atualizarDashboard();
     listarVendas();
 });
@@ -1033,169 +1036,6 @@ function mostrarSpinner() {
 // Função para esconder o spinner de carregamento
 function esconderSpinner() {
     document.getElementById('loadingSpinner').classList.add('d-none');
-}
-
-// Inicializar gráficos
-function inicializarGraficos() {
-    const ctxVendasServico = document.getElementById('vendasServicoChart').getContext('2d');
-    const ctxDesempenhoVendedores = document.getElementById('desempenhoVendedoresChart').getContext('2d');
-    const ctxVendasCategoria = document.getElementById('vendasCategoriaChart').getContext('2d');
-
-    // Gráfico de Vendas por Serviço
-    vendasServicoChart = new Chart(ctxVendasServico, {
-        type: 'bar',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Vendas',
-                data: [],
-                backgroundColor: 'rgba(79, 70, 229, 0.6)',
-                borderColor: 'rgba(79, 70, 229, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                tooltip: {
-                    enabled: true,
-                    mode: 'index',
-                    intersect: false,
-                },
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                }
-            },
-            animation: {
-                duration: 1000,
-                easing: 'easeInOutQuad'
-            }
-        }
-    });
-
-    // Gráfico de Desempenho dos Vendedores
-    desempenhoVendedoresChart = new Chart(ctxDesempenhoVendedores, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Vendas',
-                data: [],
-                borderColor: 'rgba(239, 68, 68, 1)',
-                borderWidth: 2,
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                tooltip: {
-                    enabled: true,
-                    mode: 'index',
-                    intersect: false,
-                },
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                }
-            },
-            animation: {
-                duration: 1000,
-                easing: 'easeInOutQuad'
-            }
-        }
-    });
-
-    // Gráfico de Vendas por Categoria
-    vendasCategoriaChart = new Chart(ctxVendasCategoria, {
-        type: 'pie',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Vendas',
-                data: [],
-                backgroundColor: [
-                    'rgba(79, 70, 229, 0.6)',
-                    'rgba(239, 68, 68, 0.6)',
-                    'rgba(34, 197, 94, 0.6)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                tooltip: {
-                    enabled: true,
-                    mode: 'index',
-                    intersect: false,
-                },
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                }
-            },
-            animation: {
-                duration: 1000,
-                easing: 'easeInOutQuad'
-            }
-        }
-    });
-
-    atualizarDashboard();
-}
-
-// Função para atualizar os gráficos do dashboard
-function atualizarDashboard() {
-    const mesSelecionado = parseInt(document.getElementById('mesFiltro').value);
-    const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
-
-    const vendasFiltradas = dados.vendas.filter(venda => {
-        const dataVenda = new Date(venda.data.split('/').reverse().join('-'));
-        return dataVenda.getMonth() === mesSelecionado && dataVenda.getFullYear() === anoSelecionado;
-    });
-
-    // Atualizar gráfico de Vendas por Serviço
-    const servicos = [...new Set(dados.servicos.map(servico => servico.nome))];
-    const vendasPorServico = servicos.map(servico => {
-        return vendasFiltradas.filter(venda => venda.servico === servico).reduce((total, venda) => total + venda.valorVenda, 0);
-    });
-
-    vendasServicoChart.data.labels = servicos;
-    vendasServicoChart.data.datasets[0].data = vendasPorServico;
-    vendasServicoChart.update();
-
-    // Atualizar gráfico de Desempenho dos Vendedores
-    const vendedores = [...new Set(dados.vendedores.map(vendedor => vendedor.nome))];
-    const vendasPorVendedor = vendedores.map(vendedor => {
-        return vendasFiltradas.filter(venda => venda.vendedor === vendedor).reduce((total, venda) => total + venda.valorVenda, 0);
-    });
-
-    desempenhoVendedoresChart.data.labels = vendedores;
-    desempenhoVendedoresChart.data.datasets[0].data = vendasPorVendedor;
-    desempenhoVendedoresChart.update();
-
-    // Atualizar gráfico de Vendas por Categoria
-    const categorias = [...new Set(dados.servicos.map(servico => servico.categoria))];
-    const vendasPorCategoria = categorias.map(categoria => {
-        return vendasFiltradas.filter(venda => dados.servicos.find(servico => servico.nome === venda.servico).categoria === categoria).reduce((total, venda) => total + venda.valorVenda, 0);
-    });
-
-    vendasCategoriaChart.data.labels = categorias;
-    vendasCategoriaChart.data.datasets[0].data = vendasPorCategoria;
-    vendasCategoriaChart.update();
-
-    // Atualizar estatísticas
-    const totalVendas = vendasFiltradas.reduce((total, venda) => total + venda.valorVenda, 0);
-    const totalComissoes = vendasFiltradas.reduce((total, venda) => total + venda.comissao, 0);
-    const totalClientes = [...new Set(vendasFiltradas.map(venda => venda.nomeCliente))].length;
-    const ticketMedio = totalVendas / vendasFiltradas.length || 0;
-
-    document.getElementById('totalVendasDash').textContent = totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    document.getElementById('totalComissoesDash').textContent = totalComissoes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    document.getElementById('totalClientes').textContent = totalClientes;
-    document.getElementById('ticketMedio').textContent = ticketMedio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
 // Função para listar as vendas
