@@ -64,7 +64,7 @@ function atualizarDashboard() {
     const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
 
     const vendasFiltradas = dados.vendas.filter(venda => {
-        const dataVenda = new Date(venda.data.split('/').reverse().join('-'));
+        const dataVenda = new Date(venda.data.split('/').reverse().join('-')); // Converte a data para o formato Date
         return dataVenda.getMonth() === mesSelecionado && dataVenda.getFullYear() === anoSelecionado;
     });
 
