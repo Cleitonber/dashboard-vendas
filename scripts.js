@@ -54,18 +54,22 @@ function preencherAnos() {
         selectAno.appendChild(option);
     });
 
-    // Selecionar o ano de 2025 por padrão
-    selectAno.value = 2025;
+    // Selecionar o ano atual por padrão
+    const anoAtual = new Date().getFullYear();
+    selectAno.value = anoAtual;
 }
 
 // Função para atualizar o dashboard
 function atualizarDashboard() {
-    const mesSelecionado = parseInt(document.getElementById('mesFiltro').value);
-    const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
+    const mesSelecionado = parseInt(document.getElementById('mesFiltro').value); // Mês selecionado (1 a 12)
+    const anoSelecionado = parseInt(document.getElementById('anoFiltro').value); // Ano selecionado
 
     const vendasFiltradas = dados.vendas.filter(venda => {
         const dataVenda = new Date(venda.data.split('/').reverse().join('-')); // Converte a data para o formato Date
-        return dataVenda.getMonth() === mesSelecionado && dataVenda.getFullYear() === anoSelecionado;
+        const mesVenda = dataVenda.getMonth() + 1; // getMonth() retorna 0-11, então somamos 1
+        const anoVenda = dataVenda.getFullYear();
+
+        return mesVenda === mesSelecionado && anoVenda === anoSelecionado;
     });
 
     // Atualizar gráficos
