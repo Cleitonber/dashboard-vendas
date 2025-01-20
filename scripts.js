@@ -223,7 +223,6 @@ function inicializarGraficos() {
     atualizarDashboard(); // Atualiza os gráficos com os dados iniciais
 }
 
-
 // Função para atualizar as opções de vendedores
 function atualizarOpcoesVendedores() {
     const selectVendedor = document.getElementById('vendedorVenda');
