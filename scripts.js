@@ -13,6 +13,8 @@ let paginaAtualEmpresas = 1;
 let paginaAtualVendas = 1;
 const itensPorPagina = 5;
 
+let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart;
+
 // Função para alternar entre as abas
 function showTab(tabId) {
     const tabs = document.querySelectorAll('.tab-content');
@@ -875,13 +877,13 @@ function inicializarGraficos() {
     const ctxVendasCategoria = document.getElementById('vendasCategoriaChart').getContext('2d');
 
     // Gráfico de Vendas por Serviço
-    new Chart(ctxVendasServico, {
+    vendasServicoChart = new Chart(ctxVendasServico, {
         type: 'bar',
         data: {
-            labels: ['Serviço A', 'Serviço B', 'Serviço C'],
+            labels: [],
             datasets: [{
                 label: 'Vendas',
-                data: [1200, 1900, 800],
+                data: [],
                 backgroundColor: 'rgba(79, 70, 229, 0.6)',
                 borderColor: 'rgba(79, 70, 229, 1)',
                 borderWidth: 1
@@ -908,13 +910,13 @@ function inicializarGraficos() {
     });
 
     // Gráfico de Desempenho dos Vendedores
-    new Chart(ctxDesempenhoVendedores, {
+    desempenhoVendedoresChart = new Chart(ctxDesempenhoVendedores, {
         type: 'line',
         data: {
-            labels: ['Vendedor 1', 'Vendedor 2', 'Vendedor 3'],
+            labels: [],
             datasets: [{
                 label: 'Vendas',
-                data: [1500, 2200, 1800],
+                data: [],
                 borderColor: 'rgba(239, 68, 68, 1)',
                 borderWidth: 2,
                 fill: false
@@ -941,13 +943,13 @@ function inicializarGraficos() {
     });
 
     // Gráfico de Vendas por Categoria
-    new Chart(ctxVendasCategoria, {
+    vendasCategoriaChart = new Chart(ctxVendasCategoria, {
         type: 'pie',
         data: {
-            labels: ['Categoria A', 'Categoria B', 'Categoria C'],
+            labels: [],
             datasets: [{
                 label: 'Vendas',
-                data: [300, 500, 200],
+                data: [],
                 backgroundColor: [
                     'rgba(79, 70, 229, 0.6)',
                     'rgba(239, 68, 68, 0.6)',
@@ -975,6 +977,60 @@ function inicializarGraficos() {
             }
         }
     });
+
+    atualizarDashboard();
+}
+
+// Função para atualizar os gráficos do dashboard
+function atualizarDashboard() {
+    const mesSelecionado = parseInt(document.getElementById('mesFiltro').value);
+    const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
+
+    const vendasFiltradas = dados.vendas.filter(venda => {
+        const dataVenda = new Date(venda.data.split('/').reverse().join('-'));
+        return dataVenda.getMonth() === mesSelecionado && dataVenda.getFullYear() === anoSelecionado;
+    });
+
+    // Atualizar gráfico de Vendas por Serviço
+    const servicos = [...new Set(dados.servicos.map(servico => servico.nome))];
+    const vendasPorServico = servicos.map(servico => {
+        return vendasFiltradas.filter(venda => venda.servico === servico).reduce((total, venda) => total + venda.valorVenda, 0);
+    });
+
+    vendasServicoChart.data.labels = servicos;
+    vendasServicoChart.data.datasets[0].data = vendasPorServico;
+    vendasServicoChart.update();
+
+    // Atualizar gráfico de Desempenho dos Vendedores
+    const vendedores = [...new Set(dados.vendedores.map(vendedor => vendedor.nome))];
+    const vendasPorVendedor = vendedores.map(vendedor => {
+        return vendasFiltradas.filter(venda => venda.vendedor === vendedor).reduce((total, venda) => total + venda.valorVenda, 0);
+    });
+
+    desempenhoVendedoresChart.data.labels = vendedores;
+    desempenhoVendedoresChart.data.datasets[0].data = vendasPorVendedor;
+    desempenhoVendedoresChart.update();
+
+    // Atualizar gráfico de Vendas por Categoria
+    const categorias = [...new Set(dados.servicos.map(servico => servico.categoria))];
+    const vendasPorCategoria = categorias.map(categoria => {
+        return vendasFiltradas.filter(venda => dados.servicos.find(servico => servico.nome === venda.servico).categoria === categoria).reduce((total, venda) => total + venda.valorVenda, 0);
+    });
+
+    vendasCategoriaChart.data.labels = categorias;
+    vendasCategoriaChart.data.datasets[0].data = vendasPorCategoria;
+    vendasCategoriaChart.update();
+
+    // Atualizar estatísticas
+    const totalVendas = vendasFiltradas.reduce((total, venda) => total + venda.valorVenda, 0);
+    const totalComissoes = vendasFiltradas.reduce((total, venda) => total + venda.comissao, 0);
+    const totalClientes = [...new Set(vendasFiltradas.map(venda => venda.nomeCliente))].length;
+    const ticketMedio = totalVendas / vendasFiltradas.length || 0;
+
+    document.getElementById('totalVendasDash').textContent = totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('totalComissoesDash').textContent = totalComissoes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('totalClientes').textContent = totalClientes;
+    document.getElementById('ticketMedio').textContent = ticketMedio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
 
 // Função para listar as vendas
