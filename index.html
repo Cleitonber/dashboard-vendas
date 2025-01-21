@@ -105,6 +105,137 @@
                     </div>
                 </div>
             </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Personalizar Tema</h2>
+                </div>
+                <div class="card-body">
+                    <div class="form-group">
+                        <label class="form-label">Cor Primária</label>
+                        <input type="color" id="corPrimaria" value="#4f46e5" onchange="atualizarTema()">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Cor Secundária</label>
+                        <input type="color" id="corSecundaria" value="#64748b" onchange="atualizarTema()">
+                    </div>
+                    <button class="btn btn-secondary" onclick="restaurarTemaPadrao()">Restaurar Cores Padrão</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cadastros -->
+        <div id="cadastros" class="tab-content">
+            <div class="grid">
+                <!-- Cadastro de Vendedor -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Cadastro de Vendedor</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="vendedorForm">
+                            <div class="form-group">
+                                <label class="form-label">Nome do Vendedor</label>
+                                <input type="text" id="nomeVendedor" class="form-input" placeholder="Digite o nome do vendedor" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" id="emailVendedor" class="form-input" placeholder="Digite o email do vendedor" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Telefone</label>
+                                <input type="tel" id="telefoneVendedor" class="form-input" placeholder="(XX) XXXXX-XXXX" oninput="formatarTelefone(this)">
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cadastrar Vendedor</button>
+                        </form>
+                        <div id="listaVendedores" class="mt-4">
+                            <h3>Vendedores Cadastrados</h3>
+                            <div class="form-group">
+                                <label class="form-label">Itens por página:</label>
+                                <select id="itensPorPaginaVendedores" class="form-select" onchange="atualizarListaVendedores()">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                </select>
+                            </div>
+                            <input type="text" id="filtroVendedores" placeholder="Pesquisar vendedor..." class="form-input" oninput="atualizarListaVendedores()">
+                            <ul id="vendedoresList" class="list-group"></ul>
+                            <div id="controlesPaginacaoVendedores" class="d-flex justify-content-between align-items-center mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cadastro de Serviço -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Cadastro de Serviço</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="servicoForm">
+                            <div class="form-group">
+                                <label class="form-label">Nome do Serviço</label>
+                                <input type="text" id="nomeServico" class="form-input" placeholder="Digite o nome do serviço" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Categoria</label>
+                                <input type="text" id="categoriaServico" class="form-input" placeholder="Digite a categoria do serviço" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Tipo de Comissão</label>
+                                <select id="tipoComissao" class="form-select" required>
+                                    <option value="fixa">Fixa</option>
+                                    <option value="porcentagem">Porcentagem</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cadastrar Serviço</button>
+                        </form>
+                        <div id="listaServicos" class="mt-4">
+                            <h3>Serviços Cadastrados</h3>
+                            <div class="form-group">
+                                <label class="form-label">Itens por página:</label>
+                                <select id="itensPorPaginaServicos" class="form-select" onchange="atualizarListaServicos()">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                </select>
+                            </div>
+                            <input type="text" id="filtroServicos" placeholder="Pesquisar serviço..." class="form-input" oninput="atualizarListaServicos()">
+                            <ul id="servicosList" class="list-group"></ul>
+                            <div id="controlesPaginacaoServicos" class="d-flex justify-content-between align-items-center mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cadastro de Empresa Parceira -->
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Cadastro de Empresa Parceira</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="empresaForm">
+                            <div class="form-group">
+                                <label class="form-label">Nome da Empresa</label>
+                                <input type="text" id="nomeEmpresa" class="form-input" placeholder="Digite o nome da empresa" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Cadastrar Empresa</button>
+                        </form>
+                        <div id="listaEmpresas" class="mt-4">
+                            <h3>Empresas Parceiras Cadastradas</h3>
+                            <div class="form-group">
+                                <label class="form-label">Itens por página:</label>
+                                <select id="itensPorPaginaEmpresas" class="form-select" onchange="atualizarListaEmpresas()">
+                                    <option value="5">5</option>
+                                    <option value="10">10</option>
+                                    <option value="20">20</option>
+                                </select>
+                            </div>
+                            <input type="text" id="filtroEmpresas" placeholder="Pesquisar empresa..." class="form-input" oninput="atualizarListaEmpresas()">
+                            <ul id="empresasList" class="list-group"></ul>
+                            <div id="controlesPaginacaoEmpresas" class="d-flex justify-content-between align-items-center mt-3"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Vendas -->
@@ -155,6 +286,7 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Comissão</label>
+                            <small id="tipoComissaoInfo" class="form-text"></small>
                             <input type="text" id="comissao" class="form-input" placeholder="0,00" required oninput="formatarComissao(this)">
                         </div>
                         <button type="submit" class="btn btn-primary">Registrar Venda</button>
@@ -166,8 +298,20 @@
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">Listagem de Vendas</h2>
+                    <button class="btn btn-primary" onclick="listarVendas()">Listar Vendas</button>
                 </div>
                 <div class="card-body">
+                    <div class="filters">
+                        <div class="form-group">
+                            <label class="form-label">Data Inicial</label>
+                            <input type="text" id="filtroDataInicial" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Data Final</label>
+                            <input type="text" id="filtroDataFinal" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
+                        </div>
+                        <button class="btn btn-primary" onclick="filtrarVendas()">Filtrar</button>
+                    </div>
                     <div class="form-group">
                         <label class="form-label">Itens por página:</label>
                         <select id="itensPorPaginaVendas" class="form-select" onchange="listarVendas()">
@@ -185,4 +329,93 @@
                                 <th>Cliente</th>
                                 <th>Empresa Parceira</th>
                                 <th>Valor Venda</th>
-                                <
+                                <th>Valor Receber</th>
+                                <th>Comissão</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- As linhas serão preenchidas dinamicamente via JavaScript -->
+                        </tbody>
+                    </table>
+                    <div id="controlesPaginacaoVendas" class="d-flex justify-content-between align-items-center mt-3"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Relatórios -->
+        <div id="relatorios" class="tab-content">
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Relatório de Vendas</h2>
+                    <div>
+                        <button class="btn btn-secondary" onclick="exportarRelatorioExcel()">Exportar Excel</button>
+                        <button class="btn btn-secondary" onclick="exportarRelatorioPDF()">Exportar PDF</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="filters">
+                        <div class="form-group">
+                            <label class="form-label">Data Inicial</label>
+                            <input type="text" id="dataInicial" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Data Final</label>
+                            <input type="text" id="dataFinal" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Vendedor</label>
+                            <select id="filtroVendedor" class="form-select">
+                                <option value="">Todos</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Colunas</label>
+                            <small class="form-text">(Pressione Ctrl para selecionar mais de um item)</small>
+                            <select id="filtroColunas" class="form-select" multiple>
+                                <option value="data" selected>Data da Venda</option>
+                                <option value="vendedor" selected>Nome do Vendedor</option>
+                                <option value="servico" selected>Serviço Vendido</option>
+                                <option value="tipoComissao" selected>Tipo de Comissão</option>
+                                <option value="nomeCliente" selected>Nome do Cliente</option>
+                                <option value="empresaParceira" selected>Empresa Parceira</option>
+                                <option value="comissao" selected>Valor da Comissão</option>
+                                <option value="percentualComissao" selected>Variável da Comissão</option>
+                                <option value="valorBrutoReceber" selected>Valor Bruto a Receber</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="filtrarRelatorio()">Gerar</button>
+                    </div>
+                    <table id="tabelaRelatorio">
+                        <thead>
+                            <!-- As colunas serão preenchidas dinamicamente via JavaScript -->
+                        </thead>
+                        <tbody>
+                            <!-- As linhas da tabela serão preenchidas dinamicamente via JavaScript -->
+                        </tbody>
+                        <tfoot>
+                            <!-- O rodapé será preenchido dinamicamente via JavaScript -->
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Spinner de Carregamento -->
+    <div id="loadingSpinner" class="d-none">
+        <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Carregando...</span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.24/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script src="scripts.js"></script>
+</body>
+</html>
