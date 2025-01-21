@@ -1,5 +1,6 @@
 const { jsPDF } = window.jspdf;
 
+// Dados iniciais
 let dados = {
     vendas: [],
     vendedores: [],
@@ -7,12 +8,14 @@ let dados = {
     empresasParceiras: []
 };
 
+// Variáveis de paginação
 let paginaAtualVendedores = 1;
 let paginaAtualServicos = 1;
 let paginaAtualEmpresas = 1;
 let paginaAtualVendas = 1;
 const itensPorPagina = 5;
 
+// Gráficos
 let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart;
 
 // Função para alternar entre as abas
@@ -26,20 +29,6 @@ function showTab(tabId) {
     buttons.forEach(button => button.classList.remove('active'));
     document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
 }
-
-// Inicializa a aba "Dashboard" como ativa ao carregar a página
-document.addEventListener('DOMContentLoaded', function () {
-    showTab('dashboard');
-    preencherAnos();
-    atualizarOpcoesVendedores();
-    atualizarOpcoesServicos();
-    atualizarOpcoesEmpresas();
-    inicializarGraficos();
-
-    // Adicionar listeners para atualizar o dashboard ao mudar filtros
-    document.getElementById('mesFiltro').addEventListener('change', atualizarDashboard);
-    document.getElementById('anoFiltro').addEventListener('change', atualizarDashboard);
-});
 
 // Função para preencher o seletor de anos
 function preencherAnos() {
@@ -88,30 +77,15 @@ function atualizarDashboard() {
     const mesSelecionado = parseInt(document.getElementById('mesFiltro').value);
     const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
 
-    console.log('Filtros aplicados:', { mesSelecionado, anoSelecionado }); // Debug
-
     const vendasFiltradas = dados.vendas.filter(venda => {
         try {
             const [dia, mes, ano] = venda.data.split('/').map(Number);
-            const vendaFiltrada = mes === mesSelecionado + 1 && ano === anoSelecionado;
-
-            console.log('Processando venda:', {
-                dataOriginal: venda.data,
-                mes,
-                mesFiltro: mesSelecionado + 1,
-                ano,
-                anoFiltro: anoSelecionado,
-                incluida: vendaFiltrada
-            });
-
-            return vendaFiltrada;
+            return mes === mesSelecionado + 1 && ano === anoSelecionado;
         } catch (error) {
             console.error('Erro ao processar venda:', venda, error);
             return false;
         }
     });
-
-    console.log('Vendas filtradas:', vendasFiltradas); // Debug
 
     // Atualizar gráficos
     atualizarGraficos(vendasFiltradas);
@@ -405,6 +379,13 @@ function atualizarOpcoesVendedores() {
 
     selectVendedor.innerHTML = ''; // Limpa as opções existentes
 
+    // Adiciona uma opção padrão
+    const optionPadrao = document.createElement('option');
+    optionPadrao.value = '';
+    optionPadrao.textContent = 'Selecione um vendedor';
+    selectVendedor.appendChild(optionPadrao);
+
+    // Preenche as opções com os vendedores cadastrados
     dados.vendedores.forEach(vendedor => {
         const option = document.createElement('option');
         option.value = vendedor.id;
@@ -423,6 +404,13 @@ function atualizarOpcoesServicos() {
 
     selectServico.innerHTML = ''; // Limpa as opções existentes
 
+    // Adiciona uma opção padrão
+    const optionPadrao = document.createElement('option');
+    optionPadrao.value = '';
+    optionPadrao.textContent = 'Selecione um serviço';
+    selectServico.appendChild(optionPadrao);
+
+    // Preenche as opções com os serviços cadastrados
     dados.servicos.forEach(servico => {
         const option = document.createElement('option');
         option.value = servico.id;
@@ -441,6 +429,13 @@ function atualizarOpcoesEmpresas() {
 
     selectEmpresa.innerHTML = ''; // Limpa as opções existentes
 
+    // Adiciona uma opção padrão
+    const optionPadrao = document.createElement('option');
+    optionPadrao.value = '';
+    optionPadrao.textContent = 'Selecione uma empresa parceira';
+    selectEmpresa.appendChild(optionPadrao);
+
+    // Preenche as opções com as empresas parceiras cadastradas
     dados.empresasParceiras.forEach(empresa => {
         const option = document.createElement('option');
         option.value = empresa.id;
@@ -448,3 +443,17 @@ function atualizarOpcoesEmpresas() {
         selectEmpresa.appendChild(option);
     });
 }
+
+// Inicializa a aba "Dashboard" como ativa ao carregar a página
+document.addEventListener('DOMContentLoaded', function () {
+    showTab('dashboard');
+    preencherAnos();
+    atualizarOpcoesVendedores();
+    atualizarOpcoesServicos();
+    atualizarOpcoesEmpresas();
+    inicializarGraficos();
+
+    // Adicionar listeners para atualizar o dashboard ao mudar filtros
+    document.getElementById('mesFiltro').addEventListener('change', atualizarDashboard);
+    document.getElementById('anoFiltro').addEventListener('change', atualizarDashboard);
+});
