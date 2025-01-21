@@ -568,6 +568,150 @@ function atualizarListaEmpresas() {
     });
 }
 
+// Função para atualizar o filtro de vendedores na aba de relatórios
+function atualizarFiltroVendedores() {
+    const filtroVendedor = document.getElementById('filtroVendedor');
+    filtroVendedor.innerHTML = '<option value="">Todos</option>'; // Opção padrão
+
+    dados.vendedores.forEach(vendedor => {
+        const option = document.createElement('option');
+        option.value = vendedor.id;
+        option.textContent = vendedor.nome;
+        filtroVendedor.appendChild(option);
+    });
+}
+
+// Função para filtrar o relatório
+function filtrarRelatorio() {
+    const dataInicial = document.getElementById('dataInicial').value;
+    const dataFinal = document.getElementById('dataFinal').value;
+    const vendedorId = document.getElementById('filtroVendedor').value;
+    const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
+
+    // Converter datas para o formato DD/MM/AAAA
+    const dataInicialFormatada = dataInicial ? formatarDataParaComparacao(dataInicial) : null;
+    const dataFinalFormatada = dataFinal ? formatarDataParaComparacao(dataFinal) : null;
+
+    // Filtrar vendas
+    const vendasFiltradas = dados.vendas.filter(venda => {
+        const dataVenda = formatarDataParaComparacao(venda.data);
+
+        // Filtro por data
+        const dentroDoPeriodo = (!dataInicialFormatada || dataVenda >= dataInicialFormatada) &&
+                                (!dataFinalFormatada || dataVenda <= dataFinalFormatada);
+
+        // Filtro por vendedor
+        const vendedorSelecionado = !vendedorId || venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
+
+        return dentroDoPeriodo && vendedorSelecionado;
+    });
+
+    // Gerar relatório com as colunas selecionadas
+    gerarTabelaRelatorio(vendasFiltradas, colunasSelecionadas);
+}
+
+// Função para formatar data para comparação
+function formatarDataParaComparacao(data) {
+    const [dia, mes, ano] = data.split('/');
+    return new Date(`${ano}-${mes}-${dia}`);
+}
+
+// Função para gerar a tabela de relatório
+function gerarTabelaRelatorio(vendas, colunas) {
+    const tabelaRelatorio = document.getElementById('tabelaRelatorio');
+    const thead = tabelaRelatorio.querySelector('thead');
+    const tbody = tabelaRelatorio.querySelector('tbody');
+    const tfoot = tabelaRelatorio.querySelector('tfoot');
+
+    // Limpar tabela
+    thead.innerHTML = '';
+    tbody.innerHTML = '';
+    tfoot.innerHTML = '';
+
+    // Criar cabeçalho da tabela
+    const headerRow = document.createElement('tr');
+    colunas.forEach(coluna => {
+        const th = document.createElement('th');
+        th.textContent = coluna
+            .replace('data', 'Data da Venda')
+            .replace('vendedor', 'Vendedor')
+            .replace('servico', 'Serviço')
+            .replace('tipoComissao', 'Tipo de Comissão')
+            .replace('nomeCliente', 'Cliente')
+            .replace('empresaParceira', 'Empresa Parceira')
+            .replace('comissao', 'Comissão')
+            .replace('percentualComissao', 'Percentual da Comissão')
+            .replace('valorBrutoReceber', 'Valor Bruto a Receber');
+        headerRow.appendChild(th);
+    });
+    thead.appendChild(headerRow);
+
+    // Preencher corpo da tabela
+    vendas.forEach(venda => {
+        const row = document.createElement('tr');
+        colunas.forEach(coluna => {
+            const td = document.createElement('td');
+            switch (coluna) {
+                case 'data':
+                    td.textContent = venda.data;
+                    break;
+                case 'vendedor':
+                    td.textContent = venda.vendedor;
+                    break;
+                case 'servico':
+                    td.textContent = venda.servico;
+                    break;
+                case 'tipoComissao':
+                    td.textContent = venda.tipoComissao;
+                    break;
+                case 'nomeCliente':
+                    td.textContent = venda.nomeCliente;
+                    break;
+                case 'empresaParceira':
+                    td.textContent = venda.empresaParceira;
+                    break;
+                case 'comissao':
+                    td.textContent = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    break;
+                case 'percentualComissao':
+                    const percentual = (venda.comissao / venda.valorVenda * 100).toFixed(2);
+                    td.textContent = `${percentual}%`;
+                    break;
+                case 'valorBrutoReceber':
+                    td.textContent = venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    break;
+            }
+            row.appendChild(td);
+        });
+        tbody.appendChild(row);
+    });
+
+    // Adicionar rodapé com totais
+    const totalVendas = vendas.reduce((total, venda) => total + venda.valorVenda, 0);
+    const totalComissoes = vendas.reduce((total, venda) => total + venda.comissao, 0);
+    const totalReceber = vendas.reduce((total, venda) => total + venda.valorReceber, 0);
+
+    const footerRow = document.createElement('tr');
+    colunas.forEach(coluna => {
+        const td = document.createElement('td');
+        switch (coluna) {
+            case 'data':
+                td.textContent = 'Total';
+                break;
+            case 'comissao':
+                td.textContent = totalComissoes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                break;
+            case 'valorBrutoReceber':
+                td.textContent = totalReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                break;
+            default:
+                td.textContent = '';
+        }
+        footerRow.appendChild(td);
+    });
+    tfoot.appendChild(footerRow);
+}
+
 // Inicialização do aplicativo
 function inicializarAplicativo() {
     carregarDadosIniciais();
@@ -578,15 +722,10 @@ function inicializarAplicativo() {
     atualizarOpcoesServicos();
     atualizarOpcoesEmpresas();
     inicializarGraficos();
-
-    // Atualizar listas de cadastros
     atualizarListaVendedores();
     atualizarListaServicos();
     atualizarListaEmpresas();
-
-    // Adicionar listeners para atualizar o dashboard ao mudar filtros
-    document.getElementById('mesFiltro').addEventListener('change', atualizarDashboard);
-    document.getElementById('anoFiltro').addEventListener('change', atualizarDashboard);
+    atualizarFiltroVendedores(); // Atualiza o filtro de vendedores na aba de relatórios
 }
 
 // Event Listener para quando o DOM estiver carregado
