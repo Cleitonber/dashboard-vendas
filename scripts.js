@@ -42,8 +42,17 @@ function preencherAnos() {
     const selectAno = document.getElementById('anoFiltro');
     selectAno.innerHTML = '';
 
+    // Obter o ano atual
+    const anoAtual = new Date().getFullYear();
+    
     // Extrair anos únicos das vendas
-    const anosUnicos = [...new Set(dados.vendas.map(venda => new Date(venda.data.split('/').reverse().join('-')).getFullYear()))];
+    let anosUnicos = [...new Set(dados.vendas.map(venda => new Date(venda.data.split('/').reverse().join('-')).getFullYear()))];
+    
+    // Adicionar o ano atual se não existir
+    if (!anosUnicos.includes(anoAtual)) {
+        anosUnicos.push(anoAtual);
+    }
+    
     anosUnicos.sort((a, b) => b - a); // Ordenar do ano mais recente para o mais antigo
 
     // Adicionar opções ao seletor
@@ -54,8 +63,8 @@ function preencherAnos() {
         selectAno.appendChild(option);
     });
 
-    // Selecionar o ano de 2025 por padrão
-    selectAno.value = 2025;
+    // Selecionar o ano atual por padrão
+    selectAno.value = anoAtual;
 }
 
 // Função para atualizar o dashboard
@@ -64,8 +73,9 @@ function atualizarDashboard() {
     const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
 
     const vendasFiltradas = dados.vendas.filter(venda => {
-        const dataVenda = new Date(venda.data.split('/').reverse().join('-')); // Converte a data para o formato Date
-        return dataVenda.getMonth() === mesSelecionado && dataVenda.getFullYear() === anoSelecionado;
+        // Converter a data da venda para objeto Date
+        const [dia, mes, ano] = venda.data.split('/').map(Number);
+        return mes - 1 === mesSelecionado && ano === anoSelecionado;
     });
 
     // Atualizar gráficos
@@ -75,7 +85,7 @@ function atualizarDashboard() {
     const totalVendas = vendasFiltradas.reduce((total, venda) => total + venda.valorVenda, 0);
     const totalComissoes = vendasFiltradas.reduce((total, venda) => total + venda.comissao, 0);
     const totalClientes = [...new Set(vendasFiltradas.map(venda => venda.nomeCliente))].length;
-    const ticketMedio = totalVendas / vendasFiltradas.length || 0;
+    const ticketMedio = vendasFiltradas.length > 0 ? totalVendas / vendasFiltradas.length : 0;
 
     document.getElementById('totalVendasDash').textContent = totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     document.getElementById('totalComissoesDash').textContent = totalComissoes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -715,8 +725,9 @@ document.getElementById('vendaForm').addEventListener('submit', function (e) {
     limparCamposVenda();
 
     // Atualizar o dashboard após registrar a venda
-    atualizarDashboard();
-    listarVendas();
+    preencherAnos(); // Atualizar os anos disponíveis
+    atualizarDashboard(); // Atualizar o dashboard com a nova venda
+    listarVendas(); // Atualizar a lista de vendas
 });
 
 // Função para limpar os campos do formulário de venda
