@@ -27,66 +27,6 @@ function showTab(tabId) {
     document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
 }
 
-// Função para preencher as opções de vendedores no formulário de vendas
-function atualizarOpcoesVendedores() {
-    const selectVendedor = document.getElementById('vendedorVenda');
-    if (!selectVendedor) {
-        console.error('Elemento com id="vendedorVenda" não encontrado!');
-        return;
-    }
-
-    // Limpa as opções existentes
-    selectVendedor.innerHTML = '<option value="">Selecione um vendedor</option>';
-
-    // Adiciona as opções de vendedores
-    dados.vendedores.forEach(vendedor => {
-        const option = document.createElement('option');
-        option.value = vendedor.id;
-        option.textContent = vendedor.nome;
-        selectVendedor.appendChild(option);
-    });
-}
-
-// Função para preencher as opções de serviços no formulário de vendas
-function atualizarOpcoesServicos() {
-    const selectServico = document.getElementById('servicoVenda');
-    if (!selectServico) {
-        console.error('Elemento com id="servicoVenda" não encontrado!');
-        return;
-    }
-
-    // Limpa as opções existentes
-    selectServico.innerHTML = '<option value="">Selecione um serviço</option>';
-
-    // Adiciona as opções de serviços
-    dados.servicos.forEach(servico => {
-        const option = document.createElement('option');
-        option.value = servico.id;
-        option.textContent = servico.nome;
-        selectServico.appendChild(option);
-    });
-}
-
-// Função para preencher as opções de empresas parceiras no formulário de vendas
-function atualizarOpcoesEmpresas() {
-    const selectEmpresa = document.getElementById('empresaParceira');
-    if (!selectEmpresa) {
-        console.error('Elemento com id="empresaParceira" não encontrado!');
-        return;
-    }
-
-    // Limpa as opções existentes
-    selectEmpresa.innerHTML = '<option value="">Selecione uma empresa parceira</option>';
-
-    // Adiciona as opções de empresas parceiras
-    dados.empresasParceiras.forEach(empresa => {
-        const option = document.createElement('option');
-        option.value = empresa.id;
-        option.textContent = empresa.nome;
-        selectEmpresa.appendChild(option);
-    });
-}
-
 // Inicializa a aba "Dashboard" como ativa ao carregar a página
 document.addEventListener('DOMContentLoaded', function () {
     showTab('dashboard');
