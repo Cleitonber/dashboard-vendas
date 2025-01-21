@@ -394,3 +394,57 @@ function mudarPaginaVendas(direcao) {
     paginaAtualVendas += direcao;
     listarVendas();
 }
+
+// Função para atualizar as opções de vendedores
+function atualizarOpcoesVendedores() {
+    const selectVendedor = document.getElementById('vendedorVenda');
+    if (!selectVendedor) {
+        console.error('Elemento com id="vendedorVenda" não encontrado!');
+        return;
+    }
+
+    selectVendedor.innerHTML = ''; // Limpa as opções existentes
+
+    dados.vendedores.forEach(vendedor => {
+        const option = document.createElement('option');
+        option.value = vendedor.id;
+        option.textContent = vendedor.nome;
+        selectVendedor.appendChild(option);
+    });
+}
+
+// Função para atualizar as opções de serviços
+function atualizarOpcoesServicos() {
+    const selectServico = document.getElementById('servicoVenda');
+    if (!selectServico) {
+        console.error('Elemento com id="servicoVenda" não encontrado!');
+        return;
+    }
+
+    selectServico.innerHTML = ''; // Limpa as opções existentes
+
+    dados.servicos.forEach(servico => {
+        const option = document.createElement('option');
+        option.value = servico.id;
+        option.textContent = servico.nome;
+        selectServico.appendChild(option);
+    });
+}
+
+// Função para atualizar as opções de empresas parceiras
+function atualizarOpcoesEmpresas() {
+    const selectEmpresa = document.getElementById('empresaParceira');
+    if (!selectEmpresa) {
+        console.error('Elemento com id="empresaParceira" não encontrado!');
+        return;
+    }
+
+    selectEmpresa.innerHTML = ''; // Limpa as opções existentes
+
+    dados.empresasParceiras.forEach(empresa => {
+        const option = document.createElement('option');
+        option.value = empresa.id;
+        option.textContent = empresa.nome;
+        selectEmpresa.appendChild(option);
+    });
+}
