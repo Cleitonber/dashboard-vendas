@@ -36,9 +36,9 @@ function carregarDadosIniciais() {
     ];
 
     dados.servicos = [
-        { id: 1, nome: 'Consultoria', categoria: 'Serviços Profissionais', tipoComissao: 'Percentual' },
-        { id: 2, nome: 'Treinamento', categoria: 'Educação', tipoComissao: 'Fixo' },
-        { id: 3, nome: 'Suporte Técnico', categoria: 'TI', tipoComissao: 'Percentual' }
+        { id: 1, nome: 'Consultoria', categoria: 'Serviços Profissionais', tipoComissao: 'fixa' },
+        { id: 2, nome: 'Treinamento', categoria: 'Educação', tipoComissao: 'porcentagem' },
+        { id: 3, nome: 'Suporte Técnico', categoria: 'TI', tipoComissao: 'porcentagem' }
     ];
 
     dados.empresasParceiras = [
@@ -337,6 +337,43 @@ function atualizarOpcoesEmpresas() {
         option.textContent = empresa.nome;
         selectEmpresa.appendChild(option);
     });
+}
+
+// Função para atualizar o tipo de comissão ao selecionar um serviço
+function atualizarTipoComissao() {
+    const servicoId = document.getElementById('servicoVenda').value;
+    const servico = dados.servicos.find(s => s.id == servicoId);
+    const tipoComissaoInfo = document.getElementById('tipoComissaoInfo');
+    const comissaoInput = document.getElementById('comissao');
+
+    if (servico) {
+        tipoComissaoInfo.textContent = `Tipo de Comissão: ${servico.tipoComissao}`;
+        if (servico.tipoComissao === 'fixa') {
+            comissaoInput.placeholder = 'R$ 0,00';
+            comissaoInput.oninput = function() { formatarMoeda(this); };
+        } else if (servico.tipoComissao === 'porcentagem') {
+            comissaoInput.placeholder = '0,00%';
+            comissaoInput.oninput = function() { formatarPorcentagem(this); };
+        }
+    } else {
+        tipoComissaoInfo.textContent = '';
+        comissaoInput.placeholder = '0,00';
+        comissaoInput.oninput = null;
+    }
+}
+
+// Função para formatar o valor da comissão como moeda
+function formatarMoeda(input) {
+    let valor = input.value.replace(/\D/g, ''); // Remove tudo que não for número
+    valor = (Number(valor) / 100).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    input.value = valor;
+}
+
+// Função para formatar o valor da comissão como porcentagem
+function formatarPorcentagem(input) {
+    let valor = input.value.replace(/\D/g, ''); // Remove tudo que não for número
+    valor = (Number(valor) / 100).toFixed(2) + '%';
+    input.value = valor;
 }
 
 // Função para registrar venda
