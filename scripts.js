@@ -1,6 +1,5 @@
-const { jsPDF } = window.jspdf;
-
-let dados = {
+// Definição inicial dos objetos e variáveis
+const dados = {
     vendas: [],
     vendedores: [],
     servicos: [],
@@ -15,21 +14,59 @@ const itensPorPagina = 5;
 
 let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart;
 
-// Função para alternar entre as abas
-function showTab(tabId) {
-    const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => tab.classList.remove('active'));
+// Funções de atualização de opções
+function atualizarOpcoesVendedores() {
+    const select = document.getElementById('vendedorVenda');
+    if (!select) return;
 
-    document.getElementById(tabId).classList.add('active');
-
-    const buttons = document.querySelectorAll('.nav-button');
-    buttons.forEach(button => button.classList.remove('active'));
-    document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+    select.innerHTML = '<option value="">Selecione um vendedor</option>';
+    
+    dados.vendedores.forEach(vendedor => {
+        const option = document.createElement('option');
+        option.value = vendedor.id;
+        option.textContent = vendedor.nome;
+        select.appendChild(option);
+    });
 }
 
-// Função para carregar dados iniciais (mock)
+function atualizarOpcoesServicos() {
+    const select = document.getElementById('servicoVenda');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Selecione um serviço</option>';
+    
+    dados.servicos.forEach(servico => {
+        const option = document.createElement('option');
+        option.value = servico.id;
+        option.textContent = servico.nome;
+        select.appendChild(option);
+    });
+
+    select.addEventListener('change', function() {
+        const servicoSelecionado = dados.servicos.find(s => s.id == this.value);
+        const tipoComissaoInfo = document.getElementById('tipoComissaoInfo');
+        if (tipoComissaoInfo && servicoSelecionado) {
+            tipoComissaoInfo.textContent = `Tipo de Comissão: ${servicoSelecionado.tipoComissao}`;
+        }
+    });
+}
+
+function atualizarOpcoesEmpresas() {
+    const select = document.getElementById('empresaParceira');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Selecione uma empresa parceira</option>';
+    
+    dados.empresasParceiras.forEach(empresa => {
+        const option = document.createElement('option');
+        option.value = empresa.id;
+        option.textContent = empresa.nome;
+        select.appendChild(option);
+    });
+}
+
+// Função para carregar dados mock iniciais
 function carregarDadosIniciais() {
-    // Dados mockados para teste
     dados.vendedores = [
         { id: 1, nome: 'João Silva' },
         { id: 2, nome: 'Maria Santos' },
@@ -47,12 +84,17 @@ function carregarDadosIniciais() {
         { id: 2, nome: 'Empresa B' },
         { id: 3, nome: 'Empresa C' }
     ];
+}
 
-    // Verificar se já existem dados salvos no localStorage
+// Função para carregar dados do localStorage
+function carregarDados() {
     const dadosSalvos = localStorage.getItem('dadosVendas');
-    if (!dadosSalvos) {
-        // Se não houver dados salvos, salvar os dados iniciais
-        salvarDados();
+    if (dadosSalvos) {
+        const dadosCarregados = JSON.parse(dadosSalvos);
+        dados.vendas = dadosCarregados.vendas || [];
+        dados.vendedores = dadosCarregados.vendedores || dados.vendedores;
+        dados.servicos = dadosCarregados.servicos || dados.servicos;
+        dados.empresasParceiras = dadosCarregados.empresasParceiras || dados.empresasParceiras;
     }
 }
 
@@ -61,83 +103,17 @@ function salvarDados() {
     localStorage.setItem('dadosVendas', JSON.stringify(dados));
 }
 
-// Função para carregar dados do localStorage
-function carregarDados() {
-    const dadosSalvos = localStorage.getItem('dadosVendas');
-    if (dadosSalvos) {
-        dados = JSON.parse(dadosSalvos);
-    }
+// Função para mostrar tabs
+function showTab(tabId) {
+    const tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => tab.classList.remove('active'));
+
+    document.getElementById(tabId).classList.add('active');
+
+    const buttons = document.querySelectorAll('.nav-button');
+    buttons.forEach(button => button.classList.remove('active'));
+    document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
 }
-
-// Função para atualizar opções de vendedores
-function atualizarOpcoesVendedores() {
-    const select = document.getElementById('vendedorVenda');
-    if (!select) return;
-
-    select.innerHTML = '<option value="">Selecione um vendedor</option>';
-    
-    dados.vendedores.forEach(vendedor => {
-        const option = document.createElement('option');
-        option.value = vendedor.id;
-        option.textContent = vendedor.nome;
-        select.appendChild(option);
-    });
-}
-
-// Função para atualizar opções de serviços
-function atualizarOpcoesServicos() {
-    const select = document.getElementById('servicoVenda');
-    if (!select) return;
-
-    select.innerHTML = '<option value="">Selecione um serviço</option>';
-    
-    dados.servicos.forEach(servico => {
-        const option = document.createElement('option');
-        option.value = servico.id;
-        option.textContent = servico.nome;
-        select.appendChild(option);
-    });
-
-    // Adicionar evento de change para atualizar informação do tipo de comissão
-    select.addEventListener('change', function() {
-        const servicoSelecionado = dados.servicos.find(s => s.id == this.value);
-        const tipoComissaoInfo = document.getElementById('tipoComissaoInfo');
-        if (tipoComissaoInfo && servicoSelecionado) {
-            tipoComissaoInfo.textContent = `Tipo de Comissão: ${servicoSelecionado.tipoComissao}`;
-        }
-    });
-}
-
-// Função para atualizar opções de empresas parceiras
-function atualizarOpcoesEmpresas() {
-    const select = document.getElementById('empresaParceira');
-    if (!select) return;
-
-    select.innerHTML = '<option value="">Selecione uma empresa parceira</option>';
-    
-    dados.empresasParceiras.forEach(empresa => {
-        const option = document.createElement('option');
-        option.value = empresa.id;
-        option.textContent = empresa.nome;
-        select.appendChild(option);
-    });
-}
-
-// Inicializa a aba "Dashboard" como ativa ao carregar a página
-document.addEventListener('DOMContentLoaded', function () {
-    carregarDadosIniciais(); // Carregar dados mock iniciais se necessário
-    carregarDados(); // Carregar dados do localStorage
-    showTab('dashboard');
-    preencherAnos();
-    atualizarOpcoesVendedores();
-    atualizarOpcoesServicos();
-    atualizarOpcoesEmpresas();
-    inicializarGraficos();
-
-    // Adicionar listeners para atualizar o dashboard ao mudar filtros
-    document.getElementById('mesFiltro').addEventListener('change', atualizarDashboard);
-    document.getElementById('anoFiltro').addEventListener('change', atualizarDashboard);
-});
 
 // Função para preencher o seletor de anos
 function preencherAnos() {
@@ -179,84 +155,6 @@ function preencherAnos() {
 
     // Selecionar o ano atual por padrão
     selectAno.value = anoAtual;
-}
-
-// Função para atualizar o dashboard
-function atualizarDashboard() {
-    const mesSelecionado = parseInt(document.getElementById('mesFiltro').value);
-    const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
-
-    console.log('Filtros aplicados:', { mesSelecionado, anoSelecionado }); // Debug
-
-    const vendasFiltradas = dados.vendas.filter(venda => {
-        try {
-            const [dia, mes, ano] = venda.data.split('/').map(Number);
-            const vendaFiltrada = mes === mesSelecionado + 1 && ano === anoSelecionado;
-
-            console.log('Processando venda:', {
-                dataOriginal: venda.data,
-                mes,
-                mesFiltro: mesSelecionado + 1,
-                ano,
-                anoFiltro: anoSelecionado,
-                incluida: vendaFiltrada
-            });
-
-            return vendaFiltrada;
-        } catch (error) {
-            console.error('Erro ao processar venda:', venda, error);
-            return false;
-        }
-    });
-
-    console.log('Vendas filtradas:', vendasFiltradas); // Debug
-
-    // Atualizar gráficos
-    atualizarGraficos(vendasFiltradas);
-
-    // Atualizar estatísticas
-    const totalVendas = vendasFiltradas.reduce((total, venda) => total + venda.valorVenda, 0);
-    const totalComissoes = vendasFiltradas.reduce((total, venda) => total + venda.comissao, 0);
-    const totalClientes = [...new Set(vendasFiltradas.map(venda => venda.nomeCliente))].length;
-    const ticketMedio = vendasFiltradas.length > 0 ? totalVendas / vendasFiltradas.length : 0;
-
-    document.getElementById('totalVendasDash').textContent = totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    document.getElementById('totalComissoesDash').textContent = totalComissoes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    document.getElementById('totalClientes').textContent = totalClientes;
-    document.getElementById('ticketMedio').textContent = ticketMedio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
-
-// Função para atualizar os gráficos
-function atualizarGraficos(vendasFiltradas) {
-    // Atualizar gráfico de Vendas por Serviço
-    const servicos = [...new Set(dados.servicos.map(servico => servico.nome))];
-    const vendasPorServico = servicos.map(servico => {
-        return vendasFiltradas.filter(venda => venda.servico === servico).reduce((total, venda) => total + venda.valorVenda, 0);
-    });
-
-    vendasServicoChart.data.labels = servicos;
-    vendasServicoChart.data.datasets[0].data = vendasPorServico;
-    vendasServicoChart.update();
-
-    // Atualizar gráfico de Desempenho dos Vendedores
-    const vendedores = [...new Set(dados.vendedores.map(vendedor => vendedor.nome))];
-    const vendasPorVendedor = vendedores.map(vendedor => {
-        return vendasFiltradas.filter(venda => venda.vendedor === vendedor).reduce((total, venda) => total + venda.valorVenda, 0);
-    });
-
-    desempenhoVendedoresChart.data.labels = vendedores;
-    desempenhoVendedoresChart.data.datasets[0].data = vendasPorVendedor;
-    desempenhoVendedoresChart.update();
-
-    // Atualizar gráfico de Vendas por Categoria
-    const categorias = [...new Set(dados.servicos.map(servico => servico.categoria))];
-    const vendasPorCategoria = categorias.map(categoria => {
-        return vendasFiltradas.filter(venda => dados.servicos.find(servico => servico.nome === venda.servico).categoria === categoria).reduce((total, venda) => total + venda.valorVenda, 0);
-    });
-
-    vendasCategoriaChart.data.labels = categorias;
-    vendasCategoriaChart.data.datasets[0].data = vendasPorCategoria;
-    vendasCategoriaChart.update();
 }
 
 // Função para inicializar os gráficos
@@ -365,6 +263,64 @@ function inicializarGraficos() {
     });
 
     atualizarDashboard(); // Atualiza os gráficos com os dados iniciais
+}
+
+// Função para atualizar o dashboard
+function atualizarDashboard() {
+    const mesSelecionado = parseInt(document.getElementById('mesFiltro').value);
+    const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
+
+    const vendasFiltradas = dados.vendas.filter(venda => {
+        const [dia, mes, ano] = venda.data.split('/').map(Number);
+        return mes === mesSelecionado + 1 && ano === anoSelecionado;
+    });
+
+    // Atualizar gráficos
+    atualizarGraficos(vendasFiltradas);
+
+    // Atualizar estatísticas
+    const totalVendas = vendasFiltradas.reduce((total, venda) => total + venda.valorVenda, 0);
+    const totalComissoes = vendasFiltradas.reduce((total, venda) => total + venda.comissao, 0);
+    const totalClientes = [...new Set(vendasFiltradas.map(venda => venda.nomeCliente))].length;
+    const ticketMedio = vendasFiltradas.length > 0 ? totalVendas / vendasFiltradas.length : 0;
+
+    document.getElementById('totalVendasDash').textContent = totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('totalComissoesDash').textContent = totalComissoes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('totalClientes').textContent = totalClientes;
+    document.getElementById('ticketMedio').textContent = ticketMedio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+// Função para atualizar os gráficos
+function atualizarGraficos(vendasFiltradas) {
+    // Atualizar gráfico de Vendas por Serviço
+    const servicos = [...new Set(dados.servicos.map(servico => servico.nome))];
+    const vendasPorServico = servicos.map(servico => {
+        return vendasFiltradas.filter(venda => venda.servico === servico).reduce((total, venda) => total + venda.valorVenda, 0);
+    });
+
+    vendasServicoChart.data.labels = servicos;
+    vendasServicoChart.data.datasets[0].data = vendasPorServico;
+    vendasServicoChart.update();
+
+    // Atualizar gráfico de Desempenho dos Vendedores
+    const vendedores = [...new Set(dados.vendedores.map(vendedor => vendedor.nome))];
+    const vendasPorVendedor = vendedores.map(vendedor => {
+        return vendasFiltradas.filter(venda => venda.vendedor === vendedor).reduce((total, venda) => total + venda.valorVenda, 0);
+    });
+
+    desempenhoVendedoresChart.data.labels = vendedores;
+    desempenhoVendedoresChart.data.datasets[0].data = vendasPorVendedor;
+    desempenhoVendedoresChart.update();
+
+    // Atualizar gráfico de Vendas por Categoria
+    const categorias = [...new Set(dados.servicos.map(servico => servico.categoria))];
+    const vendasPorCategoria = categorias.map(categoria => {
+        return vendasFiltradas.filter(venda => dados.servicos.find(servico => servico.nome === venda.servico).categoria === categoria).reduce((total, venda) => total + venda.valorVenda, 0);
+    });
+
+    vendasCategoriaChart.data.labels = categorias;
+    vendasCategoriaChart.data.datasets[0].data = vendasPorCategoria;
+    vendasCategoriaChart.update();
 }
 
 // Função para formatar a data no input
@@ -510,3 +466,22 @@ function mudarPaginaVendas(direcao) {
     paginaAtualVendas += direcao;
     listarVendas();
 }
+
+// Inicialização do aplicativo
+function inicializarAplicativo() {
+    carregarDadosIniciais();
+    carregarDados();
+    showTab('dashboard');
+    preencherAnos();
+    atualizarOpcoesVendedores();
+    atualizarOpcoesServicos();
+    atualizarOpcoesEmpresas();
+    inicializarGraficos();
+
+    // Adicionar listeners para atualizar o dashboard ao mudar filtros
+    document.getElementById('mesFiltro').addEventListener('change', atualizarDashboard);
+    document.getElementById('anoFiltro').addEventListener('change', atualizarDashboard);
+}
+
+// Event Listener para quando o DOM estiver carregado
+document.addEventListener('DOMContentLoaded', inicializarAplicativo);
