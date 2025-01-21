@@ -27,8 +27,106 @@ function showTab(tabId) {
     document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
 }
 
+// Função para carregar dados iniciais (mock)
+function carregarDadosIniciais() {
+    // Dados mockados para teste
+    dados.vendedores = [
+        { id: 1, nome: 'João Silva' },
+        { id: 2, nome: 'Maria Santos' },
+        { id: 3, nome: 'Pedro Oliveira' }
+    ];
+
+    dados.servicos = [
+        { id: 1, nome: 'Consultoria', categoria: 'Serviços Profissionais', tipoComissao: 'Percentual' },
+        { id: 2, nome: 'Treinamento', categoria: 'Educação', tipoComissao: 'Fixo' },
+        { id: 3, nome: 'Suporte Técnico', categoria: 'TI', tipoComissao: 'Percentual' }
+    ];
+
+    dados.empresasParceiras = [
+        { id: 1, nome: 'Empresa A' },
+        { id: 2, nome: 'Empresa B' },
+        { id: 3, nome: 'Empresa C' }
+    ];
+
+    // Verificar se já existem dados salvos no localStorage
+    const dadosSalvos = localStorage.getItem('dadosVendas');
+    if (!dadosSalvos) {
+        // Se não houver dados salvos, salvar os dados iniciais
+        salvarDados();
+    }
+}
+
+// Função para salvar dados no localStorage
+function salvarDados() {
+    localStorage.setItem('dadosVendas', JSON.stringify(dados));
+}
+
+// Função para carregar dados do localStorage
+function carregarDados() {
+    const dadosSalvos = localStorage.getItem('dadosVendas');
+    if (dadosSalvos) {
+        dados = JSON.parse(dadosSalvos);
+    }
+}
+
+// Função para atualizar opções de vendedores
+function atualizarOpcoesVendedores() {
+    const select = document.getElementById('vendedorVenda');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Selecione um vendedor</option>';
+    
+    dados.vendedores.forEach(vendedor => {
+        const option = document.createElement('option');
+        option.value = vendedor.id;
+        option.textContent = vendedor.nome;
+        select.appendChild(option);
+    });
+}
+
+// Função para atualizar opções de serviços
+function atualizarOpcoesServicos() {
+    const select = document.getElementById('servicoVenda');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Selecione um serviço</option>';
+    
+    dados.servicos.forEach(servico => {
+        const option = document.createElement('option');
+        option.value = servico.id;
+        option.textContent = servico.nome;
+        select.appendChild(option);
+    });
+
+    // Adicionar evento de change para atualizar informação do tipo de comissão
+    select.addEventListener('change', function() {
+        const servicoSelecionado = dados.servicos.find(s => s.id == this.value);
+        const tipoComissaoInfo = document.getElementById('tipoComissaoInfo');
+        if (tipoComissaoInfo && servicoSelecionado) {
+            tipoComissaoInfo.textContent = `Tipo de Comissão: ${servicoSelecionado.tipoComissao}`;
+        }
+    });
+}
+
+// Função para atualizar opções de empresas parceiras
+function atualizarOpcoesEmpresas() {
+    const select = document.getElementById('empresaParceira');
+    if (!select) return;
+
+    select.innerHTML = '<option value="">Selecione uma empresa parceira</option>';
+    
+    dados.empresasParceiras.forEach(empresa => {
+        const option = document.createElement('option');
+        option.value = empresa.id;
+        option.textContent = empresa.nome;
+        select.appendChild(option);
+    });
+}
+
 // Inicializa a aba "Dashboard" como ativa ao carregar a página
 document.addEventListener('DOMContentLoaded', function () {
+    carregarDadosIniciais(); // Carregar dados mock iniciais se necessário
+    carregarDados(); // Carregar dados do localStorage
     showTab('dashboard');
     preencherAnos();
     atualizarOpcoesVendedores();
