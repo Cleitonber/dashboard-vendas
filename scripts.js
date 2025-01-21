@@ -1,5 +1,6 @@
-// Definição inicial dos objetos e variáveis
-const dados = {
+const { jsPDF } = window.jspdf;
+
+let dados = {
     vendas: [],
     vendedores: [],
     servicos: [],
@@ -14,58 +15,19 @@ const itensPorPagina = 5;
 
 let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart;
 
-// Funções de atualização de opções
-function atualizarOpcoesVendedores() {
-    const select = document.getElementById('vendedorVenda');
-    if (!select) return;
+// Função para alternar entre as abas
+function showTab(tabId) {
+    const tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => tab.classList.remove('active'));
 
-    select.innerHTML = '<option value="">Selecione um vendedor</option>';
-    
-    dados.vendedores.forEach(vendedor => {
-        const option = document.createElement('option');
-        option.value = vendedor.id;
-        option.textContent = vendedor.nome;
-        select.appendChild(option);
-    });
+    document.getElementById(tabId).classList.add('active');
+
+    const buttons = document.querySelectorAll('.nav-button');
+    buttons.forEach(button => button.classList.remove('active'));
+    document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
 }
 
-function atualizarOpcoesServicos() {
-    const select = document.getElementById('servicoVenda');
-    if (!select) return;
-
-    select.innerHTML = '<option value="">Selecione um serviço</option>';
-    
-    dados.servicos.forEach(servico => {
-        const option = document.createElement('option');
-        option.value = servico.id;
-        option.textContent = servico.nome;
-        select.appendChild(option);
-    });
-
-    select.addEventListener('change', function() {
-        const servicoSelecionado = dados.servicos.find(s => s.id == this.value);
-        const tipoComissaoInfo = document.getElementById('tipoComissaoInfo');
-        if (tipoComissaoInfo && servicoSelecionado) {
-            tipoComissaoInfo.textContent = `Tipo de Comissão: ${servicoSelecionado.tipoComissao}`;
-        }
-    });
-}
-
-function atualizarOpcoesEmpresas() {
-    const select = document.getElementById('empresaParceira');
-    if (!select) return;
-
-    select.innerHTML = '<option value="">Selecione uma empresa parceira</option>';
-    
-    dados.empresasParceiras.forEach(empresa => {
-        const option = document.createElement('option');
-        option.value = empresa.id;
-        option.textContent = empresa.nome;
-        select.appendChild(option);
-    });
-}
-
-// Função para carregar dados mock iniciais
+// Função para carregar dados iniciais (mock)
 function carregarDadosIniciais() {
     dados.vendedores = [
         { id: 1, nome: 'João Silva', email: 'joao@email.com', telefone: '(11) 99999-9999' },
@@ -86,33 +48,17 @@ function carregarDadosIniciais() {
     ];
 }
 
-// Função para carregar dados do localStorage
-function carregarDados() {
-    const dadosSalvos = localStorage.getItem('dadosVendas');
-    if (dadosSalvos) {
-        const dadosCarregados = JSON.parse(dadosSalvos);
-        dados.vendas = dadosCarregados.vendas || [];
-        dados.vendedores = dadosCarregados.vendedores || dados.vendedores;
-        dados.servicos = dadosCarregados.servicos || dados.servicos;
-        dados.empresasParceiras = dadosCarregados.empresasParceiras || dados.empresasParceiras;
-    }
-}
-
 // Função para salvar dados no localStorage
 function salvarDados() {
     localStorage.setItem('dadosVendas', JSON.stringify(dados));
 }
 
-// Função para mostrar tabs
-function showTab(tabId) {
-    const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => tab.classList.remove('active'));
-
-    document.getElementById(tabId).classList.add('active');
-
-    const buttons = document.querySelectorAll('.nav-button');
-    buttons.forEach(button => button.classList.remove('active'));
-    document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+// Função para carregar dados do localStorage
+function carregarDados() {
+    const dadosSalvos = localStorage.getItem('dadosVendas');
+    if (dadosSalvos) {
+        dados = JSON.parse(dadosSalvos);
+    }
 }
 
 // Função para preencher o seletor de anos
@@ -129,17 +75,15 @@ function preencherAnos() {
     const anoAtual = new Date().getFullYear();
 
     // Extrair anos únicos das vendas
-    let anosUnicos = [];
+    let anosUnicos = [anoAtual]; // Inicializa com o ano atual
+    
     if (dados.vendas.length > 0) {
-        anosUnicos = [...new Set(dados.vendas.map(venda => {
+        const anosVendas = dados.vendas.map(venda => {
             const [dia, mes, ano] = venda.data.split('/').map(Number);
             return ano;
-        }))];
-    }
-
-    // Adicionar o ano atual se não existir
-    if (!anosUnicos.includes(anoAtual)) {
-        anosUnicos.push(anoAtual);
+        });
+        // Adiciona anos das vendas sem duplicatas
+        anosUnicos = [...new Set([...anosUnicos, ...anosVendas])];
     }
 
     // Ordenar os anos do mais recente para o mais antigo
@@ -155,6 +99,64 @@ function preencherAnos() {
 
     // Selecionar o ano atual por padrão
     selectAno.value = anoAtual;
+}
+
+// Função para atualizar o dashboard
+function atualizarDashboard() {
+    const mesSelecionado = parseInt(document.getElementById('mesFiltro').value);
+    const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
+
+    const vendasFiltradas = dados.vendas.filter(venda => {
+        const [dia, mes, ano] = venda.data.split('/').map(Number);
+        return mes === mesSelecionado + 1 && ano === anoSelecionado;
+    });
+
+    // Atualizar gráficos
+    atualizarGraficos(vendasFiltradas);
+
+    // Atualizar estatísticas
+    const totalVendas = vendasFiltradas.reduce((total, venda) => total + venda.valorVenda, 0);
+    const totalComissoes = vendasFiltradas.reduce((total, venda) => total + venda.comissao, 0);
+    const totalClientes = [...new Set(vendasFiltradas.map(venda => venda.nomeCliente))].length;
+    const ticketMedio = vendasFiltradas.length > 0 ? totalVendas / vendasFiltradas.length : 0;
+
+    document.getElementById('totalVendasDash').textContent = totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('totalComissoesDash').textContent = totalComissoes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('totalClientes').textContent = totalClientes;
+    document.getElementById('ticketMedio').textContent = ticketMedio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+// Função para atualizar os gráficos
+function atualizarGraficos(vendasFiltradas) {
+    // Atualizar gráfico de Vendas por Serviço
+    const servicos = [...new Set(dados.servicos.map(servico => servico.nome))];
+    const vendasPorServico = servicos.map(servico => {
+        return vendasFiltradas.filter(venda => venda.servico === servico).reduce((total, venda) => total + venda.valorVenda, 0);
+    });
+
+    vendasServicoChart.data.labels = servicos;
+    vendasServicoChart.data.datasets[0].data = vendasPorServico;
+    vendasServicoChart.update();
+
+    // Atualizar gráfico de Desempenho dos Vendedores
+    const vendedores = [...new Set(dados.vendedores.map(vendedor => vendedor.nome))];
+    const vendasPorVendedor = vendedores.map(vendedor => {
+        return vendasFiltradas.filter(venda => venda.vendedor === vendedor).reduce((total, venda) => total + venda.valorVenda, 0);
+    });
+
+    desempenhoVendedoresChart.data.labels = vendedores;
+    desempenhoVendedoresChart.data.datasets[0].data = vendasPorVendedor;
+    desempenhoVendedoresChart.update();
+
+    // Atualizar gráfico de Vendas por Categoria
+    const categorias = [...new Set(dados.servicos.map(servico => servico.categoria))];
+    const vendasPorCategoria = categorias.map(categoria => {
+        return vendasFiltradas.filter(venda => dados.servicos.find(servico => servico.nome === venda.servico).categoria === categoria).reduce((total, venda) => total + venda.valorVenda, 0);
+    });
+
+    vendasCategoriaChart.data.labels = categorias;
+    vendasCategoriaChart.data.datasets[0].data = vendasPorCategoria;
+    vendasCategoriaChart.update();
 }
 
 // Função para inicializar os gráficos
@@ -265,64 +267,6 @@ function inicializarGraficos() {
     atualizarDashboard(); // Atualiza os gráficos com os dados iniciais
 }
 
-// Função para atualizar o dashboard
-function atualizarDashboard() {
-    const mesSelecionado = parseInt(document.getElementById('mesFiltro').value);
-    const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
-
-    const vendasFiltradas = dados.vendas.filter(venda => {
-        const [dia, mes, ano] = venda.data.split('/').map(Number);
-        return mes === mesSelecionado + 1 && ano === anoSelecionado;
-    });
-
-    // Atualizar gráficos
-    atualizarGraficos(vendasFiltradas);
-
-    // Atualizar estatísticas
-    const totalVendas = vendasFiltradas.reduce((total, venda) => total + venda.valorVenda, 0);
-    const totalComissoes = vendasFiltradas.reduce((total, venda) => total + venda.comissao, 0);
-    const totalClientes = [...new Set(vendasFiltradas.map(venda => venda.nomeCliente))].length;
-    const ticketMedio = vendasFiltradas.length > 0 ? totalVendas / vendasFiltradas.length : 0;
-
-    document.getElementById('totalVendasDash').textContent = totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    document.getElementById('totalComissoesDash').textContent = totalComissoes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    document.getElementById('totalClientes').textContent = totalClientes;
-    document.getElementById('ticketMedio').textContent = ticketMedio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-}
-
-// Função para atualizar os gráficos
-function atualizarGraficos(vendasFiltradas) {
-    // Atualizar gráfico de Vendas por Serviço
-    const servicos = [...new Set(dados.servicos.map(servico => servico.nome))];
-    const vendasPorServico = servicos.map(servico => {
-        return vendasFiltradas.filter(venda => venda.servico === servico).reduce((total, venda) => total + venda.valorVenda, 0);
-    });
-
-    vendasServicoChart.data.labels = servicos;
-    vendasServicoChart.data.datasets[0].data = vendasPorServico;
-    vendasServicoChart.update();
-
-    // Atualizar gráfico de Desempenho dos Vendedores
-    const vendedores = [...new Set(dados.vendedores.map(vendedor => vendedor.nome))];
-    const vendasPorVendedor = vendedores.map(vendedor => {
-        return vendasFiltradas.filter(venda => venda.vendedor === vendedor).reduce((total, venda) => total + venda.valorVenda, 0);
-    });
-
-    desempenhoVendedoresChart.data.labels = vendedores;
-    desempenhoVendedoresChart.data.datasets[0].data = vendasPorVendedor;
-    desempenhoVendedoresChart.update();
-
-    // Atualizar gráfico de Vendas por Categoria
-    const categorias = [...new Set(dados.servicos.map(servico => servico.categoria))];
-    const vendasPorCategoria = categorias.map(categoria => {
-        return vendasFiltradas.filter(venda => dados.servicos.find(servico => servico.nome === venda.servico).categoria === categoria).reduce((total, venda) => total + venda.valorVenda, 0);
-    });
-
-    vendasCategoriaChart.data.labels = categorias;
-    vendasCategoriaChart.data.datasets[0].data = vendasPorCategoria;
-    vendasCategoriaChart.update();
-}
-
 // Função para formatar a data no input
 function formatarDataInput(input) {
     let valor = input.value;
@@ -401,6 +345,7 @@ document.getElementById('vendaForm').addEventListener('submit', function (e) {
     };
 
     dados.vendas.push(novaVenda);
+    salvarDados(); // Salva os dados no localStorage
     alert('Venda registrada com sucesso!');
     limparCamposVenda();
 
@@ -469,16 +414,10 @@ function mudarPaginaVendas(direcao) {
 
 // Função para cadastrar vendedor
 document.getElementById('vendedorForm').addEventListener('submit', function (e) {
-    e.preventDefault(); // Impede o comportamento padrão de submissão do formulário
-
+    e.preventDefault();
     const nomeVendedor = document.getElementById('nomeVendedor').value;
     const emailVendedor = document.getElementById('emailVendedor').value;
     const telefoneVendedor = document.getElementById('telefoneVendedor').value;
-
-    if (!nomeVendedor || !emailVendedor || !telefoneVendedor) {
-        alert('Por favor, preencha todos os campos do formulário.');
-        return;
-    }
 
     const novoVendedor = {
         id: dados.vendedores.length + 1,
@@ -489,25 +428,38 @@ document.getElementById('vendedorForm').addEventListener('submit', function (e) 
 
     dados.vendedores.push(novoVendedor);
     salvarDados(); // Salva os dados no localStorage
-    atualizarOpcoesVendedores(); // Atualiza as opções de vendedores no formulário de vendas
-    atualizarListaVendedores(); // Atualiza a lista de vendedores na aba de cadastros
-
     alert('Vendedor cadastrado com sucesso!');
-    document.getElementById('vendedorForm').reset(); // Limpa o formulário
+    limparCamposVendedor();
+    atualizarOpcoesVendedores();
+    atualizarListaVendedores();
 });
+
+// Função para limpar campos do formulário de vendedor
+function limparCamposVendedor() {
+    document.getElementById('nomeVendedor').value = '';
+    document.getElementById('emailVendedor').value = '';
+    document.getElementById('telefoneVendedor').value = '';
+}
+
+// Função para atualizar a lista de vendedores
+function atualizarListaVendedores() {
+    const listaVendedores = document.getElementById('vendedoresList');
+    listaVendedores.innerHTML = '';
+
+    dados.vendedores.forEach(vendedor => {
+        const item = document.createElement('li');
+        item.className = 'list-group-item';
+        item.textContent = `${vendedor.nome} - ${vendedor.email} - ${vendedor.telefone}`;
+        listaVendedores.appendChild(item);
+    });
+}
 
 // Função para cadastrar serviço
 document.getElementById('servicoForm').addEventListener('submit', function (e) {
-    e.preventDefault(); // Impede o comportamento padrão de submissão do formulário
-
+    e.preventDefault();
     const nomeServico = document.getElementById('nomeServico').value;
     const categoriaServico = document.getElementById('categoriaServico').value;
     const tipoComissao = document.getElementById('tipoComissao').value;
-
-    if (!nomeServico || !categoriaServico || !tipoComissao) {
-        alert('Por favor, preencha todos os campos do formulário.');
-        return;
-    }
 
     const novoServico = {
         id: dados.servicos.length + 1,
@@ -518,59 +470,23 @@ document.getElementById('servicoForm').addEventListener('submit', function (e) {
 
     dados.servicos.push(novoServico);
     salvarDados(); // Salva os dados no localStorage
-    atualizarOpcoesServicos(); // Atualiza as opções de serviços no formulário de vendas
-    atualizarListaServicos(); // Atualiza a lista de serviços na aba de cadastros
-
     alert('Serviço cadastrado com sucesso!');
-    document.getElementById('servicoForm').reset(); // Limpa o formulário
+    limparCamposServico();
+    atualizarOpcoesServicos();
+    atualizarListaServicos();
 });
 
-// Função para cadastrar empresa parceira
-document.getElementById('empresaForm').addEventListener('submit', function (e) {
-    e.preventDefault(); // Impede o comportamento padrão de submissão do formulário
-
-    const nomeEmpresa = document.getElementById('nomeEmpresa').value;
-
-    if (!nomeEmpresa) {
-        alert('Por favor, preencha o nome da empresa.');
-        return;
-    }
-
-    const novaEmpresa = {
-        id: dados.empresasParceiras.length + 1,
-        nome: nomeEmpresa
-    };
-
-    dados.empresasParceiras.push(novaEmpresa);
-    salvarDados(); // Salva os dados no localStorage
-    atualizarOpcoesEmpresas(); // Atualiza as opções de empresas no formulário de vendas
-    atualizarListaEmpresas(); // Atualiza a lista de empresas na aba de cadastros
-
-    alert('Empresa cadastrada com sucesso!');
-    document.getElementById('empresaForm').reset(); // Limpa o formulário
-});
-
-// Função para atualizar a lista de vendedores
-function atualizarListaVendedores() {
-    const listaVendedores = document.getElementById('vendedoresList');
-    if (!listaVendedores) return;
-
-    listaVendedores.innerHTML = ''; // Limpa a lista atual
-
-    dados.vendedores.forEach(vendedor => {
-        const item = document.createElement('li');
-        item.className = 'list-group-item';
-        item.textContent = `${vendedor.nome} - ${vendedor.email} - ${vendedor.telefone}`;
-        listaVendedores.appendChild(item);
-    });
+// Função para limpar campos do formulário de serviço
+function limparCamposServico() {
+    document.getElementById('nomeServico').value = '';
+    document.getElementById('categoriaServico').value = '';
+    document.getElementById('tipoComissao').value = 'fixa';
 }
 
 // Função para atualizar a lista de serviços
 function atualizarListaServicos() {
     const listaServicos = document.getElementById('servicosList');
-    if (!listaServicos) return;
-
-    listaServicos.innerHTML = ''; // Limpa a lista atual
+    listaServicos.innerHTML = '';
 
     dados.servicos.forEach(servico => {
         const item = document.createElement('li');
@@ -580,12 +496,33 @@ function atualizarListaServicos() {
     });
 }
 
+// Função para cadastrar empresa parceira
+document.getElementById('empresaForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    const nomeEmpresa = document.getElementById('nomeEmpresa').value;
+
+    const novaEmpresa = {
+        id: dados.empresasParceiras.length + 1,
+        nome: nomeEmpresa
+    };
+
+    dados.empresasParceiras.push(novaEmpresa);
+    salvarDados(); // Salva os dados no localStorage
+    alert('Empresa cadastrada com sucesso!');
+    limparCamposEmpresa();
+    atualizarOpcoesEmpresas();
+    atualizarListaEmpresas();
+});
+
+// Função para limpar campos do formulário de empresa
+function limparCamposEmpresa() {
+    document.getElementById('nomeEmpresa').value = '';
+}
+
 // Função para atualizar a lista de empresas
 function atualizarListaEmpresas() {
     const listaEmpresas = document.getElementById('empresasList');
-    if (!listaEmpresas) return;
-
-    listaEmpresas.innerHTML = ''; // Limpa a lista atual
+    listaEmpresas.innerHTML = '';
 
     dados.empresasParceiras.forEach(empresa => {
         const item = document.createElement('li');
