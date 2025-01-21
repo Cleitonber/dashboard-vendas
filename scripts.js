@@ -13,7 +13,7 @@ let paginaAtualEmpresas = 1;
 let paginaAtualVendas = 1;
 const itensPorPagina = 5;
 
-let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart;
+let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart, evolucaoVendasChart, distribuicaoComissoesChart, vendasEmpresasChart;
 
 // Função para alternar entre as abas
 function showTab(tabId) {
@@ -159,6 +159,38 @@ function atualizarGraficos(vendasFiltradas) {
     vendasCategoriaChart.data.labels = categorias;
     vendasCategoriaChart.data.datasets[0].data = vendasPorCategoria;
     vendasCategoriaChart.update();
+
+    // Atualizar gráfico de Evolução de Vendas
+    const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const vendasPorMes = meses.map((mes, index) => {
+        return vendasFiltradas.filter(venda => {
+            const [dia, mesVenda, anoVenda] = venda.data.split('/').map(Number);
+            return mesVenda === index + 1;
+        }).reduce((total, venda) => total + venda.valorVenda, 0);
+    });
+
+    evolucaoVendasChart.data.labels = meses;
+    evolucaoVendasChart.data.datasets[0].data = vendasPorMes;
+    evolucaoVendasChart.update();
+
+    // Atualizar gráfico de Distribuição de Comissões
+    const comissoesPorVendedor = vendedores.map(vendedor => {
+        return vendasFiltradas.filter(venda => venda.vendedor === vendedor).reduce((total, venda) => total + venda.comissao, 0);
+    });
+
+    distribuicaoComissoesChart.data.labels = vendedores;
+    distribuicaoComissoesChart.data.datasets[0].data = comissoesPorVendedor;
+    distribuicaoComissoesChart.update();
+
+    // Atualizar gráfico de Vendas por Empresa
+    const empresas = [...new Set(dados.empresasParceiras.map(empresa => empresa.nome))];
+    const vendasPorEmpresa = empresas.map(empresa => {
+        return vendasFiltradas.filter(venda => venda.empresaParceira === empresa).reduce((total, venda) => total + venda.valorVenda, 0);
+    });
+
+    vendasEmpresasChart.data.labels = empresas;
+    vendasEmpresasChart.data.datasets[0].data = vendasPorEmpresa;
+    vendasEmpresasChart.update();
 }
 
 // Função para inicializar os gráficos
@@ -166,6 +198,9 @@ function inicializarGraficos() {
     const ctxVendasServico = document.getElementById('vendasServicoChart').getContext('2d');
     const ctxDesempenhoVendedores = document.getElementById('desempenhoVendedoresChart').getContext('2d');
     const ctxVendasCategoria = document.getElementById('vendasCategoriaChart').getContext('2d');
+    const ctxEvolucaoVendas = document.getElementById('evolucaoVendasChart').getContext('2d');
+    const ctxDistribuicaoComissoes = document.getElementById('distribuicaoComissoesChart').getContext('2d');
+    const ctxVendasEmpresas = document.getElementById('vendasEmpresasChart').getContext('2d');
 
     vendasServicoChart = new Chart(ctxVendasServico, {
         type: 'bar',
@@ -243,6 +278,102 @@ function inicializarGraficos() {
                     'rgba(239, 68, 68, 0.6)',
                     'rgba(34, 197, 94, 0.6)'
                 ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            }
+        }
+    });
+
+    evolucaoVendasChart = new Chart(ctxEvolucaoVendas, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Vendas',
+                data: [],
+                borderColor: 'rgba(79, 70, 229, 1)',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            }
+        }
+    });
+
+    distribuicaoComissoesChart = new Chart(ctxDistribuicaoComissoes, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Comissões',
+                data: [],
+                backgroundColor: 'rgba(239, 68, 68, 0.6)',
+                borderColor: 'rgba(239, 68, 68, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            }
+        }
+    });
+
+    vendasEmpresasChart = new Chart(ctxVendasEmpresas, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Vendas',
+                data: [],
+                backgroundColor: 'rgba(34, 197, 94, 0.6)',
+                borderColor: 'rgba(34, 197, 94, 1)',
                 borderWidth: 1
             }]
         },
