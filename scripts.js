@@ -303,6 +303,42 @@ function formatarTelefone(input) {
     input.value = valor;
 }
 
+// Função para atualizar as opções de vendedores no formulário de vendas
+function atualizarOpcoesVendedores() {
+    const selectVendedor = document.getElementById('vendedorVenda');
+    selectVendedor.innerHTML = '<option value="">Selecione um vendedor</option>';
+    dados.vendedores.forEach(vendedor => {
+        const option = document.createElement('option');
+        option.value = vendedor.id;
+        option.textContent = vendedor.nome;
+        selectVendedor.appendChild(option);
+    });
+}
+
+// Função para atualizar as opções de serviços no formulário de vendas
+function atualizarOpcoesServicos() {
+    const selectServico = document.getElementById('servicoVenda');
+    selectServico.innerHTML = '<option value="">Selecione um serviço</option>';
+    dados.servicos.forEach(servico => {
+        const option = document.createElement('option');
+        option.value = servico.id;
+        option.textContent = servico.nome;
+        selectServico.appendChild(option);
+    });
+}
+
+// Função para atualizar as opções de empresas no formulário de vendas
+function atualizarOpcoesEmpresas() {
+    const selectEmpresa = document.getElementById('empresaParceira');
+    selectEmpresa.innerHTML = '<option value="">Selecione uma empresa parceira</option>';
+    dados.empresasParceiras.forEach(empresa => {
+        const option = document.createElement('option');
+        option.value = empresa.id;
+        option.textContent = empresa.nome;
+        selectEmpresa.appendChild(option);
+    });
+}
+
 // Função para registrar venda
 document.getElementById('vendaForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -454,18 +490,6 @@ function atualizarListaVendedores() {
     });
 }
 
-// Função para atualizar as opções de vendedores no formulário de vendas
-function atualizarOpcoesVendedores() {
-    const selectVendedor = document.getElementById('vendedorVenda');
-    selectVendedor.innerHTML = '<option value="">Selecione um vendedor</option>';
-    dados.vendedores.forEach(vendedor => {
-        const option = document.createElement('option');
-        option.value = vendedor.id;
-        option.textContent = vendedor.nome;
-        selectVendedor.appendChild(option);
-    });
-}
-
 // Função para cadastrar serviço
 document.getElementById('servicoForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -508,18 +532,6 @@ function atualizarListaServicos() {
     });
 }
 
-// Função para atualizar as opções de serviços no formulário de vendas
-function atualizarOpcoesServicos() {
-    const selectServico = document.getElementById('servicoVenda');
-    selectServico.innerHTML = '<option value="">Selecione um serviço</option>';
-    dados.servicos.forEach(servico => {
-        const option = document.createElement('option');
-        option.value = servico.id;
-        option.textContent = servico.nome;
-        selectServico.appendChild(option);
-    });
-}
-
 // Função para cadastrar empresa parceira
 document.getElementById('empresaForm').addEventListener('submit', function (e) {
     e.preventDefault();
@@ -553,18 +565,6 @@ function atualizarListaEmpresas() {
         item.className = 'list-group-item';
         item.textContent = empresa.nome;
         listaEmpresas.appendChild(item);
-    });
-}
-
-// Função para atualizar as opções de empresas no formulário de vendas
-function atualizarOpcoesEmpresas() {
-    const selectEmpresa = document.getElementById('empresaParceira');
-    selectEmpresa.innerHTML = '<option value="">Selecione uma empresa parceira</option>';
-    dados.empresasParceiras.forEach(empresa => {
-        const option = document.createElement('option');
-        option.value = empresa.id;
-        option.textContent = empresa.nome;
-        selectEmpresa.appendChild(option);
     });
 }
 
