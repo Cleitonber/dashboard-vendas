@@ -287,6 +287,24 @@ function formatarDataInput(input) {
     }
 }
 
+// Função para formatar número de telefone
+function formatarTelefone(input) {
+    let valor = input.value.replace(/\D/g, ''); // Remove tudo que não for número
+    
+    // Limita o tamanho máximo para 11 dígitos (com DDD)
+    valor = valor.slice(0, 11);
+    
+    // Aplica a máscara conforme a quantidade de dígitos
+    if (valor.length > 2) {
+        valor = `(${valor.slice(0, 2)}) ${valor.slice(2)}`;
+    }
+    if (valor.length > 9) {
+        valor = `${valor.slice(0, 9)}-${valor.slice(9)}`;
+    }
+    
+    input.value = valor;
+}
+
 // Função para registrar venda
 document.getElementById('vendaForm').addEventListener('submit', function (e) {
     e.preventDefault();
