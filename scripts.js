@@ -524,6 +524,71 @@ function excluirVenda(id) {
     alert('Venda excluída com sucesso!');
 }
 
+// Função para listar vendedores com checkboxes
+function listarVendedores() {
+    const tbody = document.querySelector('#tabelaVendedores tbody');
+    tbody.innerHTML = '';
+
+    const itensPorPagina = parseInt(document.getElementById('itensPorPaginaVendedores').value);
+    const inicio = (paginaAtualVendedores - 1) * itensPorPagina;
+    const fim = inicio + itensPorPagina;
+    const vendedoresPaginados = dados.vendedores.slice(inicio, fim);
+
+    vendedoresPaginados.forEach(vendedor => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td><input type="checkbox" class="vendedor-checkbox" value="${vendedor.id}"></td>
+            <td>${vendedor.nome}</td>
+            <td>${vendedor.email}</td>
+            <td>${vendedor.telefone}</td>
+            <td>
+                <button class="btn btn-sm btn-secondary" onclick="editarVendedor(${vendedor.id})">Editar</button>
+                <button class="btn btn-sm btn-danger" onclick="excluirVendedor(${vendedor.id})">Excluir</button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    // Atualizar controles de paginação
+    const totalPaginas = Math.ceil(dados.vendedores.length / itensPorPagina);
+    document.getElementById('controlesPaginacaoVendedores').innerHTML = `
+        <button class="btn btn-secondary" onclick="mudarPaginaVendedores(-1)" ${paginaAtualVendedores === 1 ? 'disabled' : ''}>Anterior</button>
+        <span>Página ${paginaAtualVendedores} de ${totalPaginas}</span>
+        <button class="btn btn-secondary" onclick="mudarPaginaVendedores(1)" ${paginaAtualVendedores === totalPaginas ? 'disabled' : ''}>Próxima</button>
+    `;
+}
+
+// Função para excluir vendedores selecionados
+function excluirVendedoresSelecionados() {
+    const checkboxes = document.querySelectorAll('.vendedor-checkbox:checked');
+    const idsParaExcluir = Array.from(checkboxes).map(checkbox => parseInt(checkbox.value));
+
+    if (idsParaExcluir.length === 0) {
+        alert('Nenhum vendedor selecionado.');
+        return;
+    }
+
+    if (confirm('Tem certeza que deseja excluir os vendedores selecionados?')) {
+        dados.vendedores = dados.vendedores.filter(vendedor => !idsParaExcluir.includes(vendedor.id));
+        salvarDados(); // Salva os dados no localStorage
+
+        // Verifica se a página atual ainda é válida após a exclusão
+        const totalPaginas = Math.ceil(dados.vendedores.length / parseInt(document.getElementById('itensPorPaginaVendedores').value));
+        if (paginaAtualVendedores > totalPaginas) {
+            paginaAtualVendedores = totalPaginas;
+        }
+
+        listarVendedores(); // Atualiza a lista de vendedores exibida
+        alert('Vendedores excluídos com sucesso!');
+    }
+}
+
+// Função para mudar a página de vendedores
+function mudarPaginaVendedores(direcao) {
+    paginaAtualVendedores += direcao;
+    listarVendedores();
+}
+
 // Inicialização do aplicativo
 function inicializarAplicativo() {
     carregarDadosIniciais();
@@ -535,6 +600,7 @@ function inicializarAplicativo() {
     atualizarOpcoesEmpresas();
     inicializarGraficos();
     listarVendas();
+    listarVendedores(); // Adicionar esta linha para listar os vendedores ao inicializar
 }
 
 // Event Listener para quando o DOM estiver carregado
