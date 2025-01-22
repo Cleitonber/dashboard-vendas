@@ -883,22 +883,60 @@ function atualizarTipoComissao() {
     }
 }
 
+// Função para salvar as cores no localStorage
+function salvarCores() {
+    const corPrimaria = document.getElementById('corPrimaria').value;
+    const corSecundaria = document.getElementById('corSecundaria').value;
+
+    localStorage.setItem('corPrimaria', corPrimaria);
+    localStorage.setItem('corSecundaria', corSecundaria);
+
+    alert('Cores salvas com sucesso!');
+}
+
+// Função para carregar as cores salvas ao iniciar o site
+document.addEventListener('DOMContentLoaded', function () {
+    // Carregar cores salvas do localStorage
+    const corPrimariaSalva = localStorage.getItem('corPrimaria');
+    const corSecundariaSalva = localStorage.getItem('corSecundaria');
+
+    if (corPrimariaSalva && corSecundariaSalva) {
+        document.getElementById('corPrimaria').value = corPrimariaSalva;
+        document.getElementById('corSecundaria').value = corSecundariaSalva;
+        atualizarTema(); // Aplicar as cores salvas
+    }
+
+    showTab('dashboard');
+    preencherAnos();
+    atualizarOpcoesVendedores();
+    atualizarOpcoesServicos();
+    atualizarOpcoesEmpresas();
+    inicializarGraficos();
+});
+
 // Função para atualizar o tema com base na cor selecionada
 function atualizarTema() {
     const corPrimaria = document.getElementById('corPrimaria').value;
     const corSecundaria = document.getElementById('corSecundaria').value;
 
+    // Aplicar a cor primária
     document.documentElement.style.setProperty('--primary', corPrimaria);
     document.documentElement.style.setProperty('--primary-light', `${corPrimaria}99`);
     document.documentElement.style.setProperty('--primary-dark', `${corPrimaria}cc`);
+
+    // Aplicar a cor secundária como background da página
     document.documentElement.style.setProperty('--secondary', corSecundaria);
+    document.body.style.backgroundColor = corSecundaria;
 }
 
 // Restaurar tema padrão
 function restaurarTemaPadrao() {
     document.getElementById('corPrimaria').value = '#4f46e5';
     document.getElementById('corSecundaria').value = '#64748b';
-    atualizarTema();
+    atualizarTema(); // Aplicar as cores padrão
+    localStorage.removeItem('corPrimaria'); // Remover cores salvas
+    localStorage.removeItem('corSecundaria');
+    alert('Cores padrão restauradas!');
 }
 
 // Função para filtrar e gerar o relatório
