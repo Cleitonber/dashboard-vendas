@@ -484,333 +484,44 @@ function mudarPaginaVendas(direcao) {
     listarVendas();
 }
 
-// Função para cadastrar vendedor
-document.getElementById('vendedorForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const nomeVendedor = document.getElementById('nomeVendedor').value;
-    const emailVendedor = document.getElementById('emailVendedor').value;
-    const telefoneVendedor = document.getElementById('telefoneVendedor').value;
+// Função para editar uma venda
+function editarVenda(id) {
+    const venda = dados.vendas.find(v => v.id === id);
+    if (venda) {
+        // Exemplo de edição (substitua pelo seu código de edição real)
+        const novoValorVenda = parseFloat(prompt('Novo valor da venda:', venda.valorVenda));
+        const novaComissao = parseFloat(prompt('Nova comissão:', venda.comissao));
 
-    const novoVendedor = {
-        id: dados.vendedores.length + 1,
-        nome: nomeVendedor,
-        email: emailVendedor,
-        telefone: telefoneVendedor
-    };
+        if (!isNaN(novoValorVenda) && !isNaN(novaComissao)) {
+            // Atualiza os valores da venda
+            venda.valorVenda = novoValorVenda;
+            venda.comissao = novaComissao;
 
-    dados.vendedores.push(novoVendedor);
+            salvarDados(); // Salva os dados no localStorage
+
+            // Atualiza o dashboard e os gráficos
+            preencherAnos(); // Atualiza os anos disponíveis no filtro
+            atualizarDashboard(); // Recalcula os valores do dashboard
+            listarVendas(); // Atualiza a lista de vendas exibida
+
+            alert('Venda atualizada com sucesso!');
+        } else {
+            alert('Valores inválidos. A venda não foi atualizada.');
+        }
+    }
+}
+
+// Função para excluir uma venda
+function excluirVenda(id) {
+    dados.vendas = dados.vendas.filter(venda => venda.id !== id);
     salvarDados(); // Salva os dados no localStorage
-    alert('Vendedor cadastrado com sucesso!');
-    limparCamposVendedor();
-    atualizarOpcoesVendedores();
-    atualizarListaVendedores();
-});
 
-// Função para limpar campos do formulário de vendedor
-function limparCamposVendedor() {
-    document.getElementById('nomeVendedor').value = '';
-    document.getElementById('emailVendedor').value = '';
-    document.getElementById('telefoneVendedor').value = '';
-}
+    // Atualiza o dashboard e os gráficos
+    preencherAnos(); // Atualiza os anos disponíveis no filtro
+    atualizarDashboard(); // Recalcula os valores do dashboard
+    listarVendas(); // Atualiza a lista de vendas exibida
 
-// Função para atualizar a lista de vendedores
-function atualizarListaVendedores(vendedores = dados.vendedores) {
-    const listaVendedores = document.getElementById('vendedoresList');
-    const itensPorPagina = parseInt(document.getElementById('itensPorPaginaVendedores').value);
-    const vendedoresPaginados = paginarItens(vendedores, itensPorPagina, paginaAtualVendedores);
-
-    listaVendedores.innerHTML = '';
-
-    vendedoresPaginados.forEach(vendedor => {
-        const item = document.createElement('li');
-        item.className = 'list-group-item d-flex justify-content-between align-items-center';
-        item.innerHTML = `
-            <div class="vendedor-info" id="vendedor-view-${vendedor.id}">
-                <span contenteditable="false" class="editable" data-field="nome">${vendedor.nome}</span> - 
-                <span contenteditable="false" class="editable" data-field="email">${vendedor.email}</span> - 
-                <span contenteditable="false" class="editable" data-field="telefone">${vendedor.telefone}</span>
-            </div>
-        `;
-        listaVendedores.appendChild(item);
-    });
-
-    // Controles de paginação
-    const totalPaginas = Math.ceil(vendedores.length / itensPorPagina);
-    const controlesPaginacao = document.getElementById('controlesPaginacaoVendedores');
-    controlesPaginacao.innerHTML = `
-        <button class="btn btn-secondary" onclick="mudarPaginaVendedores(-1)" ${paginaAtualVendedores === 1 ? 'disabled' : ''}>Anterior</button>
-        <span>Página ${paginaAtualVendedores} de ${totalPaginas}</span>
-        <button class="btn btn-secondary" onclick="mudarPaginaVendedores(1)" ${paginaAtualVendedores === totalPaginas ? 'disabled' : ''}>Próxima</button>
-    `;
-}
-
-// Função para filtrar vendedores conforme o usuário digita
-function filtrarVendedores() {
-    const termo = document.getElementById('filtroVendedores').value.toLowerCase();
-    const vendedoresFiltrados = dados.vendedores.filter(vendedor => 
-        vendedor.nome.toLowerCase().includes(termo)
-    );
-    atualizarListaVendedores(vendedoresFiltrados);
-}
-
-// Função para habilitar a edição de todos os vendedores
-function habilitarEdicaoVendedores() {
-    const vendedoresList = document.getElementById('vendedoresList');
-    const camposEditaveis = vendedoresList.querySelectorAll('.editable');
-    camposEditaveis.forEach(campo => campo.setAttribute('contenteditable', 'true'));
-}
-
-// Função para salvar todas as alterações nos vendedores
-function salvarTodosVendedores() {
-    const vendedoresList = document.getElementById('vendedoresList');
-    const camposEditaveis = vendedoresList.querySelectorAll('.editable');
-    camposEditaveis.forEach(campo => campo.setAttribute('contenteditable', 'false'));
-
-    dados.vendedores.forEach(vendedor => {
-        const nome = document.querySelector(`#vendedor-view-${vendedor.id} [data-field="nome"]`).textContent;
-        const email = document.querySelector(`#vendedor-view-${vendedor.id} [data-field="email"]`).textContent;
-        const telefone = document.querySelector(`#vendedor-view-${vendedor.id} [data-field="telefone"]`).textContent;
-
-        vendedor.nome = nome;
-        vendedor.email = email;
-        vendedor.telefone = telefone;
-    });
-
-    salvarDados();
-    alert('Alterações salvas com sucesso!');
-}
-
-// Função para mudar a página de vendedores
-function mudarPaginaVendedores(direcao) {
-    const totalPaginas = Math.ceil(dados.vendedores.length / parseInt(document.getElementById('itensPorPaginaVendedores').value));
-    const novaPagina = paginaAtualVendedores + direcao;
-
-    if (novaPagina >= 1 && novaPagina <= totalPaginas) {
-        paginaAtualVendedores = novaPagina;
-        atualizarListaVendedores();
-    }
-}
-
-// Função para excluir vendedor
-function excluirVendedor(id) {
-    dados.vendedores = dados.vendedores.filter(v => v.id !== id);
-    salvarDados();
-    atualizarListaVendedores();
-    atualizarOpcoesVendedores();
-}
-
-// Função para excluir vendedores selecionados
-function excluirVendedoresSelecionados() {
-    const checkboxes = document.querySelectorAll('#vendedoresList .form-check-input:checked');
-    const ids = Array.from(checkboxes).map(checkbox => parseInt(checkbox.value));
-    
-    dados.vendedores = dados.vendedores.filter(v => !ids.includes(v.id));
-    salvarDados();
-    atualizarListaVendedores();
-}
-
-// Função para cadastrar serviço
-document.getElementById('servicoForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const nomeServico = document.getElementById('nomeServico').value;
-    const categoriaServico = document.getElementById('categoriaServico').value;
-    const tipoComissao = document.getElementById('tipoComissao').value;
-
-    const novoServico = {
-        id: dados.servicos.length + 1,
-        nome: nomeServico,
-        categoria: categoriaServico,
-        tipoComissao: tipoComissao
-    };
-
-    dados.servicos.push(novoServico);
-    salvarDados(); // Salva os dados no localStorage
-    alert('Serviço cadastrado com sucesso!');
-    limparCamposServico();
-    atualizarOpcoesServicos();
-    atualizarListaServicos();
-});
-
-// Função para limpar campos do formulário de serviço
-function limparCamposServico() {
-    document.getElementById('nomeServico').value = '';
-    document.getElementById('categoriaServico').value = '';
-    document.getElementById('tipoComissao').value = 'fixa';
-}
-
-// Função para atualizar a lista de serviços
-function atualizarListaServicos() {
-    const listaServicos = document.getElementById('servicosList');
-    const itensPorPagina = parseInt(document.getElementById('itensPorPaginaServicos').value);
-    const servicosPaginados = paginarItens(dados.servicos, itensPorPagina, paginaAtualServicos);
-
-    listaServicos.innerHTML = '';
-
-    servicosPaginados.forEach(servico => {
-        const item = document.createElement('li');
-        item.className = 'list-group-item d-flex justify-content-between align-items-center';
-        item.innerHTML = `
-            <div class="servico-info" id="servico-view-${servico.id}">
-                <input type="checkbox" class="form-check-input" value="${servico.id}">
-                <span contenteditable="true" class="editable" data-field="nome">${servico.nome}</span> - 
-                <span contenteditable="true" class="editable" data-field="categoria">${servico.categoria}</span> - 
-                <span contenteditable="true" class="editable" data-field="tipoComissao">${servico.tipoComissao}</span>
-                <button class="btn btn-sm btn-secondary" onclick="salvarEdicaoServico(${servico.id})">Salvar</button>
-                <button class="btn btn-sm btn-danger" onclick="excluirServico(${servico.id})">Excluir</button>
-            </div>
-        `;
-        listaServicos.appendChild(item);
-    });
-
-    // Controles de paginação
-    const totalPaginas = Math.ceil(dados.servicos.length / itensPorPagina);
-    const controlesPaginacao = document.getElementById('controlesPaginacaoServicos');
-    controlesPaginacao.innerHTML = `
-        <button class="btn btn-secondary" onclick="mudarPaginaServicos(-1)" ${paginaAtualServicos === 1 ? 'disabled' : ''}>Anterior</button>
-        <span>Página ${paginaAtualServicos} de ${totalPaginas}</span>
-        <button class="btn btn-secondary" onclick="mudarPaginaServicos(1)" ${paginaAtualServicos === totalPaginas ? 'disabled' : ''}>Próxima</button>
-        <button class="btn btn-danger" onclick="excluirServicosSelecionados()">Excluir Selecionados</button>
-    `;
-}
-
-function mudarPaginaServicos(direcao) {
-    const totalPaginas = Math.ceil(dados.servicos.length / parseInt(document.getElementById('itensPorPaginaServicos').value));
-    const novaPagina = paginaAtualServicos + direcao;
-
-    if (novaPagina >= 1 && novaPagina <= totalPaginas) {
-        paginaAtualServicos = novaPagina;
-        atualizarListaServicos();
-    }
-}
-
-function salvarEdicaoServico(id) {
-    const servico = dados.servicos.find(s => s.id === id);
-    if (servico) {
-        const nome = document.querySelector(`#servico-view-${id} [data-field="nome"]`).textContent;
-        const categoria = document.querySelector(`#servico-view-${id} [data-field="categoria"]`).textContent;
-        const tipoComissao = document.querySelector(`#servico-view-${id} [data-field="tipoComissao"]`).textContent;
-
-        servico.nome = nome;
-        servico.categoria = categoria;
-        servico.tipoComissao = tipoComissao;
-        salvarDados();
-        alert('Serviço atualizado com sucesso!');
-    }
-}
-
-function excluirServico(id) {
-    dados.servicos = dados.servicos.filter(s => s.id !== id);
-    salvarDados();
-    atualizarListaServicos();
-    atualizarOpcoesServicos();
-}
-
-function excluirServicosSelecionados() {
-    const checkboxes = document.querySelectorAll('#servicosList .form-check-input:checked');
-    const ids = Array.from(checkboxes).map(checkbox => parseInt(checkbox.value));
-    
-    dados.servicos = dados.servicos.filter(s => !ids.includes(s.id));
-    salvarDados();
-    atualizarListaServicos();
-}
-
-// Função para cadastrar empresa parceira
-document.getElementById('empresaForm').addEventListener('submit', function (e) {
-    e.preventDefault();
-    const nomeEmpresa = document.getElementById('nomeEmpresa').value;
-
-    const novaEmpresa = {
-        id: dados.empresasParceiras.length + 1,
-        nome: nomeEmpresa
-    };
-
-    dados.empresasParceiras.push(novaEmpresa);
-    salvarDados(); // Salva os dados no localStorage
-    alert('Empresa cadastrada com sucesso!');
-    limparCamposEmpresa();
-    atualizarOpcoesEmpresas();
-    atualizarListaEmpresas();
-});
-
-// Função para limpar campos do formulário de empresa
-function limparCamposEmpresa() {
-    document.getElementById('nomeEmpresa').value = '';
-}
-
-// Função para atualizar a lista de empresas
-function atualizarListaEmpresas() {
-    const listaEmpresas = document.getElementById('empresasList');
-    const itensPorPagina = parseInt(document.getElementById('itensPorPaginaEmpresas').value);
-    const empresasPaginadas = paginarItens(dados.empresasParceiras, itensPorPagina, paginaAtualEmpresas);
-
-    listaEmpresas.innerHTML = '';
-
-    empresasPaginadas.forEach(empresa => {
-        const item = document.createElement('li');
-        item.className = 'list-group-item d-flex justify-content-between align-items-center';
-        item.innerHTML = `
-            <div class="empresa-info" id="empresa-view-${empresa.id}">
-                <input type="checkbox" class="form-check-input" value="${empresa.id}">
-                <span contenteditable="true" class="editable" data-field="nome">${empresa.nome}</span>
-                <button class="btn btn-sm btn-secondary" onclick="salvarEdicaoEmpresa(${empresa.id})">Salvar</button>
-                <button class="btn btn-sm btn-danger" onclick="excluirEmpresa(${empresa.id})">Excluir</button>
-            </div>
-        `;
-        listaEmpresas.appendChild(item);
-    });
-
-    // Controles de paginação
-    const totalPaginas = Math.ceil(dados.empresasParceiras.length / itensPorPagina);
-    const controlesPaginacao = document.getElementById('controlesPaginacaoEmpresas');
-    controlesPaginacao.innerHTML = `
-        <button class="btn btn-secondary" onclick="mudarPaginaEmpresas(-1)" ${paginaAtualEmpresas === 1 ? 'disabled' : ''}>Anterior</button>
-        <span>Página ${paginaAtualEmpresas} de ${totalPaginas}</span>
-        <button class="btn btn-secondary" onclick="mudarPaginaEmpresas(1)" ${paginaAtualEmpresas === totalPaginas ? 'disabled' : ''}>Próxima</button>
-        <button class="btn btn-danger" onclick="excluirEmpresasSelecionadas()">Excluir Selecionadas</button>
-    `;
-}
-
-function mudarPaginaEmpresas(direcao) {
-    const totalPaginas = Math.ceil(dados.empresasParceiras.length / parseInt(document.getElementById('itensPorPaginaEmpresas').value));
-    const novaPagina = paginaAtualEmpresas + direcao;
-
-    if (novaPagina >= 1 && novaPagina <= totalPaginas) {
-        paginaAtualEmpresas = novaPagina;
-        atualizarListaEmpresas();
-    }
-}
-
-function salvarEdicaoEmpresa(id) {
-    const empresa = dados.empresasParceiras.find(e => e.id === id);
-    if (empresa) {
-        const nome = document.querySelector(`#empresa-view-${id} [data-field="nome"]`).textContent;
-        empresa.nome = nome;
-        salvarDados();
-        alert('Empresa atualizada com sucesso!');
-    }
-}
-
-function excluirEmpresa(id) {
-    dados.empresasParceiras = dados.empresasParceiras.filter(e => e.id !== id);
-    salvarDados();
-    atualizarListaEmpresas();
-    atualizarOpcoesEmpresas();
-}
-
-function excluirEmpresasSelecionadas() {
-    const checkboxes = document.querySelectorAll('#empresasList .form-check-input:checked');
-    const ids = Array.from(checkboxes).map(checkbox => parseInt(checkbox.value));
-    
-    dados.empresasParceiras = dados.empresasParceiras.filter(e => !ids.includes(e.id));
-    salvarDados();
-    atualizarListaEmpresas();
-}
-
-// Função para paginar itens
-function paginarItens(lista, itensPorPagina, paginaAtual) {
-    const inicio = (paginaAtual - 1) * itensPorPagina;
-    const fim = inicio + itensPorPagina;
-    return lista.slice(inicio, fim);
+    alert('Venda excluída com sucesso!');
 }
 
 // Inicialização do aplicativo
@@ -823,9 +534,7 @@ function inicializarAplicativo() {
     atualizarOpcoesServicos();
     atualizarOpcoesEmpresas();
     inicializarGraficos();
-    atualizarListaVendedores();
-    atualizarListaServicos();
-    atualizarListaEmpresas();
+    listarVendas();
 }
 
 // Event Listener para quando o DOM estiver carregado
