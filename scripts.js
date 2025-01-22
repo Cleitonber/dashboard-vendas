@@ -514,10 +514,10 @@ function limparCamposVendedor() {
 }
 
 // Função para atualizar a lista de vendedores
-function atualizarListaVendedores() {
+function atualizarListaVendedores(vendedores = dados.vendedores) {
     const listaVendedores = document.getElementById('vendedoresList');
     const itensPorPagina = parseInt(document.getElementById('itensPorPaginaVendedores').value);
-    const vendedoresPaginados = paginarItens(dados.vendedores, itensPorPagina, paginaAtualVendedores);
+    const vendedoresPaginados = paginarItens(vendedores, itensPorPagina, paginaAtualVendedores);
 
     listaVendedores.innerHTML = '';
 
@@ -526,28 +526,61 @@ function atualizarListaVendedores() {
         item.className = 'list-group-item d-flex justify-content-between align-items-center';
         item.innerHTML = `
             <div class="vendedor-info" id="vendedor-view-${vendedor.id}">
-                <input type="checkbox" class="form-check-input" value="${vendedor.id}">
-                <span contenteditable="true" class="editable" data-field="nome">${vendedor.nome}</span> - 
-                <span contenteditable="true" class="editable" data-field="email">${vendedor.email}</span> - 
-                <span contenteditable="true" class="editable" data-field="telefone">${vendedor.telefone}</span>
-                <button class="btn btn-sm btn-secondary" onclick="salvarEdicaoVendedor(${vendedor.id})">Salvar</button>
-                <button class="btn btn-sm btn-danger" onclick="excluirVendedor(${vendedor.id})">Excluir</button>
+                <span contenteditable="false" class="editable" data-field="nome">${vendedor.nome}</span> - 
+                <span contenteditable="false" class="editable" data-field="email">${vendedor.email}</span> - 
+                <span contenteditable="false" class="editable" data-field="telefone">${vendedor.telefone}</span>
             </div>
         `;
         listaVendedores.appendChild(item);
     });
 
     // Controles de paginação
-    const totalPaginas = Math.ceil(dados.vendedores.length / itensPorPagina);
+    const totalPaginas = Math.ceil(vendedores.length / itensPorPagina);
     const controlesPaginacao = document.getElementById('controlesPaginacaoVendedores');
     controlesPaginacao.innerHTML = `
         <button class="btn btn-secondary" onclick="mudarPaginaVendedores(-1)" ${paginaAtualVendedores === 1 ? 'disabled' : ''}>Anterior</button>
         <span>Página ${paginaAtualVendedores} de ${totalPaginas}</span>
         <button class="btn btn-secondary" onclick="mudarPaginaVendedores(1)" ${paginaAtualVendedores === totalPaginas ? 'disabled' : ''}>Próxima</button>
-        <button class="btn btn-danger" onclick="excluirVendedoresSelecionados()">Excluir Selecionados</button>
     `;
 }
 
+// Função para filtrar vendedores conforme o usuário digita
+function filtrarVendedores() {
+    const termo = document.getElementById('filtroVendedores').value.toLowerCase();
+    const vendedoresFiltrados = dados.vendedores.filter(vendedor => 
+        vendedor.nome.toLowerCase().includes(termo)
+    );
+    atualizarListaVendedores(vendedoresFiltrados);
+}
+
+// Função para habilitar a edição de todos os vendedores
+function habilitarEdicaoVendedores() {
+    const vendedoresList = document.getElementById('vendedoresList');
+    const camposEditaveis = vendedoresList.querySelectorAll('.editable');
+    camposEditaveis.forEach(campo => campo.setAttribute('contenteditable', 'true'));
+}
+
+// Função para salvar todas as alterações nos vendedores
+function salvarTodosVendedores() {
+    const vendedoresList = document.getElementById('vendedoresList');
+    const camposEditaveis = vendedoresList.querySelectorAll('.editable');
+    camposEditaveis.forEach(campo => campo.setAttribute('contenteditable', 'false'));
+
+    dados.vendedores.forEach(vendedor => {
+        const nome = document.querySelector(`#vendedor-view-${vendedor.id} [data-field="nome"]`).textContent;
+        const email = document.querySelector(`#vendedor-view-${vendedor.id} [data-field="email"]`).textContent;
+        const telefone = document.querySelector(`#vendedor-view-${vendedor.id} [data-field="telefone"]`).textContent;
+
+        vendedor.nome = nome;
+        vendedor.email = email;
+        vendedor.telefone = telefone;
+    });
+
+    salvarDados();
+    alert('Alterações salvas com sucesso!');
+}
+
+// Função para mudar a página de vendedores
 function mudarPaginaVendedores(direcao) {
     const totalPaginas = Math.ceil(dados.vendedores.length / parseInt(document.getElementById('itensPorPaginaVendedores').value));
     const novaPagina = paginaAtualVendedores + direcao;
@@ -558,21 +591,7 @@ function mudarPaginaVendedores(direcao) {
     }
 }
 
-function salvarEdicaoVendedor(id) {
-    const vendedor = dados.vendedores.find(v => v.id === id);
-    if (vendedor) {
-        const nome = document.querySelector(`#vendedor-view-${id} [data-field="nome"]`).textContent;
-        const email = document.querySelector(`#vendedor-view-${id} [data-field="email"]`).textContent;
-        const telefone = document.querySelector(`#vendedor-view-${id} [data-field="telefone"]`).textContent;
-
-        vendedor.nome = nome;
-        vendedor.email = email;
-        vendedor.telefone = telefone;
-        salvarDados();
-        alert('Vendedor atualizado com sucesso!');
-    }
-}
-
+// Função para excluir vendedor
 function excluirVendedor(id) {
     dados.vendedores = dados.vendedores.filter(v => v.id !== id);
     salvarDados();
@@ -580,6 +599,7 @@ function excluirVendedor(id) {
     atualizarOpcoesVendedores();
 }
 
+// Função para excluir vendedores selecionados
 function excluirVendedoresSelecionados() {
     const checkboxes = document.querySelectorAll('#vendedoresList .form-check-input:checked');
     const ids = Array.from(checkboxes).map(checkbox => parseInt(checkbox.value));
