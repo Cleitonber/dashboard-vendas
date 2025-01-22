@@ -11,7 +11,6 @@ let paginaAtualVendedores = 1;
 let paginaAtualServicos = 1;
 let paginaAtualEmpresas = 1;
 let paginaAtualVendas = 1;
-const itensPorPagina = 5;
 
 let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart;
 
@@ -518,94 +517,76 @@ function limparCamposVendedor() {
 function atualizarListaVendedores() {
     const listaVendedores = document.getElementById('vendedoresList');
     const itensPorPagina = parseInt(document.getElementById('itensPorPaginaVendedores').value);
-    const inicio = (paginaAtualVendedores - 1) * itensPorPagina;
-    const fim = inicio + itensPorPagina;
-    
+    const vendedoresPaginados = paginarItens(dados.vendedores, itensPorPagina, paginaAtualVendedores);
+
     listaVendedores.innerHTML = '';
-    
-    const vendedoresFiltrados = dados.vendedores.slice(inicio, fim);
-    
-    vendedoresFiltrados.forEach(vendedor => {
+
+    vendedoresPaginados.forEach(vendedor => {
         const item = document.createElement('li');
         item.className = 'list-group-item d-flex justify-content-between align-items-center';
         item.innerHTML = `
             <div class="vendedor-info" id="vendedor-view-${vendedor.id}">
-                ${vendedor.nome} - ${vendedor.email} - ${vendedor.telefone}
-                <button class="btn btn-sm btn-secondary" onclick="editarVendedor(${vendedor.id})">Editar</button>
+                <input type="checkbox" class="form-check-input" value="${vendedor.id}">
+                <span contenteditable="true" class="editable" data-field="nome">${vendedor.nome}</span> - 
+                <span contenteditable="true" class="editable" data-field="email">${vendedor.email}</span> - 
+                <span contenteditable="true" class="editable" data-field="telefone">${vendedor.telefone}</span>
+                <button class="btn btn-sm btn-secondary" onclick="salvarEdicaoVendedor(${vendedor.id})">Salvar</button>
                 <button class="btn btn-sm btn-danger" onclick="excluirVendedor(${vendedor.id})">Excluir</button>
-            </div>
-            <div class="vendedor-edit d-none" id="vendedor-edit-${vendedor.id}">
-                <input type="text" class="form-input" value="${vendedor.nome}" id="edit-nome-${vendedor.id}">
-                <input type="email" class="form-input" value="${vendedor.email}" id="edit-email-${vendedor.id}">
-                <input type="tel" class="form-input" value="${vendedor.telefone}" id="edit-telefone-${vendedor.id}">
-                <button class="btn btn-sm btn-primary" onclick="salvarEdicaoVendedor(${vendedor.id})">Salvar</button>
-                <button class="btn btn-sm btn-secondary" onclick="cancelarEdicaoVendedor(${vendedor.id})">Cancelar</button>
             </div>
         `;
         listaVendedores.appendChild(item);
     });
 
-    // Atualizar controles de paginação
+    // Controles de paginação
     const totalPaginas = Math.ceil(dados.vendedores.length / itensPorPagina);
     const controlesPaginacao = document.getElementById('controlesPaginacaoVendedores');
     controlesPaginacao.innerHTML = `
         <button class="btn btn-secondary" onclick="mudarPaginaVendedores(-1)" ${paginaAtualVendedores === 1 ? 'disabled' : ''}>Anterior</button>
         <span>Página ${paginaAtualVendedores} de ${totalPaginas}</span>
         <button class="btn btn-secondary" onclick="mudarPaginaVendedores(1)" ${paginaAtualVendedores === totalPaginas ? 'disabled' : ''}>Próxima</button>
+        <button class="btn btn-danger" onclick="excluirVendedoresSelecionados()">Excluir Selecionados</button>
     `;
 }
 
 function mudarPaginaVendedores(direcao) {
     const totalPaginas = Math.ceil(dados.vendedores.length / parseInt(document.getElementById('itensPorPaginaVendedores').value));
     const novaPagina = paginaAtualVendedores + direcao;
-    
+
     if (novaPagina >= 1 && novaPagina <= totalPaginas) {
         paginaAtualVendedores = novaPagina;
         atualizarListaVendedores();
     }
 }
 
-// Função para editar vendedor
-function editarVendedor(id) {
-    document.getElementById(`vendedor-view-${id}`).classList.add('d-none');
-    document.getElementById(`vendedor-edit-${id}`).classList.remove('d-none');
-}
-
-// Função para salvar edição de vendedor
 function salvarEdicaoVendedor(id) {
-    const novoNome = document.getElementById(`edit-nome-${id}`).value;
-    const novoEmail = document.getElementById(`edit-email-${id}`).value;
-    const novoTelefone = document.getElementById(`edit-telefone-${id}`).value;
-
-    // Verificar se já existe outro vendedor com o mesmo nome
-    if (dados.vendedores.some(v => v.nome === novoNome && v.id !== id)) {
-        alert('Já existe um vendedor com este nome!');
-        return;
-    }
-
     const vendedor = dados.vendedores.find(v => v.id === id);
     if (vendedor) {
-        vendedor.nome = novoNome;
-        vendedor.email = novoEmail;
-        vendedor.telefone = novoTelefone;
+        const nome = document.querySelector(`#vendedor-view-${id} [data-field="nome"]`).textContent;
+        const email = document.querySelector(`#vendedor-view-${id} [data-field="email"]`).textContent;
+        const telefone = document.querySelector(`#vendedor-view-${id} [data-field="telefone"]`).textContent;
+
+        vendedor.nome = nome;
+        vendedor.email = email;
+        vendedor.telefone = telefone;
         salvarDados();
-        atualizarListaVendedores();
-        atualizarOpcoesVendedores();
+        alert('Vendedor atualizado com sucesso!');
     }
 }
 
-// Função para cancelar edição de vendedor
-function cancelarEdicaoVendedor(id) {
-    document.getElementById(`vendedor-view-${id}`).classList.remove('d-none');
-    document.getElementById(`vendedor-edit-${id}`).classList.add('d-none');
-}
-
-// Função para excluir vendedor
 function excluirVendedor(id) {
     dados.vendedores = dados.vendedores.filter(v => v.id !== id);
     salvarDados();
     atualizarListaVendedores();
     atualizarOpcoesVendedores();
+}
+
+function excluirVendedoresSelecionados() {
+    const checkboxes = document.querySelectorAll('#vendedoresList .form-check-input:checked');
+    const ids = Array.from(checkboxes).map(checkbox => parseInt(checkbox.value));
+    
+    dados.vendedores = dados.vendedores.filter(v => !ids.includes(v.id));
+    salvarDados();
+    atualizarListaVendedores();
 }
 
 // Função para cadastrar serviço
@@ -641,97 +622,76 @@ function limparCamposServico() {
 function atualizarListaServicos() {
     const listaServicos = document.getElementById('servicosList');
     const itensPorPagina = parseInt(document.getElementById('itensPorPaginaServicos').value);
-    const inicio = (paginaAtualServicos - 1) * itensPorPagina;
-    const fim = inicio + itensPorPagina;
-    
+    const servicosPaginados = paginarItens(dados.servicos, itensPorPagina, paginaAtualServicos);
+
     listaServicos.innerHTML = '';
-    
-    const servicosFiltrados = dados.servicos.slice(inicio, fim);
-    
-    servicosFiltrados.forEach(servico => {
+
+    servicosPaginados.forEach(servico => {
         const item = document.createElement('li');
         item.className = 'list-group-item d-flex justify-content-between align-items-center';
         item.innerHTML = `
             <div class="servico-info" id="servico-view-${servico.id}">
-                ${servico.nome} - ${servico.categoria} - ${servico.tipoComissao}
-                <button class="btn btn-sm btn-secondary" onclick="editarServico(${servico.id})">Editar</button>
+                <input type="checkbox" class="form-check-input" value="${servico.id}">
+                <span contenteditable="true" class="editable" data-field="nome">${servico.nome}</span> - 
+                <span contenteditable="true" class="editable" data-field="categoria">${servico.categoria}</span> - 
+                <span contenteditable="true" class="editable" data-field="tipoComissao">${servico.tipoComissao}</span>
+                <button class="btn btn-sm btn-secondary" onclick="salvarEdicaoServico(${servico.id})">Salvar</button>
                 <button class="btn btn-sm btn-danger" onclick="excluirServico(${servico.id})">Excluir</button>
-            </div>
-            <div class="servico-edit d-none" id="servico-edit-${servico.id}">
-                <input type="text" class="form-input" value="${servico.nome}" id="edit-nome-servico-${servico.id}">
-                <input type="text" class="form-input" value="${servico.categoria}" id="edit-categoria-${servico.id}">
-                <select class="form-select" id="edit-tipo-comissao-${servico.id}">
-                    <option value="fixa" ${servico.tipoComissao === 'fixa' ? 'selected' : ''}>Fixa</option>
-                    <option value="porcentagem" ${servico.tipoComissao === 'porcentagem' ? 'selected' : ''}>Porcentagem</option>
-                </select>
-                <button class="btn btn-sm btn-primary" onclick="salvarEdicaoServico(${servico.id})">Salvar</button>
-                <button class="btn btn-sm btn-secondary" onclick="cancelarEdicaoServico(${servico.id})">Cancelar</button>
             </div>
         `;
         listaServicos.appendChild(item);
     });
 
-    // Atualizar controles de paginação
+    // Controles de paginação
     const totalPaginas = Math.ceil(dados.servicos.length / itensPorPagina);
     const controlesPaginacao = document.getElementById('controlesPaginacaoServicos');
     controlesPaginacao.innerHTML = `
         <button class="btn btn-secondary" onclick="mudarPaginaServicos(-1)" ${paginaAtualServicos === 1 ? 'disabled' : ''}>Anterior</button>
         <span>Página ${paginaAtualServicos} de ${totalPaginas}</span>
         <button class="btn btn-secondary" onclick="mudarPaginaServicos(1)" ${paginaAtualServicos === totalPaginas ? 'disabled' : ''}>Próxima</button>
+        <button class="btn btn-danger" onclick="excluirServicosSelecionados()">Excluir Selecionados</button>
     `;
 }
 
 function mudarPaginaServicos(direcao) {
     const totalPaginas = Math.ceil(dados.servicos.length / parseInt(document.getElementById('itensPorPaginaServicos').value));
     const novaPagina = paginaAtualServicos + direcao;
-    
+
     if (novaPagina >= 1 && novaPagina <= totalPaginas) {
         paginaAtualServicos = novaPagina;
         atualizarListaServicos();
     }
 }
 
-// Função para editar serviço
-function editarServico(id) {
-    document.getElementById(`servico-view-${id}`).classList.add('d-none');
-    document.getElementById(`servico-edit-${id}`).classList.remove('d-none');
-}
-
-// Função para salvar edição de serviço
 function salvarEdicaoServico(id) {
-    const novoNome = document.getElementById(`edit-nome-servico-${id}`).value;
-    const novaCategoria = document.getElementById(`edit-categoria-${id}`).value;
-    const novoTipoComissao = document.getElementById(`edit-tipo-comissao-${id}`).value;
-
-    // Verificar se já existe outro serviço com o mesmo nome
-    if (dados.servicos.some(s => s.nome === novoNome && s.id !== id)) {
-        alert('Já existe um serviço com este nome!');
-        return;
-    }
-
     const servico = dados.servicos.find(s => s.id === id);
     if (servico) {
-        servico.nome = novoNome;
-        servico.categoria = novaCategoria;
-        servico.tipoComissao = novoTipoComissao;
+        const nome = document.querySelector(`#servico-view-${id} [data-field="nome"]`).textContent;
+        const categoria = document.querySelector(`#servico-view-${id} [data-field="categoria"]`).textContent;
+        const tipoComissao = document.querySelector(`#servico-view-${id} [data-field="tipoComissao"]`).textContent;
+
+        servico.nome = nome;
+        servico.categoria = categoria;
+        servico.tipoComissao = tipoComissao;
         salvarDados();
-        atualizarListaServicos();
-        atualizarOpcoesServicos();
+        alert('Serviço atualizado com sucesso!');
     }
 }
 
-// Função para cancelar edição de serviço
-function cancelarEdicaoServico(id) {
-    document.getElementById(`servico-view-${id}`).classList.remove('d-none');
-    document.getElementById(`servico-edit-${id}`).classList.add('d-none');
-}
-
-// Função para excluir serviço
 function excluirServico(id) {
     dados.servicos = dados.servicos.filter(s => s.id !== id);
     salvarDados();
     atualizarListaServicos();
     atualizarOpcoesServicos();
+}
+
+function excluirServicosSelecionados() {
+    const checkboxes = document.querySelectorAll('#servicosList .form-check-input:checked');
+    const ids = Array.from(checkboxes).map(checkbox => parseInt(checkbox.value));
+    
+    dados.servicos = dados.servicos.filter(s => !ids.includes(s.id));
+    salvarDados();
+    atualizarListaServicos();
 }
 
 // Função para cadastrar empresa parceira
@@ -761,83 +721,55 @@ function limparCamposEmpresa() {
 function atualizarListaEmpresas() {
     const listaEmpresas = document.getElementById('empresasList');
     const itensPorPagina = parseInt(document.getElementById('itensPorPaginaEmpresas').value);
-    const inicio = (paginaAtualEmpresas - 1) * itensPorPagina;
-    const fim = inicio + itensPorPagina;
-    
+    const empresasPaginadas = paginarItens(dados.empresasParceiras, itensPorPagina, paginaAtualEmpresas);
+
     listaEmpresas.innerHTML = '';
-    
-    const empresasFiltradas = dados.empresasParceiras.slice(inicio, fim);
-    
-    empresasFiltradas.forEach(empresa => {
+
+    empresasPaginadas.forEach(empresa => {
         const item = document.createElement('li');
         item.className = 'list-group-item d-flex justify-content-between align-items-center';
         item.innerHTML = `
             <div class="empresa-info" id="empresa-view-${empresa.id}">
-                ${empresa.nome}
-                <button class="btn btn-sm btn-secondary" onclick="editarEmpresa(${empresa.id})">Editar</button>
+                <input type="checkbox" class="form-check-input" value="${empresa.id}">
+                <span contenteditable="true" class="editable" data-field="nome">${empresa.nome}</span>
+                <button class="btn btn-sm btn-secondary" onclick="salvarEdicaoEmpresa(${empresa.id})">Salvar</button>
                 <button class="btn btn-sm btn-danger" onclick="excluirEmpresa(${empresa.id})">Excluir</button>
-            </div>
-            <div class="empresa-edit d-none" id="empresa-edit-${empresa.id}">
-                <input type="text" class="form-input" value="${empresa.nome}" id="edit-nome-empresa-${empresa.id}">
-                <button class="btn btn-sm btn-primary" onclick="salvarEdicaoEmpresa(${empresa.id})">Salvar</button>
-                <button class="btn btn-sm btn-secondary" onclick="cancelarEdicaoEmpresa(${empresa.id})">Cancelar</button>
             </div>
         `;
         listaEmpresas.appendChild(item);
     });
 
-    // Atualizar controles de paginação
+    // Controles de paginação
     const totalPaginas = Math.ceil(dados.empresasParceiras.length / itensPorPagina);
     const controlesPaginacao = document.getElementById('controlesPaginacaoEmpresas');
     controlesPaginacao.innerHTML = `
         <button class="btn btn-secondary" onclick="mudarPaginaEmpresas(-1)" ${paginaAtualEmpresas === 1 ? 'disabled' : ''}>Anterior</button>
         <span>Página ${paginaAtualEmpresas} de ${totalPaginas}</span>
         <button class="btn btn-secondary" onclick="mudarPaginaEmpresas(1)" ${paginaAtualEmpresas === totalPaginas ? 'disabled' : ''}>Próxima</button>
+        <button class="btn btn-danger" onclick="excluirEmpresasSelecionadas()">Excluir Selecionadas</button>
     `;
 }
 
 function mudarPaginaEmpresas(direcao) {
     const totalPaginas = Math.ceil(dados.empresasParceiras.length / parseInt(document.getElementById('itensPorPaginaEmpresas').value));
     const novaPagina = paginaAtualEmpresas + direcao;
-    
+
     if (novaPagina >= 1 && novaPagina <= totalPaginas) {
         paginaAtualEmpresas = novaPagina;
         atualizarListaEmpresas();
     }
 }
 
-// Função para editar empresa
-function editarEmpresa(id) {
-    document.getElementById(`empresa-view-${id}`).classList.add('d-none');
-    document.getElementById(`empresa-edit-${id}`).classList.remove('d-none');
-}
-
-// Função para salvar edição de empresa
 function salvarEdicaoEmpresa(id) {
-    const novoNome = document.getElementById(`edit-nome-empresa-${id}`).value;
-
-    // Verificar se já existe outra empresa com o mesmo nome
-    if (dados.empresasParceiras.some(e => e.nome === novoNome && e.id !== id)) {
-        alert('Já existe uma empresa com este nome!');
-        return;
-    }
-
     const empresa = dados.empresasParceiras.find(e => e.id === id);
     if (empresa) {
-        empresa.nome = novoNome;
+        const nome = document.querySelector(`#empresa-view-${id} [data-field="nome"]`).textContent;
+        empresa.nome = nome;
         salvarDados();
-        atualizarListaEmpresas();
-        atualizarOpcoesEmpresas();
+        alert('Empresa atualizada com sucesso!');
     }
 }
 
-// Função para cancelar edição de empresa
-function cancelarEdicaoEmpresa(id) {
-    document.getElementById(`empresa-view-${id}`).classList.remove('d-none');
-    document.getElementById(`empresa-edit-${id}`).classList.add('d-none');
-}
-
-// Função para excluir empresa
 function excluirEmpresa(id) {
     dados.empresasParceiras = dados.empresasParceiras.filter(e => e.id !== id);
     salvarDados();
@@ -845,148 +777,20 @@ function excluirEmpresa(id) {
     atualizarOpcoesEmpresas();
 }
 
-// Função para atualizar o filtro de vendedores na aba de relatórios
-function atualizarFiltroVendedores() {
-    const filtroVendedor = document.getElementById('filtroVendedor');
-    filtroVendedor.innerHTML = '<option value="">Todos</option>'; // Opção padrão
-
-    dados.vendedores.forEach(vendedor => {
-        const option = document.createElement('option');
-        option.value = vendedor.id;
-        option.textContent = vendedor.nome;
-        filtroVendedor.appendChild(option);
-    });
+function excluirEmpresasSelecionadas() {
+    const checkboxes = document.querySelectorAll('#empresasList .form-check-input:checked');
+    const ids = Array.from(checkboxes).map(checkbox => parseInt(checkbox.value));
+    
+    dados.empresasParceiras = dados.empresasParceiras.filter(e => !ids.includes(e.id));
+    salvarDados();
+    atualizarListaEmpresas();
 }
 
-// Função para filtrar o relatório
-function filtrarRelatorio() {
-    const dataInicial = document.getElementById('dataInicial').value;
-    const dataFinal = document.getElementById('dataFinal').value;
-    const vendedorId = document.getElementById('filtroVendedor').value;
-    const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
-
-    // Converter datas para o formato DD/MM/AAAA
-    const dataInicialFormatada = dataInicial ? formatarDataParaComparacao(dataInicial) : null;
-    const dataFinalFormatada = dataFinal ? formatarDataParaComparacao(dataFinal) : null;
-
-    // Filtrar vendas
-    const vendasFiltradas = dados.vendas.filter(venda => {
-        const dataVenda = formatarDataParaComparacao(venda.data);
-
-        // Filtro por data
-        const dentroDoPeriodo = (!dataInicialFormatada || dataVenda >= dataInicialFormatada) &&
-                                (!dataFinalFormatada || dataVenda <= dataFinalFormatada);
-
-        // Filtro por vendedor
-        const vendedorSelecionado = !vendedorId || venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
-
-        return dentroDoPeriodo && vendedorSelecionado;
-    });
-
-    // Gerar relatório com as colunas selecionadas
-    gerarTabelaRelatorio(vendasFiltradas, colunasSelecionadas);
-}
-
-// Função para formatar data para comparação
-function formatarDataParaComparacao(data) {
-    const [dia, mes, ano] = data.split('/');
-    return new Date(`${ano}-${mes}-${dia}`);
-}
-
-// Função para gerar a tabela de relatório
-function gerarTabelaRelatorio(vendas, colunas) {
-    const tabelaRelatorio = document.getElementById('tabelaRelatorio');
-    const thead = tabelaRelatorio.querySelector('thead');
-    const tbody = tabelaRelatorio.querySelector('tbody');
-    const tfoot = tabelaRelatorio.querySelector('tfoot');
-
-    // Limpar tabela
-    thead.innerHTML = '';
-    tbody.innerHTML = '';
-    tfoot.innerHTML = '';
-
-    // Criar cabeçalho da tabela
-    const headerRow = document.createElement('tr');
-    colunas.forEach(coluna => {
-        const th = document.createElement('th');
-        th.textContent = coluna
-            .replace('data', 'Data da Venda')
-            .replace('vendedor', 'Vendedor')
-            .replace('servico', 'Serviço')
-            .replace('tipoComissao', 'Tipo de Comissão')
-            .replace('nomeCliente', 'Cliente')
-            .replace('empresaParceira', 'Empresa Parceira')
-            .replace('comissao', 'Comissão')
-            .replace('percentualComissao', 'Percentual da Comissão')
-            .replace('valorBrutoReceber', 'Valor Bruto a Receber');
-        headerRow.appendChild(th);
-    });
-    thead.appendChild(headerRow);
-
-    // Preencher corpo da tabela
-    vendas.forEach(venda => {
-        const row = document.createElement('tr');
-        colunas.forEach(coluna => {
-            const td = document.createElement('td');
-            switch (coluna) {
-                case 'data':
-                    td.textContent = venda.data;
-                    break;
-                case 'vendedor':
-                    td.textContent = venda.vendedor;
-                    break;
-                case 'servico':
-                    td.textContent = venda.servico;
-                    break;
-                case 'tipoComissao':
-                    td.textContent = venda.tipoComissao;
-                    break;
-                case 'nomeCliente':
-                    td.textContent = venda.nomeCliente;
-                    break;
-                case 'empresaParceira':
-                    td.textContent = venda.empresaParceira;
-                    break;
-                case 'comissao':
-                    td.textContent = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                    break;
-                case 'percentualComissao':
-                    const percentual = (venda.comissao / venda.valorVenda * 100).toFixed(2);
-                    td.textContent = `${percentual}%`;
-                    break;
-                case 'valorBrutoReceber':
-                    td.textContent = venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                    break;
-            }
-            row.appendChild(td);
-        });
-        tbody.appendChild(row);
-    });
-
-    // Adicionar rodapé com totais
-    const totalVendas = vendas.reduce((total, venda) => total + venda.valorVenda, 0);
-    const totalComissoes = vendas.reduce((total, venda) => total + venda.comissao, 0);
-    const totalReceber = vendas.reduce((total, venda) => total + venda.valorReceber, 0);
-
-    const footerRow = document.createElement('tr');
-    colunas.forEach(coluna => {
-        const td = document.createElement('td');
-        switch (coluna) {
-            case 'data':
-                td.textContent = 'Total';
-                break;
-            case 'comissao':
-                td.textContent = totalComissoes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                break;
-            case 'valorBrutoReceber':
-                td.textContent = totalReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                break;
-            default:
-                td.textContent = '';
-        }
-        footerRow.appendChild(td);
-    });
-    tfoot.appendChild(footerRow);
+// Função para paginar itens
+function paginarItens(lista, itensPorPagina, paginaAtual) {
+    const inicio = (paginaAtual - 1) * itensPorPagina;
+    const fim = inicio + itensPorPagina;
+    return lista.slice(inicio, fim);
 }
 
 // Inicialização do aplicativo
@@ -1002,7 +806,6 @@ function inicializarAplicativo() {
     atualizarListaVendedores();
     atualizarListaServicos();
     atualizarListaEmpresas();
-    atualizarFiltroVendedores(); // Atualiza o filtro de vendedores na aba de relatórios
 }
 
 // Event Listener para quando o DOM estiver carregado
