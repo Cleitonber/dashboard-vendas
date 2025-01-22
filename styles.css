@@ -24,9 +24,10 @@
 
 body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background: var(--background);
+    background: var(--secondary); /* Usar a cor secundária como background */
     color: var(--text);
     line-height: 1.5;
+    transition: background 0.3s ease; /* Adicionar transição suave */
 }
 
 .container {
