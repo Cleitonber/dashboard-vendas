@@ -154,11 +154,15 @@
                                 <label class="form-label">Itens por página:</label>
                                 <select id="itensPorPaginaVendedores" class="form-select" onchange="atualizarListaVendedores()">
                                     <option value="5">5</option>
-                                    <option value="10">10</option>
+                                    <option value="10" selected>10</option>
                                     <option value="20">20</option>
                                 </select>
                             </div>
-                            <input type="text" id="filtroVendedores" placeholder="Pesquisar vendedor..." class="form-input" oninput="atualizarListaVendedores()">
+                            <input type="text" id="filtroVendedores" placeholder="Pesquisar vendedor..." class="form-input" oninput="filtrarVendedores()">
+                            <div class="d-flex gap-2 mt-2">
+                                <button class="btn btn-primary" onclick="habilitarEdicaoVendedores()">Editar</button>
+                                <button class="btn btn-success" onclick="salvarTodosVendedores()">Salvar</button>
+                            </div>
                             <ul id="vendedoresList" class="list-group"></ul>
                             <div id="controlesPaginacaoVendedores" class="d-flex justify-content-between align-items-center mt-3"></div>
                         </div>
@@ -400,13 +404,6 @@
                     </table>
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Spinner de Carregamento -->
-    <div id="loadingSpinner" class="d-none">
-        <div class="spinner-border text-primary" role="status">
-            <span class="visually-hidden">Carregando...</span>
         </div>
     </div>
 
