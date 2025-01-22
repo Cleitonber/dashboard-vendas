@@ -512,6 +512,12 @@ function limparCamposVendedor() {
     document.getElementById('nomeVendedor').value = '';
     document.getElementById('emailVendedor').value = '';
     document.getElementById('telefoneVendedor').value = '';
+    const form = document.getElementById('vendedorForm');
+    form.querySelector('button[type="submit"]').textContent = 'Cadastrar Vendedor';
+    form.onsubmit = function(e) {
+        e.preventDefault();
+        cadastrarVendedor();
+    };
 }
 
 // Função para atualizar a lista de vendedores
@@ -521,10 +527,49 @@ function atualizarListaVendedores() {
 
     dados.vendedores.forEach(vendedor => {
         const item = document.createElement('li');
-        item.className = 'list-group-item';
-        item.textContent = `${vendedor.nome} - ${vendedor.email} - ${vendedor.telefone}`;
+        item.className = 'list-group-item d-flex justify-content-between align-items-center';
+        item.innerHTML = `
+            <span>${vendedor.nome} - ${vendedor.email} - ${vendedor.telefone}</span>
+            <button class="btn btn-sm btn-secondary" onclick="editarVendedor(${vendedor.id})">Editar</button>
+        `;
         listaVendedores.appendChild(item);
     });
+}
+
+// Função para editar vendedor
+function editarVendedor(id) {
+    const vendedor = dados.vendedores.find(v => v.id === id);
+    if (vendedor) {
+        document.getElementById('nomeVendedor').value = vendedor.nome;
+        document.getElementById('emailVendedor').value = vendedor.email;
+        document.getElementById('telefoneVendedor').value = vendedor.telefone;
+
+        // Alterar o botão de cadastrar para "Atualizar"
+        const form = document.getElementById('vendedorForm');
+        form.querySelector('button[type="submit"]').textContent = 'Atualizar Vendedor';
+        form.onsubmit = function(e) {
+            e.preventDefault();
+            atualizarVendedor(id);
+        };
+    }
+}
+
+// Função para atualizar vendedor
+function atualizarVendedor(id) {
+    const nome = document.getElementById('nomeVendedor').value;
+    const email = document.getElementById('emailVendedor').value;
+    const telefone = document.getElementById('telefoneVendedor').value;
+
+    const vendedor = dados.vendedores.find(v => v.id === id);
+    if (vendedor) {
+        vendedor.nome = nome;
+        vendedor.email = email;
+        vendedor.telefone = telefone;
+        salvarDados();
+        alert('Vendedor atualizado com sucesso!');
+        limparCamposVendedor();
+        atualizarListaVendedores();
+    }
 }
 
 // Função para cadastrar serviço
@@ -554,6 +599,12 @@ function limparCamposServico() {
     document.getElementById('nomeServico').value = '';
     document.getElementById('categoriaServico').value = '';
     document.getElementById('tipoComissao').value = 'fixa';
+    const form = document.getElementById('servicoForm');
+    form.querySelector('button[type="submit"]').textContent = 'Cadastrar Serviço';
+    form.onsubmit = function(e) {
+        e.preventDefault();
+        cadastrarServico();
+    };
 }
 
 // Função para atualizar a lista de serviços
@@ -563,10 +614,49 @@ function atualizarListaServicos() {
 
     dados.servicos.forEach(servico => {
         const item = document.createElement('li');
-        item.className = 'list-group-item';
-        item.textContent = `${servico.nome} - ${servico.categoria} - ${servico.tipoComissao}`;
+        item.className = 'list-group-item d-flex justify-content-between align-items-center';
+        item.innerHTML = `
+            <span>${servico.nome} - ${servico.categoria} - ${servico.tipoComissao}</span>
+            <button class="btn btn-sm btn-secondary" onclick="editarServico(${servico.id})">Editar</button>
+        `;
         listaServicos.appendChild(item);
     });
+}
+
+// Função para editar serviço
+function editarServico(id) {
+    const servico = dados.servicos.find(s => s.id === id);
+    if (servico) {
+        document.getElementById('nomeServico').value = servico.nome;
+        document.getElementById('categoriaServico').value = servico.categoria;
+        document.getElementById('tipoComissao').value = servico.tipoComissao;
+
+        // Alterar o botão de cadastrar para "Atualizar"
+        const form = document.getElementById('servicoForm');
+        form.querySelector('button[type="submit"]').textContent = 'Atualizar Serviço';
+        form.onsubmit = function(e) {
+            e.preventDefault();
+            atualizarServico(id);
+        };
+    }
+}
+
+// Função para atualizar serviço
+function atualizarServico(id) {
+    const nome = document.getElementById('nomeServico').value;
+    const categoria = document.getElementById('categoriaServico').value;
+    const tipoComissao = document.getElementById('tipoComissao').value;
+
+    const servico = dados.servicos.find(s => s.id === id);
+    if (servico) {
+        servico.nome = nome;
+        servico.categoria = categoria;
+        servico.tipoComissao = tipoComissao;
+        salvarDados();
+        alert('Serviço atualizado com sucesso!');
+        limparCamposServico();
+        atualizarListaServicos();
+    }
 }
 
 // Função para cadastrar empresa parceira
@@ -590,6 +680,12 @@ document.getElementById('empresaForm').addEventListener('submit', function (e) {
 // Função para limpar campos do formulário de empresa
 function limparCamposEmpresa() {
     document.getElementById('nomeEmpresa').value = '';
+    const form = document.getElementById('empresaForm');
+    form.querySelector('button[type="submit"]').textContent = 'Cadastrar Empresa';
+    form.onsubmit = function(e) {
+        e.preventDefault();
+        cadastrarEmpresa();
+    };
 }
 
 // Função para atualizar a lista de empresas
@@ -599,10 +695,43 @@ function atualizarListaEmpresas() {
 
     dados.empresasParceiras.forEach(empresa => {
         const item = document.createElement('li');
-        item.className = 'list-group-item';
-        item.textContent = empresa.nome;
+        item.className = 'list-group-item d-flex justify-content-between align-items-center';
+        item.innerHTML = `
+            <span>${empresa.nome}</span>
+            <button class="btn btn-sm btn-secondary" onclick="editarEmpresa(${empresa.id})">Editar</button>
+        `;
         listaEmpresas.appendChild(item);
     });
+}
+
+// Função para editar empresa
+function editarEmpresa(id) {
+    const empresa = dados.empresasParceiras.find(e => e.id === id);
+    if (empresa) {
+        document.getElementById('nomeEmpresa').value = empresa.nome;
+
+        // Alterar o botão de cadastrar para "Atualizar"
+        const form = document.getElementById('empresaForm');
+        form.querySelector('button[type="submit"]').textContent = 'Atualizar Empresa';
+        form.onsubmit = function(e) {
+            e.preventDefault();
+            atualizarEmpresa(id);
+        };
+    }
+}
+
+// Função para atualizar empresa
+function atualizarEmpresa(id) {
+    const nome = document.getElementById('nomeEmpresa').value;
+
+    const empresa = dados.empresasParceiras.find(e => e.id === id);
+    if (empresa) {
+        empresa.nome = nome;
+        salvarDados();
+        alert('Empresa atualizada com sucesso!');
+        limparCamposEmpresa();
+        atualizarListaEmpresas();
+    }
 }
 
 // Função para atualizar o filtro de vendedores na aba de relatórios
