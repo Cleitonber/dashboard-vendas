@@ -206,6 +206,11 @@ body {
     opacity: 0.9;
 }
 
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
+}
+
 .chart-container {
     position: relative;
     height: 300px;
@@ -403,4 +408,71 @@ th:active {
     outline: none;
     border-color: var(--primary);
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Estilos para edição direta */
+.editable {
+    padding: 0.25rem;
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+    transition: all 0.2s;
+}
+
+.editable:focus {
+    outline: none;
+    border-color: var(--primary);
+    background-color: #f1f5f9;
+}
+
+/* Estilos para listas */
+.list-group {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    transition: all 0.2s;
+}
+
+.list-group-item:hover {
+    background-color: #f1f5f9;
+}
+
+/* Estilos para controles de paginação */
+.controles-paginacao {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.controles-paginacao button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--primary);
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.controles-paginacao button:hover {
+    background: var(--primary-dark);
+}
+
+.controles-paginacao button:disabled {
+    background: var(--secondary);
+    cursor: not-allowed;
+}
+
+/* Estilos para checkboxes */
+.form-check-input {
+    margin-right: 0.5rem;
+    cursor: pointer;
 }
