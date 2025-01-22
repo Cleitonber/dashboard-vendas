@@ -932,7 +932,7 @@ function atualizarTema() {
 // Restaurar tema padrão
 function restaurarTemaPadrao() {
     document.getElementById('corPrimaria').value = '#4f46e5';
-    document.getElementById('corSecundaria').value = '#64748b';
+    document.getElementById('corSecundaria').value = '#ebebeb';
     atualizarTema(); // Aplicar as cores padrão
     localStorage.removeItem('corPrimaria'); // Remover cores salvas
     localStorage.removeItem('corSecundaria');
