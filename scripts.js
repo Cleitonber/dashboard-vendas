@@ -286,6 +286,13 @@ document.getElementById('vendedorForm').addEventListener('submit', function (e) 
     const emailVendedor = document.getElementById('emailVendedor').value;
     const telefoneVendedor = document.getElementById('telefoneVendedor').value;
 
+    // Verifica se já existe um vendedor com o mesmo nome
+    const vendedorExistente = dados.vendedores.find(v => v.nome === nomeVendedor);
+    if (vendedorExistente) {
+        alert('Já existe um vendedor com esse nome!');
+        return;
+    }
+
     const novoVendedor = {
         id: dados.vendedores.length + 1,
         nome: nomeVendedor,
@@ -305,6 +312,13 @@ function limparCamposVendedor() {
     document.getElementById('nomeVendedor').value = '';
     document.getElementById('emailVendedor').value = '';
     document.getElementById('telefoneVendedor').value = '';
+}
+
+// Função para filtrar vendedores pelo nome
+function filtrarVendedores() {
+    const filtro = document.getElementById('filtroVendedores').value.toLowerCase();
+    const vendedoresFiltrados = dados.vendedores.filter(v => v.nome.toLowerCase().includes(filtro));
+    atualizarListaVendedores(vendedoresFiltrados);
 }
 
 // Função para atualizar a lista de vendedores
