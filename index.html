@@ -150,18 +150,22 @@
                             <button type="submit" class="btn btn-primary">Cadastrar Vendedor</button>
                         </form>
                         <div id="listaVendedores" class="mt-4">
-                            <h3>Vendedores Cadastrados</h3>
-                            <div class="form-group">
-                                <label class="form-label">Itens por página:</label>
-                                <select id="itensPorPaginaVendedores" class="form-select" onchange="atualizarListaVendedores()">
-                                    <option value="5">5</option>
-                                    <option value="10" selected>10</option>
-                                    <option value="20">20</option>
-                                </select>
+                            <h3 onclick="toggleList('vendedoresList')" style="cursor: pointer;">
+                                Vendedores Cadastrados <span id="arrowVendedores">▼</span>
+                            </h3>
+                            <div id="vendedoresListContainer" style="display: none;">
+                                <div class="form-group">
+                                    <label class="form-label">Itens por página:</label>
+                                    <select id="itensPorPaginaVendedores" class="form-select" onchange="atualizarListaVendedores()">
+                                        <option value="5">5</option>
+                                        <option value="10" selected>10</option>
+                                        <option value="20">20</option>
+                                    </select>
+                                </div>
+                                <input type="text" id="filtroVendedores" placeholder="Pesquisar vendedor..." class="form-input" oninput="filtrarVendedores()">
+                                <ul id="vendedoresList" class="list-group"></ul>
+                                <div id="controlesPaginacaoVendedores" class="d-flex justify-content-between align-items-center mt-3"></div>
                             </div>
-                            <input type="text" id="filtroVendedores" placeholder="Pesquisar vendedor..." class="form-input" oninput="filtrarVendedores()">
-                            <ul id="vendedoresList" class="list-group"></ul>
-                            <div id="controlesPaginacaoVendedores" class="d-flex justify-content-between align-items-center mt-3"></div>
                         </div>
                     </div>
                 </div>
@@ -191,18 +195,22 @@
                             <button type="submit" class="btn btn-primary">Cadastrar Serviço</button>
                         </form>
                         <div id="listaServicos" class="mt-4">
-                            <h3>Serviços Cadastrados</h3>
-                            <div class="form-group">
-                                <label class="form-label">Itens por página:</label>
-                                <select id="itensPorPaginaServicos" class="form-select" onchange="atualizarListaServicos()">
-                                    <option value="5">5</option>
-                                    <option value="10" selected>10</option>
-                                    <option value="20">20</option>
-                                </select>
+                            <h3 onclick="toggleList('servicosList')" style="cursor: pointer;">
+                                Serviços Cadastrados <span id="arrowServicos">▼</span>
+                            </h3>
+                            <div id="servicosListContainer" style="display: none;">
+                                <div class="form-group">
+                                    <label class="form-label">Itens por página:</label>
+                                    <select id="itensPorPaginaServicos" class="form-select" onchange="atualizarListaServicos()">
+                                        <option value="5">5</option>
+                                        <option value="10" selected>10</option>
+                                        <option value="20">20</option>
+                                    </select>
+                                </div>
+                                <input type="text" id="filtroServicos" placeholder="Pesquisar serviço..." class="form-input" oninput="filtrarServicos()">
+                                <ul id="servicosList" class="list-group"></ul>
+                                <div id="controlesPaginacaoServicos" class="d-flex justify-content-between align-items-center mt-3"></div>
                             </div>
-                            <input type="text" id="filtroServicos" placeholder="Pesquisar serviço..." class="form-input" oninput="filtrarServicos()">
-                            <ul id="servicosList" class="list-group"></ul>
-                            <div id="controlesPaginacaoServicos" class="d-flex justify-content-between align-items-center mt-3"></div>
                         </div>
                     </div>
                 </div>
@@ -221,18 +229,22 @@
                             <button type="submit" class="btn btn-primary">Cadastrar Empresa</button>
                         </form>
                         <div id="listaEmpresas" class="mt-4">
-                            <h3>Empresas Parceiras Cadastradas</h3>
-                            <div class="form-group">
-                                <label class="form-label">Itens por página:</label>
-                                <select id="itensPorPaginaEmpresas" class="form-select" onchange="atualizarListaEmpresas()">
-                                    <option value="5">5</option>
-                                    <option value="10" selected>10</option>
-                                    <option value="20">20</option>
-                                </select>
+                            <h3 onclick="toggleList('empresasList')" style="cursor: pointer;">
+                                Empresas Parceiras Cadastradas <span id="arrowEmpresas">▼</span>
+                            </h3>
+                            <div id="empresasListContainer" style="display: none;">
+                                <div class="form-group">
+                                    <label class="form-label">Itens por página:</label>
+                                    <select id="itensPorPaginaEmpresas" class="form-select" onchange="atualizarListaEmpresas()">
+                                        <option value="5">5</option>
+                                        <option value="10" selected>10</option>
+                                        <option value="20">20</option>
+                                    </select>
+                                </div>
+                                <input type="text" id="filtroEmpresas" placeholder="Pesquisar empresa..." class="form-input" oninput="filtrarEmpresas()">
+                                <ul id="empresasList" class="list-group"></ul>
+                                <div id="controlesPaginacaoEmpresas" class="d-flex justify-content-between align-items-center mt-3"></div>
                             </div>
-                            <input type="text" id="filtroEmpresas" placeholder="Pesquisar empresa..." class="form-input" oninput="filtrarEmpresas()">
-                            <ul id="empresasList" class="list-group"></ul>
-                            <div id="controlesPaginacaoEmpresas" class="d-flex justify-content-between align-items-center mt-3"></div>
                         </div>
                     </div>
                 </div>
@@ -299,7 +311,6 @@
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">Listagem de Vendas</h2>
-                    <button class="btn btn-primary" onclick="listarVendas()">Listar Vendas</button>
                 </div>
                 <div class="card-body">
                     <div class="filters">
@@ -311,13 +322,34 @@
                             <label class="form-label">Data Final</label>
                             <input type="text" id="filtroDataFinal" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
                         </div>
+                        <div class="form-group">
+                            <label class="form-label">Vendedor</label>
+                            <select id="filtroVendedorVendas" class="form-select">
+                                <option value="">Todos</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Serviço</label>
+                            <select id="filtroServicoVendas" class="form-select">
+                                <option value="">Todos</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Empresa Parceira</label>
+                            <select id="filtroEmpresaVendas" class="form-select">
+                                <option value="">Todas</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
                         <button class="btn btn-primary" onclick="filtrarVendas()">Filtrar</button>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Itens por página:</label>
                         <select id="itensPorPaginaVendas" class="form-select" onchange="listarVendas()">
                             <option value="5">5</option>
-                            <option value="10">10</option>
+                            <option value="10" selected>10</option>
                             <option value="20">20</option>
                         </select>
                     </div>
