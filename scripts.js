@@ -36,12 +36,140 @@ document.addEventListener('DOMContentLoaded', function () {
     atualizarOpcoesEmpresas();
     inicializarGraficos();
     atualizarFiltrosVendas();
+    inicializarSortable(); // Inicializa a funcionalidade de arrastar e soltar
+    preencherFiltrosVendas(); // Preenche os filtros de vendedores, serviços e empresas
+
+    // Adicionar eventos de clique aos cabeçalhos da tabela para ordenação
+    const ths = document.querySelectorAll('#tabelaVendas th');
+    ths.forEach((th, index) => {
+        th.addEventListener('click', () => ordenarTabelaVendas(index));
+    });
 
     // Definir o valor padrão de 10 para os campos de paginação
     document.getElementById('itensPorPaginaServicos').value = 10;
     document.getElementById('itensPorPaginaEmpresas').value = 10;
     document.getElementById('itensPorPaginaVendas').value = 10;
 });
+
+// Função para inicializar a funcionalidade de arrastar e soltar
+function inicializarSortable() {
+    const tabelaVendas = document.getElementById('tabelaVendas');
+    new Sortable(tabelaVendas.querySelector('thead tr'), {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: function (evt) {
+            const ths = Array.from(tabelaVendas.querySelectorAll('th'));
+            const tbody = tabelaVendas.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            rows.forEach(row => {
+                const cells = Array.from(row.querySelectorAll('td'));
+                const newCells = ths.map(th => cells[ths.indexOf(th)]);
+                newCells.forEach((cell, index) => {
+                    row.appendChild(cell);
+                });
+            });
+        }
+    });
+}
+
+// Função para ordenar a tabela de vendas
+function ordenarTabelaVendas(coluna) {
+    const tbody = document.querySelector('#tabelaVendas tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+
+    // Determinar a direção da ordenação
+    const direcao = tbody.getAttribute('data-ordenacao') === 'asc' ? 'desc' : 'asc';
+    tbody.setAttribute('data-ordenacao', direcao);
+
+    // Ordenar as linhas
+    rows.sort((a, b) => {
+        const valorA = a.querySelector(`td:nth-child(${coluna + 1})`).textContent;
+        const valorB = b.querySelector(`td:nth-child(${coluna + 1})`).textContent;
+
+        if (direcao === 'asc') {
+            return valorA.localeCompare(valorB, undefined, { numeric: true });
+        } else {
+            return valorB.localeCompare(valorA, undefined, { numeric: true });
+        }
+    });
+
+    // Reinserir as linhas ordenadas
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+// Função para exportar a tabela de vendas para Excel
+function exportarVendasExcel() {
+    const tabela = document.getElementById('tabelaVendas');
+    const headers = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent);
+    const data = [];
+
+    document.querySelectorAll('#tabelaVendas tbody tr').forEach(row => {
+        const rowData = {};
+        row.querySelectorAll('td').forEach((cell, index) => {
+            rowData[headers[index]] = cell.textContent;
+        });
+        data.push(rowData);
+    });
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Vendas');
+    XLSX.writeFile(wb, 'vendas.xlsx');
+}
+
+// Função para exportar a tabela de vendas para PDF
+function exportarVendasPDF() {
+    const doc = new jsPDF();
+    const tabela = document.getElementById('tabelaVendas');
+    const headers = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent);
+    const rows = Array.from(tabela.querySelectorAll('tbody tr')).map(tr =>
+        Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
+    );
+
+    doc.autoTable({
+        head: [headers],
+        body: rows,
+        theme: 'grid',
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [79, 70, 229] }
+    });
+
+    doc.save('vendas.pdf');
+}
+
+// Função para preencher os filtros de vendedores, serviços e empresas
+function preencherFiltrosVendas() {
+    const selectVendedor = document.getElementById('filtroVendedorVendas');
+    const selectServico = document.getElementById('filtroServicoVendas');
+    const selectEmpresa = document.getElementById('filtroEmpresaVendas');
+
+    selectVendedor.innerHTML = '<option value="">Todos</option>';
+    selectServico.innerHTML = '<option value="">Todos</option>';
+    selectEmpresa.innerHTML = '<option value="">Todas</option>';
+
+    dados.vendedores.forEach(vendedor => {
+        const option = document.createElement('option');
+        option.value = vendedor.id;
+        option.textContent = vendedor.nome;
+        selectVendedor.appendChild(option);
+    });
+
+    dados.servicos.forEach(servico => {
+        const option = document.createElement('option');
+        option.value = servico.id;
+        option.textContent = servico.nome;
+        selectServico.appendChild(option);
+    });
+
+    dados.empresasParceiras.forEach(empresa => {
+        const option = document.createElement('option');
+        option.value = empresa.id;
+        option.textContent = empresa.nome;
+        selectEmpresa.appendChild(option);
+    });
+}
 
 // Função para preencher o seletor de anos
 function preencherAnos() {
