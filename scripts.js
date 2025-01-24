@@ -35,10 +35,12 @@ document.addEventListener('DOMContentLoaded', function () {
     atualizarOpcoesServicos();
     atualizarOpcoesEmpresas();
     inicializarGraficos();
+    atualizarFiltrosVendas();
 
     // Definir o valor padrão de 10 para os campos de paginação
     document.getElementById('itensPorPaginaServicos').value = 10;
     document.getElementById('itensPorPaginaEmpresas').value = 10;
+    document.getElementById('itensPorPaginaVendas').value = 10;
 });
 
 // Função para preencher o seletor de anos
@@ -771,6 +773,16 @@ document.getElementById('vendaForm').addEventListener('submit', function (e) {
         return;
     }
 
+    if (valorReceber > valorVenda) {
+        alert('O valor a receber não pode ser maior que o valor da venda.');
+        return;
+    }
+
+    if (servico.tipoComissao === 'fixa' && comissao > valorReceber) {
+        alert('A comissão em reais não pode ser maior que o valor a receber.');
+        return;
+    }
+
     const novaVenda = {
         id: dados.vendas.length + 1,
         vendedor: vendedor.nome,
@@ -1199,6 +1211,9 @@ function mudarPaginaVendas(direcao) {
 function filtrarVendas() {
     const dataInicial = document.getElementById('filtroDataInicial').value;
     const dataFinal = document.getElementById('filtroDataFinal').value;
+    const vendedorId = document.getElementById('filtroVendedorVendas').value;
+    const servicoId = document.getElementById('filtroServicoVendas').value;
+    const empresaId = document.getElementById('filtroEmpresaVendas').value;
 
     const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
     const dataFinalObj = dataFinal ? new Date(dataFinal.split('/').reverse().join('-')) : null;
@@ -1209,7 +1224,11 @@ function filtrarVendas() {
         const filtroData = (!dataInicialObj || dataVendaObj >= dataInicialObj) &&
                            (!dataFinalObj || dataVendaObj <= dataFinalObj);
 
-        return filtroData;
+        const filtroVendedor = !vendedorId || venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
+        const filtroServico = !servicoId || venda.servico === dados.servicos.find(s => s.id == servicoId).nome;
+        const filtroEmpresa = !empresaId || venda.empresaParceira === dados.empresasParceiras.find(e => e.id == empresaId).nome;
+
+        return filtroData && filtroVendedor && filtroServico && filtroEmpresa;
     });
 
     listarVendas(vendasFiltradas);
@@ -1291,4 +1310,49 @@ function excluirVenda(id) {
         listarVendas();
         alert('Venda excluída com sucesso!');
     }
+}
+
+// Função para alternar a exibição das listas
+function toggleList(listId) {
+    const container = document.getElementById(`${listId}Container`);
+    const arrow = document.getElementById(`arrow${listId.replace('List', '')}`);
+    if (container.style.display === "none") {
+        container.style.display = "block";
+        arrow.textContent = "▲";
+    } else {
+        container.style.display = "none";
+        arrow.textContent = "▼";
+    }
+}
+
+// Função para atualizar os filtros de vendedores, serviços e empresas
+function atualizarFiltrosVendas() {
+    const selectVendedor = document.getElementById('filtroVendedorVendas');
+    const selectServico = document.getElementById('filtroServicoVendas');
+    const selectEmpresa = document.getElementById('filtroEmpresaVendas');
+
+    selectVendedor.innerHTML = '<option value="">Todos</option>';
+    selectServico.innerHTML = '<option value="">Todos</option>';
+    selectEmpresa.innerHTML = '<option value="">Todas</option>';
+
+    dados.vendedores.forEach(vendedor => {
+        const option = document.createElement('option');
+        option.value = vendedor.id;
+        option.textContent = vendedor.nome;
+        selectVendedor.appendChild(option);
+    });
+
+    dados.servicos.forEach(servico => {
+        const option = document.createElement('option');
+        option.value = servico.id;
+        option.textContent = servico.nome;
+        selectServico.appendChild(option);
+    });
+
+    dados.empresasParceiras.forEach(empresa => {
+        const option = document.createElement('option');
+        option.value = empresa.id;
+        option.textContent = empresa.nome;
+        selectEmpresa.appendChild(option);
+    });
 }
