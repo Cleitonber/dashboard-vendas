@@ -35,6 +35,10 @@ document.addEventListener('DOMContentLoaded', function () {
     atualizarOpcoesServicos();
     atualizarOpcoesEmpresas();
     inicializarGraficos();
+
+    // Definir o valor padrão de 10 para os campos de paginação
+    document.getElementById('itensPorPaginaServicos').value = 10;
+    document.getElementById('itensPorPaginaEmpresas').value = 10;
 });
 
 // Função para preencher o seletor de anos
@@ -442,6 +446,13 @@ document.getElementById('servicoForm').addEventListener('submit', function (e) {
     const categoriaServico = document.getElementById('categoriaServico').value;
     const tipoComissao = document.getElementById('tipoComissao').value;
 
+    // Verifica se já existe um serviço com o mesmo nome
+    const servicoExistente = dados.servicos.find(s => s.nome === nomeServico);
+    if (servicoExistente) {
+        alert('Já existe um serviço com esse nome!');
+        return;
+    }
+
     const novoServico = {
         id: dados.servicos.length + 1,
         nome: nomeServico,
@@ -463,15 +474,22 @@ function limparCamposServico() {
     document.getElementById('tipoComissao').value = 'fixa';
 }
 
+// Função para filtrar serviços pelo nome
+function filtrarServicos() {
+    const filtro = document.getElementById('filtroServicos').value.toLowerCase();
+    const servicosFiltrados = dados.servicos.filter(s => s.nome.toLowerCase().includes(filtro));
+    atualizarListaServicos(servicosFiltrados);
+}
+
 // Função para atualizar a lista de serviços
-function atualizarListaServicos() {
+function atualizarListaServicos(servicos = dados.servicos) {
     const listaServicos = document.getElementById('servicosList');
     listaServicos.innerHTML = '';
 
     const itensPorPagina = parseInt(document.getElementById('itensPorPaginaServicos').value);
     const inicio = (paginaAtualServicos - 1) * itensPorPagina;
     const fim = inicio + itensPorPagina;
-    const servicosPaginados = dados.servicos.slice(inicio, fim);
+    const servicosPaginados = servicos.slice(inicio, fim);
 
     servicosPaginados.forEach(servico => {
         const li = document.createElement('li');
@@ -492,7 +510,7 @@ function atualizarListaServicos() {
     });
 
     // Atualizar controles de paginação
-    const totalPaginas = Math.ceil(dados.servicos.length / itensPorPagina);
+    const totalPaginas = Math.ceil(servicos.length / itensPorPagina);
     document.getElementById('controlesPaginacaoServicos').innerHTML = `
         <button class="btn btn-secondary" onclick="mudarPaginaServicos(-1)" ${paginaAtualServicos === 1 ? 'disabled' : ''}>Anterior</button>
         <span>Página ${paginaAtualServicos} de ${totalPaginas}</span>
@@ -557,7 +575,16 @@ function editarServico(id) {
 function salvarEdicaoServico(id) {
     const servico = dados.servicos.find(s => s.id === id);
     if (servico) {
-        servico.nome = document.getElementById('editNomeServico').value;
+        const novoNome = document.getElementById('editNomeServico').value;
+
+        // Verifica se já existe um serviço com o mesmo nome
+        const servicoExistente = dados.servicos.find(s => s.nome === novoNome && s.id !== id);
+        if (servicoExistente) {
+            alert('Já existe um serviço com esse nome!');
+            return;
+        }
+
+        servico.nome = novoNome;
         servico.categoria = document.getElementById('editCategoriaServico').value;
         servico.tipoComissao = document.getElementById('editTipoComissao').value;
         atualizarListaServicos();
@@ -580,6 +607,13 @@ document.getElementById('empresaForm').addEventListener('submit', function (e) {
     e.preventDefault();
     const nomeEmpresa = document.getElementById('nomeEmpresa').value;
 
+    // Verifica se já existe uma empresa com o mesmo nome
+    const empresaExistente = dados.empresasParceiras.find(e => e.nome === nomeEmpresa);
+    if (empresaExistente) {
+        alert('Já existe uma empresa com esse nome!');
+        return;
+    }
+
     const novaEmpresa = {
         id: dados.empresasParceiras.length + 1,
         nome: nomeEmpresa
@@ -597,15 +631,22 @@ function limparCamposEmpresa() {
     document.getElementById('nomeEmpresa').value = '';
 }
 
+// Função para filtrar empresas pelo nome
+function filtrarEmpresas() {
+    const filtro = document.getElementById('filtroEmpresas').value.toLowerCase();
+    const empresasFiltradas = dados.empresasParceiras.filter(e => e.nome.toLowerCase().includes(filtro));
+    atualizarListaEmpresas(empresasFiltradas);
+}
+
 // Função para atualizar a lista de empresas parceiras
-function atualizarListaEmpresas() {
+function atualizarListaEmpresas(empresas = dados.empresasParceiras) {
     const listaEmpresas = document.getElementById('empresasList');
     listaEmpresas.innerHTML = '';
 
     const itensPorPagina = parseInt(document.getElementById('itensPorPaginaEmpresas').value);
     const inicio = (paginaAtualEmpresas - 1) * itensPorPagina;
     const fim = inicio + itensPorPagina;
-    const empresasPaginadas = dados.empresasParceiras.slice(inicio, fim);
+    const empresasPaginadas = empresas.slice(inicio, fim);
 
     empresasPaginadas.forEach(empresa => {
         const li = document.createElement('li');
@@ -625,7 +666,7 @@ function atualizarListaEmpresas() {
     });
 
     // Atualizar controles de paginação
-    const totalPaginas = Math.ceil(dados.empresasParceiras.length / itensPorPagina);
+    const totalPaginas = Math.ceil(empresas.length / itensPorPagina);
     document.getElementById('controlesPaginacaoEmpresas').innerHTML = `
         <button class="btn btn-secondary" onclick="mudarPaginaEmpresas(-1)" ${paginaAtualEmpresas === 1 ? 'disabled' : ''}>Anterior</button>
         <span>Página ${paginaAtualEmpresas} de ${totalPaginas}</span>
@@ -684,7 +725,16 @@ function editarEmpresa(id) {
 function salvarEdicaoEmpresa(id) {
     const empresa = dados.empresasParceiras.find(e => e.id === id);
     if (empresa) {
-        empresa.nome = document.getElementById('editNomeEmpresa').value;
+        const novoNome = document.getElementById('editNomeEmpresa').value;
+
+        // Verifica se já existe uma empresa com o mesmo nome
+        const empresaExistente = dados.empresasParceiras.find(e => e.nome === novoNome && e.id !== id);
+        if (empresaExistente) {
+            alert('Já existe uma empresa com esse nome!');
+            return;
+        }
+
+        empresa.nome = novoNome;
         atualizarListaEmpresas();
         alert('Empresa atualizada com sucesso!');
     }
