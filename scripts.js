@@ -98,8 +98,22 @@ function inicializarSortable() {
 // Função para inicializar a funcionalidade de arrastar e soltar na tabela de relatórios
 function inicializarSortableRelatorio() {
     const tabelaRelatorio = document.getElementById('tabelaRelatorio');
+    if (!tabelaRelatorio) {
+        console.error('A tabela com o ID "tabelaRelatorio" não foi encontrada no DOM.');
+        return;
+    }
+
     const thead = tabelaRelatorio.querySelector('thead tr');
+    if (!thead) {
+        console.error('O elemento <thead> ou <tr> dentro do <thead> não foi encontrado na tabela.');
+        return;
+    }
+
     const tbody = tabelaRelatorio.querySelector('tbody');
+    if (!tbody) {
+        console.error('O elemento <tbody> não foi encontrado na tabela.');
+        return;
+    }
 
     // Tornar as colunas do cabeçalho arrastáveis
     new Sortable(thead, {
