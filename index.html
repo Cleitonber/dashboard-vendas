@@ -120,7 +120,7 @@
                         <input type="color" id="corSecundaria" value="#ebebeb" onchange="atualizarTema()">
                     </div>
                     <button class="btn btn-secondary" onclick="restaurarTemaPadrao()">Restaurar Cores Padrão</button>
-                                            <button class="btn btn-primary" onclick="salvarCores()">Salvar</button>
+                    <button class="btn btn-primary" onclick="salvarCores()">Salvar</button>
                 </div>
             </div>
         </div>
@@ -196,11 +196,11 @@
                                 <label class="form-label">Itens por página:</label>
                                 <select id="itensPorPaginaServicos" class="form-select" onchange="atualizarListaServicos()">
                                     <option value="5">5</option>
-                                    <option value="10">10</option>
+                                    <option value="10" selected>10</option>
                                     <option value="20">20</option>
                                 </select>
                             </div>
-                            <input type="text" id="filtroServicos" placeholder="Pesquisar serviço..." class="form-input" oninput="atualizarListaServicos()">
+                            <input type="text" id="filtroServicos" placeholder="Pesquisar serviço..." class="form-input" oninput="filtrarServicos()">
                             <ul id="servicosList" class="list-group"></ul>
                             <div id="controlesPaginacaoServicos" class="d-flex justify-content-between align-items-center mt-3"></div>
                         </div>
@@ -226,11 +226,11 @@
                                 <label class="form-label">Itens por página:</label>
                                 <select id="itensPorPaginaEmpresas" class="form-select" onchange="atualizarListaEmpresas()">
                                     <option value="5">5</option>
-                                    <option value="10">10</option>
+                                    <option value="10" selected>10</option>
                                     <option value="20">20</option>
                                 </select>
                             </div>
-                            <input type="text" id="filtroEmpresas" placeholder="Pesquisar empresa..." class="form-input" oninput="atualizarListaEmpresas()">
+                            <input type="text" id="filtroEmpresas" placeholder="Pesquisar empresa..." class="form-input" oninput="filtrarEmpresas()">
                             <ul id="empresasList" class="list-group"></ul>
                             <div id="controlesPaginacaoEmpresas" class="d-flex justify-content-between align-items-center mt-3"></div>
                         </div>
@@ -408,7 +408,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.24/jspdf.plugin.autotable.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.0/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="scripts.js"></script>
 </body>
