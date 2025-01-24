@@ -270,104 +270,111 @@ function inicializarGraficos() {
     const ctxDesempenhoVendedores = document.getElementById('desempenhoVendedoresChart').getContext('2d');
     const ctxVendasCategoria = document.getElementById('vendasCategoriaChart').getContext('2d');
 
-    vendasServicoChart = new Chart(ctxVendasServico, {
-        type: 'bar',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Vendas',
-                data: [],
-                backgroundColor: 'rgba(79, 70, 229, 0.6)',
-                borderColor: 'rgba(79, 70, 229, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                tooltip: {
-                    enabled: true,
-                    mode: 'index',
-                    intersect: false,
-                },
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                }
+    // Verifica se os gráficos já foram inicializados
+    if (!vendasServicoChart) {
+        vendasServicoChart = new Chart(ctxVendasServico, {
+            type: 'bar',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Vendas',
+                    data: [],
+                    backgroundColor: 'rgba(79, 70, 229, 0.6)',
+                    borderColor: 'rgba(79, 70, 229, 1)',
+                    borderWidth: 1
+                }]
             },
-            animation: {
-                duration: 1000,
-                easing: 'easeInOutQuad'
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuad'
+                }
             }
-        }
-    });
+        });
+    }
 
-    desempenhoVendedoresChart = new Chart(ctxDesempenhoVendedores, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Vendas',
-                data: [],
-                borderColor: 'rgba(239, 68, 68, 1)',
-                borderWidth: 2,
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                tooltip: {
-                    enabled: true,
-                    mode: 'index',
-                    intersect: false,
-                },
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                }
+    if (!desempenhoVendedoresChart) {
+        desempenhoVendedoresChart = new Chart(ctxDesempenhoVendedores, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Vendas',
+                    data: [],
+                    borderColor: 'rgba(239, 68, 68, 1)',
+                    borderWidth: 2,
+                    fill: false
+                }]
             },
-            animation: {
-                duration: 1000,
-                easing: 'easeInOutQuad'
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuad'
+                }
             }
-        }
-    });
+        });
+    }
 
-    vendasCategoriaChart = new Chart(ctxVendasCategoria, {
-        type: 'pie',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Vendas',
-                data: [],
-                backgroundColor: [
-                    'rgba(79, 70, 229, 0.6)',
-                    'rgba(239, 68, 68, 0.6)',
-                    'rgba(34, 197, 94, 0.6)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                tooltip: {
-                    enabled: true,
-                    mode: 'index',
-                    intersect: false,
-                },
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                }
+    if (!vendasCategoriaChart) {
+        vendasCategoriaChart = new Chart(ctxVendasCategoria, {
+            type: 'pie',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Vendas',
+                    data: [],
+                    backgroundColor: [
+                        'rgba(79, 70, 229, 0.6)',
+                        'rgba(239, 68, 68, 0.6)',
+                        'rgba(34, 197, 94, 0.6)'
+                    ],
+                    borderWidth: 1
+                }]
             },
-            animation: {
-                duration: 1000,
-                easing: 'easeInOutQuad'
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        enabled: true,
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    legend: {
+                        display: true,
+                        position: 'bottom',
+                    }
+                },
+                animation: {
+                    duration: 1000,
+                    easing: 'easeInOutQuad'
+                }
             }
-        }
-    });
+        });
+    }
 
     atualizarDashboard(); // Atualiza os gráficos com os dados iniciais
 }
