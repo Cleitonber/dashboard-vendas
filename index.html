@@ -328,21 +328,21 @@
                         </div>
                         <div class="form-group">
                             <label class="form-label">Vendedor</label>
-                            <select id="filtroVendedorVendas" class="form-select">
+                            <select id="filtroVendedorVendas" class="form-select" multiple>
                                 <option value="">Todos</option>
                                 <!-- As opções serão preenchidas dinamicamente via JavaScript -->
                             </select>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Serviço</label>
-                            <select id="filtroServicoVendas" class="form-select">
+                            <select id="filtroServicoVendas" class="form-select" multiple>
                                 <option value="">Todos</option>
                                 <!-- As opções serão preenchidas dinamicamente via JavaScript -->
                             </select>
                         </div>
                         <div class="form-group">
                             <label class="form-label">Empresa Parceira</label>
-                            <select id="filtroEmpresaVendas" class="form-select">
+                            <select id="filtroEmpresaVendas" class="form-select" multiple>
                                 <option value="">Todas</option>
                                 <!-- As opções serão preenchidas dinamicamente via JavaScript -->
                             </select>
@@ -361,6 +361,7 @@
                         <thead>
                             <tr>
                                 <th>Data</th>
+                                <th>ID da Venda</th> <!-- Nova coluna -->
                                 <th>Vendedor</th>
                                 <th>Serviço</th>
                                 <th>Cliente</th>
@@ -385,10 +386,6 @@
             <div class="card">
                 <div class="card-header">
                     <h2 class="card-title">Relatório de Vendas</h2>
-                    <div>
-                        <button class="btn btn-secondary" onclick="exportarRelatorioExcel()">Exportar Excel</button>
-                        <button class="btn btn-secondary" onclick="exportarRelatorioPDF()">Exportar PDF</button>
-                    </div>
                 </div>
                 <div class="card-body">
                     <div class="filters">
@@ -416,6 +413,7 @@
                             <small class="form-text">(Pressione Ctrl para selecionar mais de um item)</small>
                             <select id="filtroColunas" class="form-select" multiple>
                                 <option value="data" selected>Data da Venda</option>
+                                <option value="id" selected>ID da Venda</option> <!-- Nova coluna -->
                                 <option value="vendedor" selected>Nome do Vendedor</option>
                                 <option value="servico" selected>Serviço Vendido</option>
                                 <option value="tipoComissao" selected>Tipo de Comissão</option>
@@ -440,6 +438,10 @@
                             <!-- O rodapé será preenchido dinamicamente via JavaScript -->
                         </tfoot>
                     </table>
+                    <div class="mt-3">
+                        <button class="btn btn-secondary" onclick="exportarRelatorioExcel()">Exportar Excel</button>
+                        <button class="btn btn-secondary" onclick="exportarRelatorioPDF()">Exportar PDF</button>
+                    </div>
                 </div>
             </div>
         </div>
