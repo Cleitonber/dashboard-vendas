@@ -1022,7 +1022,8 @@ function exportarRelatorioExcel() {
             empresaParceira: 'Empresa Parceira',
             comissao: 'Valor da Comissão',
             percentualComissao: 'Variável da Comissão',
-            valorBrutoReceber: 'Valor Bruto a Receber'
+            valorBrutoReceber: 'Valor Bruto a Receber',
+            valorVenda: 'Valor da Venda' // Nova coluna
         };
 
         const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
@@ -1138,11 +1139,15 @@ function filtrarRelatorio() {
     const dataInicial = document.getElementById('dataInicial').value;
     const dataFinal = document.getElementById('dataFinal').value;
     const vendedorId = document.getElementById('filtroVendedor').value;
+    const valorVenda = document.getElementById('filtroValorVenda').value;
     const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
 
     // Converter datas para o formato Date
     const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
     const dataFinalObj = dataFinal ? new Date(dataFinal.split('/').reverse().join('-')) : null;
+
+    // Converter valor da venda para número
+    const valorVendaNum = valorVenda ? parseFloat(valorVenda.replace(/[^0-9,]/g, '').replace(',', '.')) : null;
 
     // Filtrar vendas
     const vendasFiltradas = dados.vendas.filter(venda => {
@@ -1155,7 +1160,10 @@ function filtrarRelatorio() {
         // Filtro por vendedor
         const filtroVendedor = !vendedorId || venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
 
-        return filtroData && filtroVendedor;
+        // Filtro por valor da venda
+        const filtroValorVenda = !valorVendaNum || venda.valorVenda >= valorVendaNum;
+
+        return filtroData && filtroVendedor && filtroValorVenda;
     });
 
     // Gerar colunas da tabela
@@ -1168,7 +1176,8 @@ function filtrarRelatorio() {
         empresaParceira: 'Empresa Parceira',
         comissao: 'Valor da Comissão',
         percentualComissao: 'Variável da Comissão',
-        valorBrutoReceber: 'Valor Bruto a Receber'
+        valorBrutoReceber: 'Valor Bruto a Receber',
+        valorVenda: 'Valor da Venda' // Nova coluna
     };
 
     const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
@@ -1192,6 +1201,7 @@ function filtrarRelatorio() {
 
     let totalComissao = 0;
     let totalValorBruto = 0;
+    let totalValorVenda = 0; // Variável para armazenar o total das vendas
 
     vendasFiltradas.forEach(venda => {
         const row = document.createElement('tr');
@@ -1239,6 +1249,10 @@ function filtrarRelatorio() {
                     valor = venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                     totalValorBruto += venda.valorReceber;
                     break;
+                case 'valorVenda':
+                    valor = venda.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    totalValorVenda += venda.valorVenda; // Acumular o valor total das vendas
+                    break;
                 default:
                     valor = '-';
             }
@@ -1252,9 +1266,10 @@ function filtrarRelatorio() {
     const tfoot = document.querySelector('#tabelaRelatorio tfoot');
     tfoot.innerHTML = `
         <tr>
-            <td colspan="${colunasSelecionadas.length - 2}" style="text-align: right;"><strong>Totais:</strong></td>
+            <td colspan="${colunasSelecionadas.length - 3}" style="text-align: right;"><strong>Totais:</strong></td>
             <td><strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
             <td><strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
+            <td><strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
         </tr>
     `;
 }
