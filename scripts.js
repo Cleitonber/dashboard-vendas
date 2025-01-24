@@ -54,14 +54,18 @@ document.addEventListener('DOMContentLoaded', function () {
 // Função para inicializar a funcionalidade de arrastar e soltar
 function inicializarSortable() {
     const tabelaVendas = document.getElementById('tabelaVendas');
-    new Sortable(tabelaVendas.querySelector('thead tr'), {
+    const thead = tabelaVendas.querySelector('thead tr');
+    const tbody = tabelaVendas.querySelector('tbody');
+
+    // Tornar as colunas do cabeçalho arrastáveis
+    new Sortable(thead, {
         animation: 150,
         ghostClass: 'sortable-ghost',
         onEnd: function (evt) {
-            const ths = Array.from(tabelaVendas.querySelectorAll('th'));
-            const tbody = tabelaVendas.querySelector('tbody');
+            const ths = Array.from(thead.querySelectorAll('th'));
             const rows = Array.from(tbody.querySelectorAll('tr'));
 
+            // Reorganizar as células das linhas de acordo com a nova ordem das colunas
             rows.forEach(row => {
                 const cells = Array.from(row.querySelectorAll('td'));
                 const newCells = ths.map(th => cells[ths.indexOf(th)]);
