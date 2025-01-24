@@ -270,111 +270,118 @@ function inicializarGraficos() {
     const ctxDesempenhoVendedores = document.getElementById('desempenhoVendedoresChart').getContext('2d');
     const ctxVendasCategoria = document.getElementById('vendasCategoriaChart').getContext('2d');
 
-    // Verifica se os gráficos já foram inicializados
-    if (!vendasServicoChart) {
-        vendasServicoChart = new Chart(ctxVendasServico, {
-            type: 'bar',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Vendas',
-                    data: [],
-                    backgroundColor: 'rgba(79, 70, 229, 0.6)',
-                    borderColor: 'rgba(79, 70, 229, 1)',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    tooltip: {
-                        enabled: true,
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    legend: {
-                        display: true,
-                        position: 'bottom',
-                    }
-                },
-                animation: {
-                    duration: 1000,
-                    easing: 'easeInOutQuad'
-                }
-            }
-        });
+    // Destruir gráficos existentes, se houver
+    if (vendasServicoChart) {
+        vendasServicoChart.destroy();
+    }
+    if (desempenhoVendedoresChart) {
+        desempenhoVendedoresChart.destroy();
+    }
+    if (vendasCategoriaChart) {
+        vendasCategoriaChart.destroy();
     }
 
-    if (!desempenhoVendedoresChart) {
-        desempenhoVendedoresChart = new Chart(ctxDesempenhoVendedores, {
-            type: 'line',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Vendas',
-                    data: [],
-                    borderColor: 'rgba(239, 68, 68, 1)',
-                    borderWidth: 2,
-                    fill: false
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    tooltip: {
-                        enabled: true,
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    legend: {
-                        display: true,
-                        position: 'bottom',
-                    }
+    // Inicializar gráfico de Vendas por Serviço
+    vendasServicoChart = new Chart(ctxVendasServico, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Vendas',
+                data: [],
+                backgroundColor: 'rgba(79, 70, 229, 0.6)',
+                borderColor: 'rgba(79, 70, 229, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
                 },
-                animation: {
-                    duration: 1000,
-                    easing: 'easeInOutQuad'
+                legend: {
+                    display: true,
+                    position: 'bottom',
                 }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuad'
             }
-        });
-    }
+        }
+    });
 
-    if (!vendasCategoriaChart) {
-        vendasCategoriaChart = new Chart(ctxVendasCategoria, {
-            type: 'pie',
-            data: {
-                labels: [],
-                datasets: [{
-                    label: 'Vendas',
-                    data: [],
-                    backgroundColor: [
-                        'rgba(79, 70, 229, 0.6)',
-                        'rgba(239, 68, 68, 0.6)',
-                        'rgba(34, 197, 94, 0.6)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    tooltip: {
-                        enabled: true,
-                        mode: 'index',
-                        intersect: false,
-                    },
-                    legend: {
-                        display: true,
-                        position: 'bottom',
-                    }
+    // Inicializar gráfico de Desempenho dos Vendedores
+    desempenhoVendedoresChart = new Chart(ctxDesempenhoVendedores, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Vendas',
+                data: [],
+                borderColor: 'rgba(239, 68, 68, 1)',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
                 },
-                animation: {
-                    duration: 1000,
-                    easing: 'easeInOutQuad'
+                legend: {
+                    display: true,
+                    position: 'bottom',
                 }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuad'
             }
-        });
-    }
+        }
+    });
+
+    // Inicializar gráfico de Vendas por Categoria
+    vendasCategoriaChart = new Chart(ctxVendasCategoria, {
+        type: 'pie',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Vendas',
+                data: [],
+                backgroundColor: [
+                    'rgba(79, 70, 229, 0.6)',
+                    'rgba(239, 68, 68, 0.6)',
+                    'rgba(34, 197, 94, 0.6)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            }
+        }
+    });
 
     atualizarDashboard(); // Atualiza os gráficos com os dados iniciais
 }
