@@ -221,12 +221,12 @@ function atualizarDashboard() {
 
     // Atualizar estatísticas
     const totalVendas = vendasFiltradas.reduce((total, venda) => total + venda.valorVenda, 0);
-    const totalComissoes = vendasFiltradas.reduce((total, venda) => total + venda.comissao, 0);
+    const totalValorReceber = vendasFiltradas.reduce((total, venda) => total + venda.valorReceber, 0); // Soma dos valores a receber
     const totalClientes = [...new Set(vendasFiltradas.map(venda => venda.nomeCliente))].length;
     const ticketMedio = vendasFiltradas.length > 0 ? totalVendas / vendasFiltradas.length : 0;
 
     document.getElementById('totalVendasDash').textContent = totalVendas.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    document.getElementById('totalComissoesDash').textContent = totalComissoes.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    document.getElementById('totalComissoesDash').textContent = totalValorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); // Exibe a soma dos valores a receber
     document.getElementById('totalClientes').textContent = totalClientes;
     document.getElementById('ticketMedio').textContent = ticketMedio.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 }
@@ -1223,7 +1223,7 @@ function filtrarRelatorio() {
                         valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                         totalComissao += venda.comissao;
                     } else {
-                        const comissao = (venda.valorReceber * venda.comissao) / 100;
+                        const comissao = (venda.valorReceber * venda.comissao) / 100; // Cálculo da comissão em porcentagem
                         valor = comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                         totalComissao += comissao;
                     }
