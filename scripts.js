@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function () {
     atualizarFiltrosVendas();
     inicializarSortable(); // Inicializa a funcionalidade de arrastar e soltar
     preencherFiltrosVendas(); // Preenche os filtros de vendedores, serviços e empresas
+    inicializarSortableRelatorio(); // Inicializa a funcionalidade de arrastar e soltar na tabela de relatórios
 
     // Adicionar eventos de clique aos cabeçalhos da tabela para ordenação
     const ths = document.querySelectorAll('#tabelaVendas th');
@@ -56,6 +57,32 @@ function inicializarSortable() {
     const tabelaVendas = document.getElementById('tabelaVendas');
     const thead = tabelaVendas.querySelector('thead tr');
     const tbody = tabelaVendas.querySelector('tbody');
+
+    // Tornar as colunas do cabeçalho arrastáveis
+    new Sortable(thead, {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: function (evt) {
+            const ths = Array.from(thead.querySelectorAll('th'));
+            const rows = Array.from(tbody.querySelectorAll('tr'));
+
+            // Reorganizar as células das linhas de acordo com a nova ordem das colunas
+            rows.forEach(row => {
+                const cells = Array.from(row.querySelectorAll('td'));
+                const newCells = ths.map(th => cells[ths.indexOf(th)]);
+                newCells.forEach((cell, index) => {
+                    row.appendChild(cell);
+                });
+            });
+        }
+    });
+}
+
+// Função para inicializar a funcionalidade de arrastar e soltar na tabela de relatórios
+function inicializarSortableRelatorio() {
+    const tabelaRelatorio = document.getElementById('tabelaRelatorio');
+    const thead = tabelaRelatorio.querySelector('thead tr');
+    const tbody = tabelaRelatorio.querySelector('tbody');
 
     // Tornar as colunas do cabeçalho arrastáveis
     new Sortable(thead, {
@@ -1029,6 +1056,7 @@ function exportarRelatorioExcel() {
         const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
         const colunas = {
             data: 'Data da Venda',
+            id: 'ID da Venda', // Nova coluna
             vendedor: 'Nome do Vendedor',
             servico: 'Serviço Vendido',
             tipoComissao: 'Tipo de Comissão',
@@ -1037,7 +1065,7 @@ function exportarRelatorioExcel() {
             comissao: 'Valor da Comissão',
             percentualComissao: 'Variável da Comissão',
             valorBrutoReceber: 'Valor Bruto a Receber',
-            valorVenda: 'Valor da Venda' // Nova coluna
+            valorVenda: 'Valor da Venda'
         };
 
         const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
@@ -1050,6 +1078,17 @@ function exportarRelatorioExcel() {
             });
             data.push(rowData);
         });
+
+        // Adicionar o total das comissões
+        const totalComissao = dados.vendas.reduce((total, venda) => {
+            if (venda.tipoComissao === 'fixa') {
+                return total + venda.comissao;
+            } else {
+                return total + (venda.valorReceber * venda.comissao) / 100;
+            }
+        }, 0);
+
+        data.push({ 'Valor da Comissão': `Total: ${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}` });
 
         const ws = XLSX.utils.json_to_sheet(data);
         const wb = XLSX.utils.book_new();
@@ -1067,6 +1106,17 @@ function exportarRelatorioPDF() {
     const rows = Array.from(tabela.querySelectorAll('tbody tr')).map(tr =>
         Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
     );
+
+    // Adicionar o total das comissões
+    const totalComissao = dados.vendas.reduce((total, venda) => {
+        if (venda.tipoComissao === 'fixa') {
+            return total + venda.comissao;
+        } else {
+            return total + (venda.valorReceber * venda.comissao) / 100;
+        }
+    }, 0);
+
+    rows.push(['Total Comissões:', '', '', '', '', '', '', totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })]);
 
     doc.autoTable({
         head: [headers],
@@ -1183,6 +1233,7 @@ function filtrarRelatorio() {
     // Gerar colunas da tabela
     const colunas = {
         data: 'Data da Venda',
+        id: 'ID da Venda', // Nova coluna
         vendedor: 'Nome do Vendedor',
         servico: 'Serviço Vendido',
         tipoComissao: 'Tipo de Comissão',
@@ -1191,7 +1242,7 @@ function filtrarRelatorio() {
         comissao: 'Valor da Comissão',
         percentualComissao: 'Variável da Comissão',
         valorBrutoReceber: 'Valor Bruto a Receber',
-        valorVenda: 'Valor da Venda' // Nova coluna
+        valorVenda: 'Valor da Venda'
     };
 
     const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
@@ -1226,6 +1277,9 @@ function filtrarRelatorio() {
             switch (coluna) {
                 case 'data':
                     valor = venda.data;
+                    break;
+                case 'id':
+                    valor = venda.id; // ID da venda
                     break;
                 case 'vendedor':
                     valor = venda.vendedor;
@@ -1338,6 +1392,7 @@ function listarVendas(vendas = dados.vendas) {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${venda.data}</td>
+            <td>${venda.id}</td> <!-- ID da venda -->
             <td>${venda.vendedor}</td>
             <td>${venda.servico}</td>
             <td>${venda.nomeCliente}</td>
