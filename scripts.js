@@ -54,19 +54,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Função para inicializar a funcionalidade de arrastar e soltar
 function inicializarSortable() {
+    // Verifica se a tabela existe
     const tabelaVendas = document.getElementById('tabelaVendas');
-    const thead = tabelaVendas.querySelector('thead tr');
-    const tbody = tabelaVendas.querySelector('tbody');
+    if (!tabelaVendas) {
+        console.error('A tabela com o ID "tabelaVendas" não foi encontrada no DOM.');
+        return;
+    }
 
-    // Tornar as colunas do cabeçalho arrastáveis
-    new Sortable(thead, {
+    // Verifica se o <thead> existe
+    const thead = tabelaVendas.querySelector('thead');
+    if (!thead) {
+        console.error('O elemento <thead> não foi encontrado na tabela.');
+        return;
+    }
+
+    // Verifica se a <tr> dentro do <thead> existe
+    const tr = thead.querySelector('tr');
+    if (!tr) {
+        console.error('O elemento <tr> dentro do <thead> não foi encontrado.');
+        return;
+    }
+
+    // Se tudo estiver correto, inicialize o Sortable
+    new Sortable(tr, {
         animation: 150,
         ghostClass: 'sortable-ghost',
         onEnd: function (evt) {
-            const ths = Array.from(thead.querySelectorAll('th'));
-            const rows = Array.from(tbody.querySelectorAll('tr'));
+            const ths = Array.from(tr.querySelectorAll('th'));
+            const rows = Array.from(tabelaVendas.querySelectorAll('tbody tr'));
 
-            // Reorganizar as células das linhas de acordo com a nova ordem das colunas
+            // Reorganiza as células das linhas de acordo com a nova ordem das colunas
             rows.forEach(row => {
                 const cells = Array.from(row.querySelectorAll('td'));
                 const newCells = ths.map(th => cells[ths.indexOf(th)]);
