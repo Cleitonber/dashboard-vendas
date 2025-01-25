@@ -1551,14 +1551,21 @@ function excluirVenda(id) {
 
 // Função para alternar a exibição das listas
 function toggleList(listId) {
+    // Remove 'List' do listId para obter o nome correto do arrow
+    const listName = listId.replace('List', '');
     const container = document.getElementById(`${listId}Container`);
-    const arrow = document.getElementById(`arrow${listId.replace('List', '')}`);
-    if (container.style.display === "none") {
-        container.style.display = "block";
-        arrow.textContent = "▲";
+    const arrow = document.getElementById(`arrow${listName}`);
+    
+    if (container && arrow) {
+        if (container.style.display === "none") {
+            container.style.display = "block";
+            arrow.textContent = "▲";
+        } else {
+            container.style.display = "none";
+            arrow.textContent = "▼";
+        }
     } else {
-        container.style.display = "none";
-        arrow.textContent = "▼";
+        console.error(`Elemento não encontrado: ${listId}Container ou arrow${listName}`);
     }
 }
 
