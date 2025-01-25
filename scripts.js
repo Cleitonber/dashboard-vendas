@@ -27,6 +27,27 @@ function showTab(tabId) {
     document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
 }
 
+// Função para alternar a exibição das listas
+function toggleList(listId) {
+    const listName = listId.replace('List', ''); // Remove 'List' para obter 'vendedores'
+    const container = document.getElementById(`${listId}Container`); // vendedoresListContainer
+    const arrow = document.getElementById(`arrow${listName}`); // arrowvendedores
+
+    console.log(`Container: ${container}, Arrow: ${arrow}`); // Verifique no console
+
+    if (container && arrow) {
+        if (container.style.display === "none" || container.style.display === "") {
+            container.style.display = "block";
+            arrow.textContent = "▲";
+        } else {
+            container.style.display = "none";
+            arrow.textContent = "▼";
+        }
+    } else {
+        console.error(`Elemento não encontrado: ${listId}Container ou arrow${listName}`);
+    }
+}
+
 // Função para preencher o filtro de colunas na ordem correta
 function preencherFiltroColunas() {
     const filtroColunas = document.getElementById('filtroColunas');
