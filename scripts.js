@@ -45,19 +45,14 @@ document.addEventListener('DOMContentLoaded', function () {
         th.addEventListener('click', () => ordenarTabelaVendas(index));
     });
 
-    // Definir o valor padrão de 10 para os campos de paginação
-    document.getElementById('itensPorPaginaServicos').value = 10;
-    document.getElementById('itensPorPaginaEmpresas').value = 10;
-    document.getElementById('itensPorPaginaVendas').value = 10;
-
-    // Verificar se o elemento filtroVendedor existe antes de adicionar o evento
+    // Verificar se o elemento filtroVendedor e botaoFiltrar existem antes de adicionar o evento
     const filtroVendedor = document.getElementById('filtroVendedor');
     const botaoFiltrar = document.getElementById('botaoFiltrar');
 
     if (filtroVendedor && botaoFiltrar) {
         botaoFiltrar.addEventListener('click', filtrarRelatorio);
     } else {
-        console.error('Elementos necessários não encontrados no DOM.');
+        console.error('Elementos necessários (filtroVendedor ou botaoFiltrar) não encontrados no DOM.');
     }
 });
 
@@ -246,9 +241,6 @@ function filtrarRelatorio() {
     // Inicializar o Sortable após preencher a tabela
     inicializarSortableRelatorio();
 }
-
-// Restante do código (todas as outras funções permanecem inalteradas)
-// ...
 
 // Função para inicializar a funcionalidade de arrastar e soltar
 function inicializarSortable() {
