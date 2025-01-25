@@ -180,12 +180,43 @@ function ordenarTabela(coluna, tabelaId) {
     rows.forEach(row => tbody.appendChild(row));
 }
 
+// Função para atualizar o tipo de comissão com base no serviço selecionado
+function atualizarTipoComissao() {
+    const servicoId = document.getElementById('servicoVenda').value;
+    const servico = dados.servicos.find(s => s.id == servicoId);
+
+    if (servico) {
+        const tipoComissaoInfo = document.getElementById('tipoComissaoInfo');
+        const comissaoInput = document.getElementById('comissao');
+
+        if (servico.tipoComissao === 'fixa') {
+            tipoComissaoInfo.textContent = 'Comissão Fixa (R$)';
+            comissaoInput.placeholder = 'Digite o valor da comissão em reais';
+        } else if (servico.tipoComissao === 'porcentagem') {
+            tipoComissaoInfo.textContent = 'Comissão em Porcentagem (%)';
+            comissaoInput.placeholder = 'Digite o percentual da comissão';
+        }
+    }
+}
+
+// Função para atualizar as opções de serviços
+function atualizarOpcoesServicos() {
+    const selectServico = document.getElementById('servicoVenda');
+    selectServico.innerHTML = '<option value="">Selecione um serviço</option>';
+    dados.servicos.forEach(servico => {
+        const option = document.createElement('option');
+        option.value = servico.id;
+        option.textContent = servico.nome;
+        selectServico.appendChild(option);
+    });
+}
+
 // Inicializa a aba "Dashboard" como ativa ao carregar a página
 document.addEventListener('DOMContentLoaded', function () {
     showTab('dashboard');
     preencherAnos();
     atualizarOpcoesVendedores();
-    atualizarOpcoesServicos();
+    atualizarOpcoesServicos(); // Atualiza as opções de serviços
     atualizarOpcoesEmpresas();
     inicializarGraficos();
     atualizarFiltrosVendas();
