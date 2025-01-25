@@ -404,7 +404,7 @@
                                 <!-- As opções serão preenchidas dinamicamente via JavaScript -->
                             </select>
                         </div>
-                                               <div class="form-group">
+                        <div class="form-group">
                             <label class="form-label">Colunas</label>
                             <small class="form-text">(Pressione Ctrl para selecionar mais de um item)</small>
                             <select id="filtroColunas" class="form-select" multiple>
@@ -421,11 +421,23 @@
                                 <option value="valorVenda" selected>Valor da Venda</option>
                             </select>
                         </div>
-                        <button class="btn btn-primary" onclick="filtrarRelatorio()">Gerar</button>
+                        <button id="botaoFiltrar" class="btn btn-primary">Gerar</button>
                     </div>
                     <table id="tabelaRelatorio">
                         <thead>
-                            <!-- As colunas serão preenchidas dinamicamente via JavaScript -->
+                            <tr>
+                                <th>Data da Venda</th>
+                                <th>ID da Venda</th>
+                                <th>Nome do Vendedor</th>
+                                <th>Serviço Vendido</th>
+                                <th>Tipo de Comissão</th>
+                                <th>Nome do Cliente</th>
+                                <th>Empresa Parceira</th>
+                                <th>Valor da Venda</th>
+                                <th>Valor Bruto a Receber</th>
+                                <th>Valor da Comissão</th>
+                                <th>Variável da Comissão</th>
+                            </tr>
                         </thead>
                         <tbody>
                             <!-- As linhas da tabela serão preenchidas dinamicamente via JavaScript -->
