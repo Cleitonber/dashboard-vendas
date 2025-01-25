@@ -199,6 +199,14 @@ function atualizarTipoComissao() {
     }
 }
 
+// Adicionar evento de change ao select de serviços
+document.addEventListener('DOMContentLoaded', function () {
+    const servicoVendaSelect = document.getElementById('servicoVenda');
+    if (servicoVendaSelect) {
+        servicoVendaSelect.addEventListener('change', atualizarTipoComissao);
+    }
+});
+
 // Função para atualizar as opções de serviços
 function atualizarOpcoesServicos() {
     const selectServico = document.getElementById('servicoVenda');
