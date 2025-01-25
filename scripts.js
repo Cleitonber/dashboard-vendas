@@ -240,15 +240,15 @@ function preencherAnos() {
 
     // Obter o ano atual
     const anoAtual = new Date().getFullYear();
-    
+
     // Extrair anos únicos das vendas
     let anosUnicos = [...new Set(dados.vendas.map(venda => new Date(venda.data.split('/').reverse().join('-')).getFullYear()))];
-    
+
     // Adicionar o ano atual se não existir
     if (!anosUnicos.includes(anoAtual)) {
         anosUnicos.push(anoAtual);
     }
-    
+
     anosUnicos.sort((a, b) => b - a); // Ordenar do ano mais recente para o mais antigo
 
     // Adicionar opções ao seletor
@@ -1087,16 +1087,16 @@ function exportarRelatorioExcel() {
         const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
         const colunas = {
             data: 'Data da Venda',
-            id: 'ID da Venda', // Nova coluna
+            id: 'ID da Venda',
             vendedor: 'Nome do Vendedor',
             servico: 'Serviço Vendido',
             tipoComissao: 'Tipo de Comissão',
             nomeCliente: 'Nome do Cliente',
             empresaParceira: 'Empresa Parceira',
-            comissao: 'Valor da Comissão',
-            percentualComissao: 'Variável da Comissão',
+            valorVenda: 'Valor da Venda',
             valorBrutoReceber: 'Valor Bruto a Receber',
-            valorVenda: 'Valor da Venda'
+            comissao: 'Valor da Comissão',
+            percentualComissao: 'Variável da Comissão'
         };
 
         const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
@@ -1110,7 +1110,7 @@ function exportarRelatorioExcel() {
             data.push(rowData);
         });
 
-        // Adicionar o total das comissões
+        // Adicionar o total das comissões, valor bruto e valor da venda
         const totalComissao = dados.vendas.reduce((total, venda) => {
             if (venda.tipoComissao === 'fixa') {
                 return total + venda.comissao;
@@ -1119,7 +1119,14 @@ function exportarRelatorioExcel() {
             }
         }, 0);
 
-        data.push({ 'Valor da Comissão': `Total: ${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}` });
+        const totalValorBruto = dados.vendas.reduce((total, venda) => total + venda.valorReceber, 0);
+        const totalValorVenda = dados.vendas.reduce((total, venda) => total + venda.valorVenda, 0);
+
+        data.push({
+            'Valor da Venda': `Total: ${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`,
+            'Valor Bruto a Receber': `Total: ${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`,
+            'Valor da Comissão': `Total: ${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`
+        });
 
         const ws = XLSX.utils.json_to_sheet(data);
         const wb = XLSX.utils.book_new();
@@ -1138,7 +1145,7 @@ function exportarRelatorioPDF() {
         Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
     );
 
-    // Adicionar o total das comissões
+    // Adicionar o total das comissões, valor bruto e valor da venda
     const totalComissao = dados.vendas.reduce((total, venda) => {
         if (venda.tipoComissao === 'fixa') {
             return total + venda.comissao;
@@ -1147,7 +1154,10 @@ function exportarRelatorioPDF() {
         }
     }, 0);
 
-    rows.push(['Total Comissões:', '', '', '', '', '', '', totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })]);
+    const totalValorBruto = dados.vendas.reduce((total, venda) => total + venda.valorReceber, 0);
+    const totalValorVenda = dados.vendas.reduce((total, venda) => total + venda.valorVenda, 0);
+
+    rows.push(['Totais:', '', '', '', '', '', '', totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })]);
 
     doc.autoTable({
         head: [headers],
@@ -1234,15 +1244,11 @@ function filtrarRelatorio() {
     const dataInicial = document.getElementById('dataInicial').value;
     const dataFinal = document.getElementById('dataFinal').value;
     const vendedorId = document.getElementById('filtroVendedor').value;
-    const valorVenda = document.getElementById('filtroValorVenda').value;
     const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
 
     // Converter datas para o formato Date
     const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
     const dataFinalObj = dataFinal ? new Date(dataFinal.split('/').reverse().join('-')) : null;
-
-    // Converter valor da venda para número
-    const valorVendaNum = valorVenda ? parseFloat(valorVenda.replace(/[^0-9,]/g, '').replace(',', '.')) : null;
 
     // Filtrar vendas
     const vendasFiltradas = dados.vendas.filter(venda => {
@@ -1255,25 +1261,22 @@ function filtrarRelatorio() {
         // Filtro por vendedor
         const filtroVendedor = !vendedorId || venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
 
-        // Filtro por valor da venda
-        const filtroValorVenda = !valorVendaNum || venda.valorVenda >= valorVendaNum;
-
-        return filtroData && filtroVendedor && filtroValorVenda;
+        return filtroData && filtroVendedor;
     });
 
     // Gerar colunas da tabela
     const colunas = {
         data: 'Data da Venda',
-        id: 'ID da Venda', // Nova coluna
+        id: 'ID da Venda',
         vendedor: 'Nome do Vendedor',
         servico: 'Serviço Vendido',
         tipoComissao: 'Tipo de Comissão',
         nomeCliente: 'Nome do Cliente',
         empresaParceira: 'Empresa Parceira',
-        comissao: 'Valor da Comissão',
-        percentualComissao: 'Variável da Comissão',
+        valorVenda: 'Valor da Venda',
         valorBrutoReceber: 'Valor Bruto a Receber',
-        valorVenda: 'Valor da Venda'
+        comissao: 'Valor da Comissão',
+        percentualComissao: 'Variável da Comissão'
     };
 
     const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
@@ -1297,7 +1300,7 @@ function filtrarRelatorio() {
 
     let totalComissao = 0;
     let totalValorBruto = 0;
-    let totalValorVenda = 0; // Variável para armazenar o total das vendas
+    let totalValorVenda = 0;
 
     vendasFiltradas.forEach(venda => {
         const row = document.createElement('tr');
@@ -1310,7 +1313,7 @@ function filtrarRelatorio() {
                     valor = venda.data;
                     break;
                 case 'id':
-                    valor = venda.id; // ID da venda
+                    valor = venda.id;
                     break;
                 case 'vendedor':
                     valor = venda.vendedor;
@@ -1327,12 +1330,20 @@ function filtrarRelatorio() {
                 case 'empresaParceira':
                     valor = venda.empresaParceira;
                     break;
+                case 'valorVenda':
+                    valor = venda.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    totalValorVenda += venda.valorVenda;
+                    break;
+                case 'valorBrutoReceber':
+                    valor = venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                    totalValorBruto += venda.valorReceber;
+                    break;
                 case 'comissao':
                     if (venda.tipoComissao === 'fixa') {
                         valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                         totalComissao += venda.comissao;
                     } else {
-                        const comissao = (venda.valorReceber * venda.comissao) / 100; // Cálculo da comissão em porcentagem
+                        const comissao = (venda.valorReceber * venda.comissao) / 100;
                         valor = comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                         totalComissao += comissao;
                     }
@@ -1343,14 +1354,6 @@ function filtrarRelatorio() {
                     } else {
                         valor = `${venda.comissao}%`;
                     }
-                    break;
-                case 'valorBrutoReceber':
-                    valor = venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                    totalValorBruto += venda.valorReceber;
-                    break;
-                case 'valorVenda':
-                    valor = venda.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                    totalValorVenda += venda.valorVenda; // Acumular o valor total das vendas
                     break;
                 default:
                     valor = '-';
@@ -1366,9 +1369,9 @@ function filtrarRelatorio() {
     tfoot.innerHTML = `
         <tr>
             <td colspan="${colunasSelecionadas.length - 3}" style="text-align: right;"><strong>Totais:</strong></td>
-            <td><strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
-            <td><strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
             <td><strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
+            <td><strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
+            <td><strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
         </tr>
     `;
 }
@@ -1423,7 +1426,7 @@ function listarVendas(vendas = dados.vendas) {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${venda.data}</td>
-            <td>${venda.id}</td> <!-- ID da venda -->
+            <td>${venda.id}</td>
             <td>${venda.vendedor}</td>
             <td>${venda.servico}</td>
             <td>${venda.nomeCliente}</td>
