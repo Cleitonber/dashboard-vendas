@@ -38,7 +38,6 @@ document.addEventListener('DOMContentLoaded', function () {
     atualizarFiltrosVendas();
     inicializarSortable(); // Inicializa a funcionalidade de arrastar e soltar
     preencherFiltrosVendas(); // Preenche os filtros de vendedores, serviços e empresas
-    inicializarSortableRelatorio(); // Inicializa a funcionalidade de arrastar e soltar na tabela de relatórios
 
     // Adicionar eventos de clique aos cabeçalhos da tabela para ordenação
     const ths = document.querySelectorAll('#tabelaVendas th');
@@ -61,6 +60,46 @@ document.addEventListener('DOMContentLoaded', function () {
         console.error('Elementos necessários não encontrados no DOM.');
     }
 });
+
+// Função para inicializar a funcionalidade de arrastar e soltar na tabela de relatórios
+function inicializarSortableRelatorio() {
+    const tabelaRelatorio = document.getElementById('tabelaRelatorio');
+    if (!tabelaRelatorio) {
+        console.error('A tabela com o ID "tabelaRelatorio" não foi encontrada no DOM.');
+        return;
+    }
+
+    const thead = tabelaRelatorio.querySelector('thead');
+    if (!thead) {
+        console.error('O elemento <thead> não foi encontrado na tabela.');
+        return;
+    }
+
+    const tr = thead.querySelector('tr');
+    if (!tr) {
+        console.error('O elemento <tr> dentro do <thead> não foi encontrado.');
+        return;
+    }
+
+    // Inicializar o Sortable apenas se todos os elementos existirem
+    new Sortable(tr, {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: function (evt) {
+            const ths = Array.from(tr.querySelectorAll('th'));
+            const rows = Array.from(tabelaRelatorio.querySelectorAll('tbody tr'));
+
+            // Reorganizar as células das linhas de acordo com a nova ordem das colunas
+            rows.forEach(row => {
+                const cells = Array.from(row.querySelectorAll('td'));
+                const newCells = ths.map(th => cells[ths.indexOf(th)]);
+                newCells.forEach((cell, index) => {
+                    row.appendChild(cell);
+                });
+            });
+        }
+    });
+}
 
 // Função para filtrar e gerar o relatório
 function filtrarRelatorio() {
@@ -203,6 +242,9 @@ function filtrarRelatorio() {
             <td><strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
         </tr>
     `;
+
+    // Inicializar o Sortable após preencher a tabela
+    inicializarSortableRelatorio();
 }
 
 // Restante do código (todas as outras funções permanecem inalteradas)
@@ -240,46 +282,6 @@ function inicializarSortable() {
             const rows = Array.from(tabelaVendas.querySelectorAll('tbody tr'));
 
             // Reorganiza as células das linhas de acordo com a nova ordem das colunas
-            rows.forEach(row => {
-                const cells = Array.from(row.querySelectorAll('td'));
-                const newCells = ths.map(th => cells[ths.indexOf(th)]);
-                newCells.forEach((cell, index) => {
-                    row.appendChild(cell);
-                });
-            });
-        }
-    });
-}
-
-// Função para inicializar a funcionalidade de arrastar e soltar na tabela de relatórios
-function inicializarSortableRelatorio() {
-    const tabelaRelatorio = document.getElementById('tabelaRelatorio');
-    if (!tabelaRelatorio) {
-        console.error('A tabela com o ID "tabelaRelatorio" não foi encontrada no DOM.');
-        return;
-    }
-
-    const thead = tabelaRelatorio.querySelector('thead tr');
-    if (!thead) {
-        console.error('O elemento <thead> ou <tr> dentro do <thead> não foi encontrado na tabela.');
-        return;
-    }
-
-    const tbody = tabelaRelatorio.querySelector('tbody');
-    if (!tbody) {
-        console.error('O elemento <tbody> não foi encontrado na tabela.');
-        return;
-    }
-
-    // Tornar as colunas do cabeçalho arrastáveis
-    new Sortable(thead, {
-        animation: 150,
-        ghostClass: 'sortable-ghost',
-        onEnd: function (evt) {
-            const ths = Array.from(thead.querySelectorAll('th'));
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-
-            // Reorganizar as células das linhas de acordo com a nova ordem das colunas
             rows.forEach(row => {
                 const cells = Array.from(row.querySelectorAll('td'));
                 const newCells = ths.map(th => cells[ths.indexOf(th)]);
