@@ -82,7 +82,8 @@ function inicializarSortableRelatorio() {
         ghostClass: 'sortable-ghost',
         onEnd: function (evt) {
             const ths = Array.from(tr.querySelectorAll('th'));
-            const rows = Array.from(tabelaRelatorio.querySelectorAll('tbody tr'));
+            const tbody = tabelaRelatorio.querySelector('tbody');
+            const rows = Array.from(tbody.querySelectorAll('tr'));
 
             // Reorganizar as células das linhas de acordo com a nova ordem das colunas
             rows.forEach(row => {
@@ -92,6 +93,16 @@ function inicializarSortableRelatorio() {
                     row.appendChild(cell);
                 });
             });
+
+            // Reorganizar o rodapé
+            const tfoot = tabelaRelatorio.querySelector('tfoot');
+            if (tfoot) {
+                const footerCells = Array.from(tfoot.querySelector('tr').querySelectorAll('td'));
+                const newFooterCells = ths.map(th => footerCells[ths.indexOf(th)]);
+                newFooterCells.forEach((cell, index) => {
+                    tfoot.querySelector('tr').appendChild(cell);
+                });
+            }
         }
     });
 }
@@ -127,32 +138,29 @@ function filtrarRelatorio() {
         return filtroData && filtroVendedor;
     });
 
-    // Gerar colunas da tabela
-    const colunas = {
-        data: 'Data da Venda',
-        id: 'ID da Venda',
-        vendedor: 'Nome do Vendedor',
-        servico: 'Serviço Vendido',
-        tipoComissao: 'Tipo de Comissão',
-        nomeCliente: 'Nome do Cliente',
-        empresaParceira: 'Empresa Parceira',
-        valorVenda: 'Valor da Venda',
-        valorBrutoReceber: 'Valor Bruto a Receber',
-        comissao: 'Valor da Comissão',
-        percentualComissao: 'Variável da Comissão'
-    };
-
-    const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
+    // Definir a ordem das colunas
+    const colunas = [
+        { id: 'data', label: 'Data da Venda' },
+        { id: 'id', label: 'ID da Venda' },
+        { id: 'vendedor', label: 'Nome do Vendedor' },
+        { id: 'servico', label: 'Serviço Atendido' },
+        { id: 'tipoComissao', label: 'Tipo de Comissão' },
+        { id: 'nomeCliente', label: 'Nome do Cliente' },
+        { id: 'empresaParceira', label: 'Empresa Parceira' },
+        { id: 'valorVenda', label: 'Valor da Venda' },
+        { id: 'valorBrutoReceber', label: 'Valor Bruto a Receber' },
+        { id: 'comissao', label: 'Valor da Comissão' },
+        { id: 'percentualComissao', label: 'Variável da Comissão' }
+    ];
 
     // Criar cabeçalho da tabela
     const thead = document.querySelector('#tabelaRelatorio thead');
     thead.innerHTML = '';
 
     const headerRow = document.createElement('tr');
-    headers.forEach((header, index) => {
+    colunas.forEach(coluna => {
         const th = document.createElement('th');
-        th.textContent = header;
-        th.onclick = () => ordenarTabela(index); // Adicionar função de ordenação
+        th.textContent = coluna.label;
         headerRow.appendChild(th);
     });
     thead.appendChild(headerRow);
@@ -161,17 +169,17 @@ function filtrarRelatorio() {
     const tbody = document.querySelector('#tabelaRelatorio tbody');
     tbody.innerHTML = '';
 
-    let totalComissao = 0;
-    let totalValorBruto = 0;
     let totalValorVenda = 0;
+    let totalValorBruto = 0;
+    let totalComissao = 0;
 
     vendasFiltradas.forEach(venda => {
         const row = document.createElement('tr');
-        colunasSelecionadas.forEach(coluna => {
+        colunas.forEach(coluna => {
             const cell = document.createElement('td');
             let valor = '';
 
-            switch (coluna) {
+            switch (coluna.id) {
                 case 'data':
                     valor = venda.data;
                     break;
@@ -227,19 +235,104 @@ function filtrarRelatorio() {
         tbody.appendChild(row);
     });
 
-    // Atualizar totais no rodapé
+    // Adicionar totais no rodapé
     const tfoot = document.querySelector('#tabelaRelatorio tfoot');
     tfoot.innerHTML = `
         <tr>
-            <td colspan="${colunasSelecionadas.length - 3}" style="text-align: right;"><strong>Totais:</strong></td>
+            <td colspan="7" style="text-align: right;"><strong>Totais:</strong></td>
             <td><strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
             <td><strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
             <td><strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
+            <td></td>
         </tr>
     `;
 
     // Inicializar o Sortable após preencher a tabela
     inicializarSortableRelatorio();
+}
+
+// Função para exportar relatório em Excel
+function exportarRelatorioExcel() {
+    const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
+    const colunas = [
+        { id: 'data', label: 'Data da Venda' },
+        { id: 'id', label: 'ID da Venda' },
+        { id: 'vendedor', label: 'Nome do Vendedor' },
+        { id: 'servico', label: 'Serviço Atendido' },
+        { id: 'tipoComissao', label: 'Tipo de Comissão' },
+        { id: 'nomeCliente', label: 'Nome do Cliente' },
+        { id: 'empresaParceira', label: 'Empresa Parceira' },
+        { id: 'valorVenda', label: 'Valor da Venda' },
+        { id: 'valorBrutoReceber', label: 'Valor Bruto a Receber' },
+        { id: 'comissao', label: 'Valor da Comissão' },
+        { id: 'percentualComissao', label: 'Variável da Comissão' }
+    ];
+
+    const headers = colunas.map(coluna => coluna.label);
+    const data = [];
+
+    document.querySelectorAll('#tabelaRelatorio tbody tr').forEach(row => {
+        const rowData = {};
+        row.querySelectorAll('td').forEach((cell, index) => {
+            rowData[headers[index]] = cell.textContent;
+        });
+        data.push(rowData);
+    });
+
+    // Adicionar o total das comissões, valor bruto e valor da venda
+    const totalValorVenda = dados.vendas.reduce((total, venda) => total + venda.valorVenda, 0);
+    const totalValorBruto = dados.vendas.reduce((total, venda) => total + venda.valorReceber, 0);
+    const totalComissao = dados.vendas.reduce((total, venda) => {
+        if (venda.tipoComissao === 'fixa') {
+            return total + venda.comissao;
+        } else {
+            return total + (venda.valorReceber * venda.comissao) / 100;
+        }
+    }, 0);
+
+    data.push({
+        'Valor da Venda': `Total: ${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`,
+        'Valor Bruto a Receber': `Total: ${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`,
+        'Valor da Comissão': `Total: ${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`
+    });
+
+    const ws = XLSX.utils.json_to_sheet(data);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Relatório de Vendas');
+    XLSX.writeFile(wb, 'relatorio_vendas.xlsx');
+}
+
+// Função para exportar relatório em PDF
+function exportarRelatorioPDF() {
+    const doc = new jsPDF();
+    const tabela = document.getElementById('tabelaRelatorio');
+    const headers = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent);
+    const rows = Array.from(tabela.querySelectorAll('tbody tr')).map(tr =>
+        Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
+    );
+
+    // Adicionar o total das comissões, valor bruto e valor da venda
+    const totalValorVenda = dados.vendas.reduce((total, venda) => total + venda.valorVenda, 0);
+    const totalValorBruto = dados.vendas.reduce((total, venda) => total + venda.valorReceber, 0);
+    const totalComissao = dados.vendas.reduce((total, venda) => {
+        if (venda.tipoComissao === 'fixa') {
+            return total + venda.comissao;
+        } else {
+            return total + (venda.valorReceber * venda.comissao) / 100;
+        }
+    }, 0);
+
+    rows.push(['Totais:', '', '', '', '', '', '', totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })]);
+
+    doc.autoTable({
+        head: [headers],
+        body: rows,
+        theme: 'grid',
+        styles: { fontSize: 10 },
+        headStyles: { fillColor: [79, 70, 229] }
+    });
+
+    doc.save('relatorio_vendas.pdf');
 }
 
 // Função para inicializar a funcionalidade de arrastar e soltar
@@ -1228,165 +1321,6 @@ function formatarMoeda(input) {
         currency: 'BRL'
     });
     input.value = valor;
-}
-
-// Função para exportar relatório em Excel
-function exportarRelatorioExcel() {
-    mostrarSpinner();
-    setTimeout(() => {
-        const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
-        const colunas = {
-            data: 'Data da Venda',
-            id: 'ID da Venda',
-            vendedor: 'Nome do Vendedor',
-            servico: 'Serviço Vendido',
-            tipoComissao: 'Tipo de Comissão',
-            nomeCliente: 'Nome do Cliente',
-            empresaParceira: 'Empresa Parceira',
-            valorVenda: 'Valor da Venda',
-            valorBrutoReceber: 'Valor Bruto a Receber',
-            comissao: 'Valor da Comissão',
-            percentualComissao: 'Variável da Comissão'
-        };
-
-        const headers = colunasSelecionadas.map(coluna => colunas[coluna]);
-        const data = [];
-
-        document.querySelectorAll('#tabelaRelatorio tbody tr').forEach(row => {
-            const rowData = {};
-            row.querySelectorAll('td').forEach((cell, index) => {
-                rowData[headers[index]] = cell.textContent;
-            });
-            data.push(rowData);
-        });
-
-        // Adicionar o total das comissões, valor bruto e valor da venda
-        const totalComissao = dados.vendas.reduce((total, venda) => {
-            if (venda.tipoComissao === 'fixa') {
-                return total + venda.comissao;
-            } else {
-                return total + (venda.valorReceber * venda.comissao) / 100;
-            }
-        }, 0);
-
-        const totalValorBruto = dados.vendas.reduce((total, venda) => total + venda.valorReceber, 0);
-        const totalValorVenda = dados.vendas.reduce((total, venda) => total + venda.valorVenda, 0);
-
-        data.push({
-            'Valor da Venda': `Total: ${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`,
-            'Valor Bruto a Receber': `Total: ${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`,
-            'Valor da Comissão': `Total: ${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`
-        });
-
-        const ws = XLSX.utils.json_to_sheet(data);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, 'Relatório de Vendas');
-        XLSX.writeFile(wb, 'relatorio_vendas.xlsx');
-        esconderSpinner();
-    }, 2000);
-}
-
-// Função para exportar relatório em PDF
-function exportarRelatorioPDF() {
-    const doc = new jsPDF();
-    const tabela = document.getElementById('tabelaRelatorio');
-    const headers = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent);
-    const rows = Array.from(tabela.querySelectorAll('tbody tr')).map(tr =>
-        Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
-    );
-
-    // Adicionar o total das comissões, valor bruto e valor da venda
-    const totalComissao = dados.vendas.reduce((total, venda) => {
-        if (venda.tipoComissao === 'fixa') {
-            return total + venda.comissao;
-        } else {
-            return total + (venda.valorReceber * venda.comissao) / 100;
-        }
-    }, 0);
-
-    const totalValorBruto = dados.vendas.reduce((total, venda) => total + venda.valorReceber, 0);
-    const totalValorVenda = dados.vendas.reduce((total, venda) => total + venda.valorVenda, 0);
-
-    rows.push(['Totais:', '', '', '', '', '', '', totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })]);
-
-    doc.autoTable({
-        head: [headers],
-        body: rows,
-        theme: 'grid',
-        styles: { fontSize: 10 },
-        headStyles: { fillColor: [79, 70, 229] }
-    });
-
-    doc.save('relatorio_vendas.pdf');
-}
-
-// Função para atualizar o tipo de comissão ao selecionar um serviço
-function atualizarTipoComissao() {
-    const servicoId = document.getElementById('servicoVenda').value;
-    const servico = dados.servicos.find(s => s.id == servicoId);
-
-    if (servico) {
-        const tipoComissaoInfo = document.getElementById('tipoComissaoInfo');
-        tipoComissaoInfo.textContent = `Tipo de Comissão: ${servico.tipoComissao === 'fixa' ? 'Fixa' : 'Porcentagem'}`;
-    } else {
-        document.getElementById('tipoComissaoInfo').textContent = '';
-    }
-}
-
-// Função para salvar as cores no localStorage
-function salvarCores() {
-    const corPrimaria = document.getElementById('corPrimaria').value;
-    const corSecundaria = document.getElementById('corSecundaria').value;
-
-    localStorage.setItem('corPrimaria', corPrimaria);
-    localStorage.setItem('corSecundaria', corSecundaria);
-
-    alert('Cores salvas com sucesso!');
-}
-
-// Função para carregar as cores salvas ao iniciar o site
-document.addEventListener('DOMContentLoaded', function () {
-    // Carregar cores salvas do localStorage
-    const corPrimariaSalva = localStorage.getItem('corPrimaria');
-    const corSecundariaSalva = localStorage.getItem('corSecundaria');
-
-    if (corPrimariaSalva && corSecundariaSalva) {
-        document.getElementById('corPrimaria').value = corPrimariaSalva;
-        document.getElementById('corSecundaria').value = corSecundariaSalva;
-        atualizarTema(); // Aplicar as cores salvas
-    }
-
-    showTab('dashboard');
-    preencherAnos();
-    atualizarOpcoesVendedores();
-    atualizarOpcoesServicos();
-    atualizarOpcoesEmpresas();
-    inicializarGraficos();
-});
-
-// Função para atualizar o tema com base na cor selecionada
-function atualizarTema() {
-    const corPrimaria = document.getElementById('corPrimaria').value;
-    const corSecundaria = document.getElementById('corSecundaria').value;
-
-    // Aplicar a cor primária
-    document.documentElement.style.setProperty('--primary', corPrimaria);
-    document.documentElement.style.setProperty('--primary-light', `${corPrimaria}99`);
-    document.documentElement.style.setProperty('--primary-dark', `${corPrimaria}cc`);
-
-    // Aplicar a cor secundária como background da página
-    document.documentElement.style.setProperty('--secondary', corSecundaria);
-    document.body.style.backgroundColor = corSecundaria;
-}
-
-// Restaurar tema padrão
-function restaurarTemaPadrao() {
-    document.getElementById('corPrimaria').value = '#4f46e5';
-    document.getElementById('corSecundaria').value = '#ebebeb';
-    atualizarTema(); // Aplicar as cores padrão
-    localStorage.removeItem('corPrimaria'); // Remover cores salvas
-    localStorage.removeItem('corSecundaria');
-    alert('Cores padrão restauradas!');
 }
 
 // Função para mostrar o spinner de carregamento
