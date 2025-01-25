@@ -150,10 +150,10 @@
                             <button type="submit" class="btn btn-primary">Cadastrar Vendedor</button>
                         </form>
                         <div id="listaVendedores" class="mt-4">
-                            <h3 onclick="toggleList('vendedoresList')" style="cursor: pointer;">
+                            <h3 onclick="toggleList('vendedores')" style="cursor: pointer;">
                                 Vendedores Cadastrados <span id="arrowVendedores">▼</span>
                             </h3>
-                            <div id="vendedoresListContainer" style="display: none;">
+                            <div id="vendedoresContainer" style="display: none;">
                                 <div class="form-group">
                                     <label class="form-label">Itens por página:</label>
                                     <select id="itensPorPaginaVendedores" class="form-select" onchange="atualizarListaVendedores()">
@@ -195,10 +195,10 @@
                             <button type="submit" class="btn btn-primary">Cadastrar Serviço</button>
                         </form>
                         <div id="listaServicos" class="mt-4">
-                            <h3 onclick="toggleList('servicosList')" style="cursor: pointer;">
+                            <h3 onclick="toggleList('servicos')" style="cursor: pointer;">
                                 Serviços Cadastrados <span id="arrowServicos">▼</span>
                             </h3>
-                            <div id="servicosListContainer" style="display: none;">
+                            <div id="servicosContainer" style="display: none;">
                                 <div class="form-group">
                                     <label class="form-label">Itens por página:</label>
                                     <select id="itensPorPaginaServicos" class="form-select" onchange="atualizarListaServicos()">
@@ -229,10 +229,10 @@
                             <button type="submit" class="btn btn-primary">Cadastrar Empresa</button>
                         </form>
                         <div id="listaEmpresas" class="mt-4">
-                            <h3 onclick="toggleList('empresasList')" style="cursor: pointer;">
+                            <h3 onclick="toggleList('empresas')" style="cursor: pointer;">
                                 Empresas Parceiras Cadastradas <span id="arrowEmpresas">▼</span>
                             </h3>
-                            <div id="empresasListContainer" style="display: none;">
+                            <div id="empresasContainer" style="display: none;">
                                 <div class="form-group">
                                     <label class="form-label">Itens por página:</label>
                                     <select id="itensPorPaginaEmpresas" class="form-select" onchange="atualizarListaEmpresas()">
