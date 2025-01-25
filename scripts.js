@@ -56,36 +56,6 @@ function preencherFiltroColunas() {
     });
 }
 
-// Inicializa a aba "Dashboard" como ativa ao carregar a página
-document.addEventListener('DOMContentLoaded', function () {
-    showTab('dashboard');
-    preencherAnos();
-    atualizarOpcoesVendedores();
-    atualizarOpcoesServicos();
-    atualizarOpcoesEmpresas();
-    inicializarGraficos();
-    atualizarFiltrosVendas();
-    inicializarSortable(); // Inicializa a funcionalidade de arrastar e soltar
-    preencherFiltrosVendas(); // Preenche os filtros de vendedores, serviços e empresas
-    preencherFiltroColunas(); // Preenche o filtro de colunas na ordem correta
-
-    // Adicionar eventos de clique aos cabeçalhos da tabela para ordenação
-    const ths = document.querySelectorAll('#tabelaVendas th');
-    ths.forEach((th, index) => {
-        th.addEventListener('click', () => ordenarTabelaVendas(index));
-    });
-
-    // Verificar se o elemento filtroVendedor e botaoFiltrar existem antes de adicionar o evento
-    const filtroVendedor = document.getElementById('filtroVendedor');
-    const botaoFiltrar = document.getElementById('botaoFiltrar');
-
-    if (filtroVendedor && botaoFiltrar) {
-        botaoFiltrar.addEventListener('click', filtrarRelatorio);
-    } else {
-        console.error('Elementos necessários (filtroVendedor ou botaoFiltrar) não encontrados no DOM.');
-    }
-});
-
 // Função para inicializar a funcionalidade de arrastar e soltar na tabela de relatórios
 function inicializarSortableRelatorio() {
     const tabelaRelatorio = document.getElementById('tabelaRelatorio');
@@ -113,29 +83,107 @@ function inicializarSortableRelatorio() {
         onEnd: function (evt) {
             const ths = Array.from(tr.querySelectorAll('th'));
             const tbody = tabelaRelatorio.querySelector('tbody');
-            const rows = Array.from(tbody.querySelectorAll('tr'));
-
-            // Reorganizar as células das linhas de acordo com a nova ordem das colunas
-            rows.forEach(row => {
-                const cells = Array.from(row.querySelectorAll('td'));
-                const newCells = ths.map(th => cells[ths.indexOf(th)]);
-                newCells.forEach((cell, index) => {
-                    row.appendChild(cell);
-                });
-            });
-
-            // Reorganizar o rodapé
             const tfoot = tabelaRelatorio.querySelector('tfoot');
-            if (tfoot) {
-                const footerCells = Array.from(tfoot.querySelector('tr').querySelectorAll('td'));
-                const newFooterCells = ths.map(th => footerCells[ths.indexOf(th)]);
-                newFooterCells.forEach((cell, index) => {
-                    tfoot.querySelector('tr').appendChild(cell);
+
+            // Reorganizar as células das linhas do corpo da tabela
+            if (tbody) {
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                rows.forEach(row => {
+                    const cells = Array.from(row.querySelectorAll('td'));
+                    const newCells = ths.map(th => cells[ths.indexOf(th)]);
+                    newCells.forEach((cell, index) => {
+                        row.appendChild(cell);
+                    });
                 });
+            }
+
+            // Reorganizar as células do rodapé da tabela
+            if (tfoot) {
+                const footerRow = tfoot.querySelector('tr');
+                if (footerRow) {
+                    const footerCells = Array.from(footerRow.querySelectorAll('td'));
+                    const newFooterCells = ths.map(th => footerCells[ths.indexOf(th)]);
+                    newFooterCells.forEach((cell, index) => {
+                        footerRow.appendChild(cell);
+                    });
+                }
             }
         }
     });
 }
+
+// Função para ordenar a tabela ao clicar no título da coluna
+function ordenarTabela(coluna, tabelaId) {
+    const tabela = document.getElementById(tabelaId);
+    const tbody = tabela.querySelector('tbody');
+    const ths = tabela.querySelectorAll('th');
+
+    // Remover classes de ordenação de todos os cabeçalhos
+    ths.forEach(th => {
+        th.classList.remove('sort-asc', 'sort-desc');
+    });
+
+    // Determinar a direção da ordenação
+    const direcao = tbody.getAttribute('data-ordenacao') === 'asc' ? 'desc' : 'asc';
+    tbody.setAttribute('data-ordenacao', direcao);
+
+    // Adicionar classe de ordenação ao cabeçalho clicado
+    ths[coluna].classList.add(direcao === 'asc' ? 'sort-asc' : 'sort-desc');
+
+    // Ordenar as linhas
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    rows.sort((a, b) => {
+        const valorA = a.querySelector(`td:nth-child(${coluna + 1})`).textContent.trim();
+        const valorB = b.querySelector(`td:nth-child(${coluna + 1})`).textContent.trim();
+
+        // Verificar se os valores são numéricos ou de data
+        const isNumero = !isNaN(valorA) && !isNaN(valorB);
+        const isData = valorA.includes('/') && valorB.includes('/');
+
+        let comparacao;
+        if (isNumero) {
+            comparacao = parseFloat(valorA.replace(/[^0-9,]/g, '').replace(',', '.')) - parseFloat(valorB.replace(/[^0-9,]/g, '').replace(',', '.'));
+        } else if (isData) {
+            const dataA = new Date(valorA.split('/').reverse().join('-'));
+            const dataB = new Date(valorB.split('/').reverse().join('-'));
+            comparacao = dataA - dataB;
+        } else {
+            comparacao = valorA.localeCompare(valorB, undefined, { numeric: true });
+        }
+
+        return direcao === 'asc' ? comparacao : -comparacao;
+    });
+
+    // Reinserir as linhas ordenadas
+    tbody.innerHTML = '';
+    rows.forEach(row => tbody.appendChild(row));
+}
+
+// Inicializa a aba "Dashboard" como ativa ao carregar a página
+document.addEventListener('DOMContentLoaded', function () {
+    showTab('dashboard');
+    preencherAnos();
+    atualizarOpcoesVendedores();
+    atualizarOpcoesServicos();
+    atualizarOpcoesEmpresas();
+    inicializarGraficos();
+    atualizarFiltrosVendas();
+    inicializarSortable();
+    preencherFiltrosVendas();
+    preencherFiltroColunas();
+
+    // Adicionar eventos de clique aos cabeçalhos da tabela de vendas
+    const thsVendas = document.querySelectorAll('#tabelaVendas th');
+    thsVendas.forEach((th, index) => {
+        th.addEventListener('click', () => ordenarTabela(index, 'tabelaVendas'));
+    });
+
+    // Adicionar eventos de clique aos cabeçalhos da tabela de relatórios
+    const thsRelatorio = document.querySelectorAll('#tabelaRelatorio th');
+    thsRelatorio.forEach((th, index) => {
+        th.addEventListener('click', () => ordenarTabela(index, 'tabelaRelatorio'));
+    });
+});
 
 // Função para filtrar e gerar o relatório
 function filtrarRelatorio() {
@@ -406,32 +454,6 @@ function inicializarSortable() {
             });
         }
     });
-}
-
-// Função para ordenar a tabela de vendas
-function ordenarTabelaVendas(coluna) {
-    const tbody = document.querySelector('#tabelaVendas tbody');
-    const rows = Array.from(tbody.querySelectorAll('tr'));
-
-    // Determinar a direção da ordenação
-    const direcao = tbody.getAttribute('data-ordenacao') === 'asc' ? 'desc' : 'asc';
-    tbody.setAttribute('data-ordenacao', direcao);
-
-    // Ordenar as linhas
-    rows.sort((a, b) => {
-        const valorA = a.querySelector(`td:nth-child(${coluna + 1})`).textContent;
-        const valorB = b.querySelector(`td:nth-child(${coluna + 1})`).textContent;
-
-        if (direcao === 'asc') {
-            return valorA.localeCompare(valorB, undefined, { numeric: true });
-        } else {
-            return valorB.localeCompare(valorA, undefined, { numeric: true });
-        }
-    });
-
-    // Reinserir as linhas ordenadas
-    tbody.innerHTML = '';
-    rows.forEach(row => tbody.appendChild(row));
 }
 
 // Função para exportar a tabela de vendas para Excel
