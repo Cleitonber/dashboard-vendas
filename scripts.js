@@ -27,6 +27,35 @@ function showTab(tabId) {
     document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
 }
 
+// Função para preencher o filtro de colunas na ordem correta
+function preencherFiltroColunas() {
+    const filtroColunas = document.getElementById('filtroColunas');
+    filtroColunas.innerHTML = ''; // Limpa o filtro de colunas
+
+    // Definir a ordem das colunas
+    const colunas = [
+        { id: 'data', label: 'Data da Venda' },
+        { id: 'id', label: 'ID da Venda' },
+        { id: 'vendedor', label: 'Nome do Vendedor' },
+        { id: 'servico', label: 'Serviço Vendido' },
+        { id: 'tipoComissao', label: 'Tipo de Comissão' },
+        { id: 'nomeCliente', label: 'Nome do Cliente' },
+        { id: 'empresaParceira', label: 'Empresa Parceira' },
+        { id: 'valorVenda', label: 'Valor da Venda' },
+        { id: 'valorBrutoReceber', label: 'Valor Bruto a Receber' },
+        { id: 'comissao', label: 'Valor da Comissão' },
+        { id: 'percentualComissao', label: 'Variável da Comissão' }
+    ];
+
+    // Adicionar as colunas ao filtro na ordem correta
+    colunas.forEach(coluna => {
+        const option = document.createElement('option');
+        option.value = coluna.id;
+        option.textContent = coluna.label;
+        filtroColunas.appendChild(option);
+    });
+}
+
 // Inicializa a aba "Dashboard" como ativa ao carregar a página
 document.addEventListener('DOMContentLoaded', function () {
     showTab('dashboard');
@@ -38,6 +67,7 @@ document.addEventListener('DOMContentLoaded', function () {
     atualizarFiltrosVendas();
     inicializarSortable(); // Inicializa a funcionalidade de arrastar e soltar
     preencherFiltrosVendas(); // Preenche os filtros de vendedores, serviços e empresas
+    preencherFiltroColunas(); // Preenche o filtro de colunas na ordem correta
 
     // Adicionar eventos de clique aos cabeçalhos da tabela para ordenação
     const ths = document.querySelectorAll('#tabelaVendas th');
