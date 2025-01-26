@@ -144,7 +144,7 @@ function limparFiltros() {
     // Deselecionar todas as colunas no filtro de colunas
     const filtroColunas = document.getElementById('filtroColunas');
     Array.from(filtroColunas.options).forEach(option => {
-        option.selected = false; // Deseleciona todas as colunas
+        option.selected = true; // Seleciona todas as colunas por padrão
     });
 
     // Atualizar a tabela de relatórios com os dados sem filtros
@@ -280,11 +280,21 @@ function filtrarRelatorio() {
 
     // Adicionar totais no rodapé
     const tfoot = document.querySelector('#tabelaRelatorio tfoot');
+    const posicaoValorVenda = colunasSelecionadas.indexOf('valorVenda');
+    const posicaoValorBrutoReceber = colunasSelecionadas.indexOf('valorBrutoReceber');
+    const posicaoComissao = colunasSelecionadas.indexOf('comissao');
+
+    const colspanTotais = posicaoValorVenda - 1; // Colspan até a coluna "Valor da Venda"
+    const colspanBruto = posicaoValorBrutoReceber - posicaoValorVenda - 1; // Colspan entre "Valor da Venda" e "Valor Bruto a Receber"
+    const colspanComissao = posicaoComissao - posicaoValorBrutoReceber - 1; // Colspan entre "Valor Bruto a Receber" e "Valor da Comissão"
+
     tfoot.innerHTML = `
         <tr>
-            <td colspan="7" style="text-align: right;"><strong>Totais:</strong></td>
+            <td colspan="${colspanTotais}" style="text-align: right;"><strong>Totais:</strong></td>
             <td><strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
+            <td colspan="${colspanBruto}"></td>
             <td><strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
+            <td colspan="${colspanComissao}"></td>
             <td><strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
         </tr>
     `;
