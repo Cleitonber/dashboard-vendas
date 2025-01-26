@@ -360,7 +360,7 @@
                         <thead>
                             <tr>
                                 <th>Data</th>
-                                <th>ID da Venda</th> <!-- Nova coluna -->
+                                <th>ID da Venda</th>
                                 <th>Vendedor</th>
                                 <th>Serviço</th>
                                 <th>Cliente</th>
@@ -408,7 +408,7 @@
                             <small class="form-text">(Pressione Ctrl para selecionar mais de um item)</small>
                             <select id="filtroColunas" class="form-select" multiple>
                                 <option value="data" selected>Data da Venda</option>
-                                <option value="id" selected>ID da Venda</option> <!-- Nova coluna -->
+                                <option value="id" selected>ID da Venda</option>
                                 <option value="vendedor" selected>Nome do Vendedor</option>
                                 <option value="servico" selected>Serviço Vendido</option>
                                 <option value="tipoComissao" selected>Tipo de Comissão</option>
@@ -421,7 +421,7 @@
                             </select>
                         </div>
                         <button class="btn btn-primary" onclick="filtrarRelatorio()">Gerar</button>
-                        <button class="btn btn-secondary" onclick="limparFiltros()">Limpar Filtros</button>
+                        <button id="btnLimparFiltros" class="btn btn-secondary" onclick="limparFiltros()">Limpar Filtros</button>
                     </div>
                     <table id="tabelaRelatorio">
                         <thead>
@@ -469,6 +469,24 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.24/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+    <script>
+        // Função para limpar os filtros
+        function limparFiltros() {
+            // Limpar os valores dos filtros
+            document.getElementById('dataInicial').value = ''; // Limpa a data inicial
+            document.getElementById('dataFinal').value = ''; // Limpa a data final
+            document.getElementById('filtroVendedor').value = ''; // Limpa o filtro de vendedor
+
+            // Selecionar todas as colunas no filtro de colunas
+            const filtroColunas = document.getElementById('filtroColunas');
+            Array.from(filtroColunas.options).forEach(option => {
+                option.selected = true; // Seleciona todas as colunas
+            });
+
+            // Atualizar a tabela de relatórios com os dados sem filtros
+            filtrarRelatorio();
+        }
+    </script>
     <script src="scripts.js" defer></script>
 </body>
 </html>
