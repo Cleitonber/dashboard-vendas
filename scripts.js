@@ -248,14 +248,9 @@ document.addEventListener('DOMContentLoaded', function () {
 // Função para filtrar e gerar o relatório
 function filtrarRelatorio() {
     const filtroVendedor = document.getElementById('filtroVendedor');
-    if (!filtroVendedor) {
-        console.error('Elemento filtroVendedor não encontrado no DOM.');
-        return;
-    }
-
     const dataInicial = document.getElementById('dataInicial').value;
     const dataFinal = document.getElementById('dataFinal').value;
-    const vendedorId = filtroVendedor.value;
+    const vendedorId = filtroVendedor ? filtroVendedor.value : null;
     const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
 
     // Converter datas para o formato Date
@@ -297,9 +292,11 @@ function filtrarRelatorio() {
 
     const headerRow = document.createElement('tr');
     colunas.forEach(coluna => {
-        const th = document.createElement('th');
-        th.textContent = coluna.label;
-        headerRow.appendChild(th);
+        if (colunasSelecionadas.includes(coluna.id)) {
+            const th = document.createElement('th');
+            th.textContent = coluna.label;
+            headerRow.appendChild(th);
+        }
     });
     thead.appendChild(headerRow);
 
@@ -314,61 +311,63 @@ function filtrarRelatorio() {
     vendasFiltradas.forEach(venda => {
         const row = document.createElement('tr');
         colunas.forEach(coluna => {
-            const cell = document.createElement('td');
-            let valor = '';
+            if (colunasSelecionadas.includes(coluna.id)) {
+                const cell = document.createElement('td');
+                let valor = '';
 
-            switch (coluna.id) {
-                case 'data':
-                    valor = venda.data;
-                    break;
-                case 'id':
-                    valor = venda.id;
-                    break;
-                case 'vendedor':
-                    valor = venda.vendedor;
-                    break;
-                case 'servico':
-                    valor = venda.servico;
-                    break;
-                case 'tipoComissao':
-                    valor = venda.tipoComissao === 'fixa' ? 'Fixa' : 'Porcentagem';
-                    break;
-                case 'nomeCliente':
-                    valor = venda.nomeCliente;
-                    break;
-                case 'empresaParceira':
-                    valor = venda.empresaParceira;
-                    break;
-                case 'valorVenda':
-                    valor = venda.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                    totalValorVenda += venda.valorVenda;
-                    break;
-                case 'valorBrutoReceber':
-                    valor = venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                    totalValorBruto += venda.valorReceber;
-                    break;
-                case 'comissao':
-                    if (venda.tipoComissao === 'fixa') {
-                        valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                        totalComissao += venda.comissao;
-                    } else {
-                        const comissao = (venda.valorReceber * venda.comissao) / 100;
-                        valor = comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                        totalComissao += comissao;
-                    }
-                    break;
-                case 'percentualComissao':
-                    if (venda.tipoComissao === 'fixa') {
-                        valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                    } else {
-                        valor = `${venda.comissao}%`;
-                    }
-                    break;
-                default:
-                    valor = '-';
+                switch (coluna.id) {
+                    case 'data':
+                        valor = venda.data;
+                        break;
+                    case 'id':
+                        valor = venda.id;
+                        break;
+                    case 'vendedor':
+                        valor = venda.vendedor;
+                        break;
+                    case 'servico':
+                        valor = venda.servico;
+                        break;
+                    case 'tipoComissao':
+                        valor = venda.tipoComissao === 'fixa' ? 'Fixa' : 'Porcentagem';
+                        break;
+                    case 'nomeCliente':
+                        valor = venda.nomeCliente;
+                        break;
+                    case 'empresaParceira':
+                        valor = venda.empresaParceira;
+                        break;
+                    case 'valorVenda':
+                        valor = venda.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                        totalValorVenda += venda.valorVenda;
+                        break;
+                    case 'valorBrutoReceber':
+                        valor = venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                        totalValorBruto += venda.valorReceber;
+                        break;
+                    case 'comissao':
+                        if (venda.tipoComissao === 'fixa') {
+                            valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                            totalComissao += venda.comissao;
+                        } else {
+                            const comissao = (venda.valorReceber * venda.comissao) / 100;
+                            valor = comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                            totalComissao += comissao;
+                        }
+                        break;
+                    case 'percentualComissao':
+                        if (venda.tipoComissao === 'fixa') {
+                            valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                        } else {
+                            valor = `${venda.comissao}%`;
+                        }
+                        break;
+                    default:
+                        valor = '-';
+                }
+                cell.textContent = valor;
+                row.appendChild(cell);
             }
-            cell.textContent = valor;
-            row.appendChild(cell);
         });
         tbody.appendChild(row);
     });
@@ -377,11 +376,10 @@ function filtrarRelatorio() {
     const tfoot = document.querySelector('#tabelaRelatorio tfoot');
     tfoot.innerHTML = `
         <tr>
-            <td colspan="7" style="text-align: right;"><strong>Totais:</strong></td>
+            <td colspan="${colunasSelecionadas.length - 3}" style="text-align: right;"><strong>Totais:</strong></td>
             <td><strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
             <td><strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
             <td><strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
-            <td></td>
         </tr>
     `;
 
