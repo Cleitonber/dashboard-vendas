@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function () {
     atualizarFiltrosVendas();
     inicializarSortable();
     preencherFiltrosVendas();
-    preencherFiltroColunas();
+    preencherFiltroColunas(); // Garantir que esta linha está presente
 
     // Adicionar eventos de clique aos cabeçalhos da tabela de vendas
     const thsVendas = document.querySelectorAll('#tabelaVendas th');
@@ -421,7 +421,10 @@ function exportarRelatorioExcel() {
     XLSX.utils.book_append_sheet(wb, ws, 'Relatório de Vendas');
 
     // Configuração para orientação paisagem
-    ws['!pageSetup'] = { orientation: 'landscape' };
+    if (!ws['!pageSetup']) {
+        ws['!pageSetup'] = {};
+    }
+    ws['!pageSetup'].orientation = 'landscape';
 
     XLSX.writeFile(wb, 'relatorio_vendas.xlsx');
 }
