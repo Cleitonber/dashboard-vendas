@@ -280,24 +280,58 @@ function filtrarRelatorio() {
 
     // Adicionar totais no rodapé
     const tfoot = document.querySelector('#tabelaRelatorio tfoot');
+    tfoot.innerHTML = '';
+
+    // Encontrar as posições das colunas relevantes
     const posicaoValorVenda = colunasSelecionadas.indexOf('valorVenda');
     const posicaoValorBrutoReceber = colunasSelecionadas.indexOf('valorBrutoReceber');
     const posicaoComissao = colunasSelecionadas.indexOf('comissao');
 
-    const colspanTotais = posicaoValorVenda - 1; // Colspan até a coluna "Valor da Venda"
+    // Calcular o colspan para cada célula do rodapé
+    const colspanTotais = posicaoValorVenda; // Colspan até a coluna "Valor da Venda"
     const colspanBruto = posicaoValorBrutoReceber - posicaoValorVenda - 1; // Colspan entre "Valor da Venda" e "Valor Bruto a Receber"
     const colspanComissao = posicaoComissao - posicaoValorBrutoReceber - 1; // Colspan entre "Valor Bruto a Receber" e "Valor da Comissão"
 
-    tfoot.innerHTML = `
-        <tr>
-            <td colspan="${colspanTotais}" style="text-align: right;"><strong>Totais:</strong></td>
-            <td><strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
-            <td colspan="${colspanBruto}"></td>
-            <td><strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
-            <td colspan="${colspanComissao}"></td>
-            <td><strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
-        </tr>
-    `;
+    // Montar o rodapé da tabela
+    const footerRow = document.createElement('tr');
+
+    // Adicionar célula para o texto "Totais:"
+    const cellTotais = document.createElement('td');
+    cellTotais.setAttribute('colspan', colspanTotais);
+    cellTotais.style.textAlign = 'right';
+    cellTotais.innerHTML = '<strong>Totais:</strong>';
+    footerRow.appendChild(cellTotais);
+
+    // Adicionar célula para o total de "Valor da Venda"
+    const cellValorVenda = document.createElement('td');
+    cellValorVenda.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+    footerRow.appendChild(cellValorVenda);
+
+    // Adicionar célula vazia para o colspan entre "Valor da Venda" e "Valor Bruto a Receber"
+    if (colspanBruto > 0) {
+        const cellEspacoBruto = document.createElement('td');
+        cellEspacoBruto.setAttribute('colspan', colspanBruto);
+        footerRow.appendChild(cellEspacoBruto);
+    }
+
+    // Adicionar célula para o total de "Valor Bruto a Receber"
+    const cellValorBruto = document.createElement('td');
+    cellValorBruto.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+    footerRow.appendChild(cellValorBruto);
+
+    // Adicionar célula vazia para o colspan entre "Valor Bruto a Receber" e "Valor da Comissão"
+    if (colspanComissao > 0) {
+        const cellEspacoComissao = document.createElement('td');
+        cellEspacoComissao.setAttribute('colspan', colspanComissao);
+        footerRow.appendChild(cellEspacoComissao);
+    }
+
+    // Adicionar célula para o total de "Valor da Comissão"
+    const cellComissao = document.createElement('td');
+    cellComissao.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+    footerRow.appendChild(cellComissao);
+
+    tfoot.appendChild(footerRow);
 
     // Inicializar o Sortable após preencher a tabela
     inicializarSortableRelatorio();
