@@ -585,6 +585,11 @@ function atualizarDashboard() {
 
 // Função para atualizar os gráficos
 function atualizarGraficos(vendasFiltradas) {
+    if (!vendasServicoChart || !desempenhoVendedoresChart || !vendasCategoriaChart) {
+        console.error('Gráficos não inicializados!');
+        return;
+    }
+
     // Atualizar gráfico de Vendas por Serviço
     const servicos = [...new Set(dados.servicos.map(servico => servico.nome))];
     const vendasPorServico = servicos.map(servico => {
@@ -1584,3 +1589,9 @@ function atualizarFiltrosVendas() {
         selectEmpresa.appendChild(option);
     });
 }
+
+// Inicializar gráficos ao carregar a página
+document.addEventListener('DOMContentLoaded', function () {
+    inicializarGraficos();
+    atualizarDashboard();
+});
