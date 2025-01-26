@@ -246,10 +246,12 @@ function filtrarRelatorio() {
                     case 'valorVenda':
                         valor = venda.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                         totalValorVenda += venda.valorVenda;
+                        cell.style.textAlign = 'right'; // Alinhar à direita
                         break;
                     case 'valorBrutoReceber':
                         valor = venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                         totalValorBruto += venda.valorReceber;
+                        cell.style.textAlign = 'right'; // Alinhar à direita
                         break;
                     case 'comissao':
                         if (venda.tipoComissao === 'fixa') {
@@ -260,6 +262,7 @@ function filtrarRelatorio() {
                             valor = comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                             totalComissao += comissao;
                         }
+                        cell.style.textAlign = 'right'; // Alinhar à direita
                         break;
                     case 'percentualComissao':
                         if (venda.tipoComissao === 'fixa') {
@@ -282,53 +285,30 @@ function filtrarRelatorio() {
     const tfoot = document.querySelector('#tabelaRelatorio tfoot');
     tfoot.innerHTML = '';
 
-    // Encontrar as posições das colunas relevantes
-    const posicaoValorVenda = colunasSelecionadas.indexOf('valorVenda');
-    const posicaoValorBrutoReceber = colunasSelecionadas.indexOf('valorBrutoReceber');
-    const posicaoComissao = colunasSelecionadas.indexOf('comissao');
-
-    // Calcular o colspan para cada célula do rodapé
-    const colspanTotais = posicaoValorVenda; // Colspan até a coluna "Valor da Venda"
-    const colspanBruto = posicaoValorBrutoReceber - posicaoValorVenda - 1; // Colspan entre "Valor da Venda" e "Valor Bruto a Receber"
-    const colspanComissao = posicaoComissao - posicaoValorBrutoReceber - 1; // Colspan entre "Valor Bruto a Receber" e "Valor da Comissão"
-
-    // Montar o rodapé da tabela
     const footerRow = document.createElement('tr');
 
     // Adicionar célula para o texto "Totais:"
     const cellTotais = document.createElement('td');
-    cellTotais.setAttribute('colspan', colspanTotais);
-    cellTotais.style.textAlign = 'right';
+    cellTotais.setAttribute('colspan', colunasSelecionadas.indexOf('valorVenda'));
     cellTotais.innerHTML = '<strong>Totais:</strong>';
     footerRow.appendChild(cellTotais);
 
     // Adicionar célula para o total de "Valor da Venda"
     const cellValorVenda = document.createElement('td');
     cellValorVenda.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+    cellValorVenda.style.textAlign = 'right'; // Alinhar à direita
     footerRow.appendChild(cellValorVenda);
-
-    // Adicionar célula vazia para o colspan entre "Valor da Venda" e "Valor Bruto a Receber"
-    if (colspanBruto > 0) {
-        const cellEspacoBruto = document.createElement('td');
-        cellEspacoBruto.setAttribute('colspan', colspanBruto);
-        footerRow.appendChild(cellEspacoBruto);
-    }
 
     // Adicionar célula para o total de "Valor Bruto a Receber"
     const cellValorBruto = document.createElement('td');
     cellValorBruto.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+    cellValorBruto.style.textAlign = 'right'; // Alinhar à direita
     footerRow.appendChild(cellValorBruto);
-
-    // Adicionar célula vazia para o colspan entre "Valor Bruto a Receber" e "Valor da Comissão"
-    if (colspanComissao > 0) {
-        const cellEspacoComissao = document.createElement('td');
-        cellEspacoComissao.setAttribute('colspan', colspanComissao);
-        footerRow.appendChild(cellEspacoComissao);
-    }
 
     // Adicionar célula para o total de "Valor da Comissão"
     const cellComissao = document.createElement('td');
     cellComissao.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+    cellComissao.style.textAlign = 'right'; // Alinhar à direita
     footerRow.appendChild(cellComissao);
 
     tfoot.appendChild(footerRow);
