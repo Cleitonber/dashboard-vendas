@@ -585,9 +585,10 @@ function atualizarDashboard() {
 
 // Função para atualizar os gráficos
 function atualizarGraficos(vendasFiltradas) {
+    // Verifica se os gráficos foram inicializados
     if (!vendasServicoChart || !desempenhoVendedoresChart || !vendasCategoriaChart) {
-        console.error('Gráficos não inicializados!');
-        return;
+        console.error('Gráficos não inicializados! Inicializando gráficos...');
+        inicializarGraficos(); // Inicializa os gráficos se não estiverem inicializados
     }
 
     // Atualizar gráfico de Vendas por Serviço
@@ -623,6 +624,8 @@ function atualizarGraficos(vendasFiltradas) {
 
 // Função para inicializar os gráficos
 function inicializarGraficos() {
+    console.log('Inicializando gráficos...'); // Adicione este log para depuração
+
     const ctxVendasServico = document.getElementById('vendasServicoChart').getContext('2d');
     const ctxDesempenhoVendedores = document.getElementById('desempenhoVendedoresChart').getContext('2d');
     const ctxVendasCategoria = document.getElementById('vendasCategoriaChart').getContext('2d');
@@ -740,7 +743,7 @@ function inicializarGraficos() {
         }
     });
 
-    atualizarDashboard(); // Atualiza os gráficos com os dados iniciais
+    console.log('Gráficos inicializados com sucesso!'); // Adicione este log para depuração
 }
 
 // Função para atualizar as opções de vendedores
