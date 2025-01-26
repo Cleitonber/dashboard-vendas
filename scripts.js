@@ -134,117 +134,22 @@ function inicializarSortableRelatorio() {
     });
 }
 
-// Função para ordenar a tabela ao clicar no título da coluna
-function ordenarTabela(coluna, tabelaId) {
-    const tabela = document.getElementById(tabelaId);
-    const tbody = tabela.querySelector('tbody');
-    const ths = tabela.querySelectorAll('th');
+// Função para limpar os filtros e recarregar a tabela de relatórios
+function limparFiltros() {
+    // Limpar os valores dos filtros
+    document.getElementById('dataInicial').value = ''; // Limpa a data inicial
+    document.getElementById('dataFinal').value = ''; // Limpa a data final
+    document.getElementById('filtroVendedor').value = ''; // Limpa o filtro de vendedor
 
-    // Remover classes de ordenação de todos os cabeçalhos
-    ths.forEach(th => {
-        th.classList.remove('sort-asc', 'sort-desc');
+    // Deselecionar todas as colunas no filtro de colunas
+    const filtroColunas = document.getElementById('filtroColunas');
+    Array.from(filtroColunas.options).forEach(option => {
+        option.selected = false; // Deseleciona todas as colunas
     });
 
-    // Determinar a direção da ordenação
-    const direcao = tbody.getAttribute('data-ordenacao') === 'asc' ? 'desc' : 'asc';
-    tbody.setAttribute('data-ordenacao', direcao);
-
-    // Adicionar classe de ordenação ao cabeçalho clicado
-    ths[coluna].classList.add(direcao === 'asc' ? 'sort-asc' : 'sort-desc');
-
-    // Ordenar as linhas
-    const rows = Array.from(tbody.querySelectorAll('tr'));
-    rows.sort((a, b) => {
-        const valorA = a.querySelector(`td:nth-child(${coluna + 1})`).textContent.trim();
-        const valorB = b.querySelector(`td:nth-child(${coluna + 1})`).textContent.trim();
-
-        // Verificar se os valores são numéricos ou de data
-        const isNumero = !isNaN(valorA) && !isNaN(valorB);
-        const isData = valorA.includes('/') && valorB.includes('/');
-
-        let comparacao;
-        if (isNumero) {
-            comparacao = parseFloat(valorA.replace(/[^0-9,]/g, '').replace(',', '.')) - parseFloat(valorB.replace(/[^0-9,]/g, '').replace(',', '.'));
-        } else if (isData) {
-            const dataA = new Date(valorA.split('/').reverse().join('-'));
-            const dataB = new Date(valorB.split('/').reverse().join('-'));
-            comparacao = dataA - dataB;
-        } else {
-            comparacao = valorA.localeCompare(valorB, undefined, { numeric: true });
-        }
-
-        return direcao === 'asc' ? comparacao : -comparacao;
-    });
-
-    // Reinserir as linhas ordenadas
-    tbody.innerHTML = '';
-    rows.forEach(row => tbody.appendChild(row));
+    // Atualizar a tabela de relatórios com os dados sem filtros
+    filtrarRelatorio();
 }
-
-// Função para atualizar o tipo de comissão com base no serviço selecionado
-function atualizarTipoComissao() {
-    const servicoId = document.getElementById('servicoVenda').value;
-    const servico = dados.servicos.find(s => s.id == servicoId);
-
-    if (servico) {
-        const tipoComissaoInfo = document.getElementById('tipoComissaoInfo');
-        const comissaoInput = document.getElementById('comissao');
-
-        if (servico.tipoComissao === 'fixa') {
-            tipoComissaoInfo.textContent = 'Comissão Fixa (R$)';
-            comissaoInput.placeholder = 'Digite o valor da comissão em reais';
-        } else if (servico.tipoComissao === 'porcentagem') {
-            tipoComissaoInfo.textContent = 'Comissão em Porcentagem (%)';
-            comissaoInput.placeholder = 'Digite o percentual da comissão';
-        }
-    }
-}
-
-// Adicionar evento de change ao select de serviços
-document.addEventListener('DOMContentLoaded', function () {
-    const servicoVendaSelect = document.getElementById('servicoVenda');
-    if (servicoVendaSelect) {
-        servicoVendaSelect.addEventListener('change', atualizarTipoComissao);
-    }
-});
-
-// Função para atualizar as opções de serviços
-function atualizarOpcoesServicos() {
-    const selectServico = document.getElementById('servicoVenda');
-    selectServico.innerHTML = '<option value="">Selecione um serviço</option>';
-    dados.servicos.forEach(servico => {
-        const option = document.createElement('option');
-        option.value = servico.id;
-        option.textContent = servico.nome;
-        selectServico.appendChild(option);
-    });
-}
-
-// Inicializa a aba "Dashboard" como ativa ao carregar a página
-document.addEventListener('DOMContentLoaded', function () {
-    showTab('dashboard');
-    preencherAnos();
-    atualizarOpcoesVendedores();
-    atualizarOpcoesServicos(); // Atualiza as opções de serviços
-    atualizarOpcoesEmpresas();
-    inicializarGraficos();
-    atualizarFiltrosVendas();
-    inicializarSortable();
-    preencherFiltrosVendas();
-    preencherFiltroColunas(); // Garantir que esta linha está presente
-
-    // Adicionar eventos de clique aos cabeçalhos da tabela de vendas
-    const thsVendas = document.querySelectorAll('#tabelaVendas th');
-    thsVendas.forEach((th, index) => {
-        th.addEventListener('click', () => ordenarTabela(index, 'tabelaVendas'));
-    });
-
-    // Adicionar eventos de clique aos cabeçalhos da tabela de relatórios
-    const thsRelatorio = document.querySelectorAll('#tabelaRelatorio th');
-    thsRelatorio.forEach((th, index) => {
-        th.addEventListener('click', () => ordenarTabela(index, 'tabelaRelatorio'));
-    });
-});
 
 // Função para filtrar e gerar o relatório
 function filtrarRelatorio() {
@@ -377,7 +282,7 @@ function filtrarRelatorio() {
     const tfoot = document.querySelector('#tabelaRelatorio tfoot');
     tfoot.innerHTML = `
         <tr>
-            <td colspan="${colunasSelecionadas.length - 3}" style="text-align: right;"><strong>Totais:</strong></td>
+            <td colspan="7" style="text-align: right;"><strong>Totais:</strong></td>
             <td><strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
             <td><strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
             <td><strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></td>
