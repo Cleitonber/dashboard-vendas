@@ -420,7 +420,8 @@
                                 <option value="valorVenda" selected>Valor da Venda</option>
                             </select>
                         </div>
-                        <button id="botaoFiltrar" class="btn btn-primary">Gerar</button>
+                        <button class="btn btn-primary" onclick="filtrarRelatorio()">Gerar</button>
+                        <button class="btn btn-secondary" onclick="limparFiltros()">Limpar Filtros</button>
                     </div>
                     <table id="tabelaRelatorio">
                         <thead>
@@ -454,11 +455,20 @@
         </div>
     </div>
 
+    <!-- Spinner de carregamento -->
+    <div id="loadingSpinner" class="loading-spinner d-none">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Mensagem de feedback -->
+    <div id="mensagemFeedback" class="mensagem-feedback"></div>
+
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.24/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <script src="scripts.js" defer></script> <!-- Adicionado defer aqui -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+    <script src="scripts.js" defer></script>
 </body>
 </html>
