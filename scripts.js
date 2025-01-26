@@ -73,6 +73,7 @@ function preencherFiltroColunas() {
         const option = document.createElement('option');
         option.value = coluna.id;
         option.textContent = coluna.label;
+        option.selected = true; // Seleciona todas as opções por padrão
         filtroColunas.appendChild(option);
     });
 }
@@ -415,32 +416,20 @@ function exportarRelatorioExcel() {
         data.push(rowData);
     });
 
-    // Adicionar o total das comissões, valor bruto e valor da venda
-    const totalValorVenda = dados.vendas.reduce((total, venda) => total + venda.valorVenda, 0);
-    const totalValorBruto = dados.vendas.reduce((total, venda) => total + venda.valorReceber, 0);
-    const totalComissao = dados.vendas.reduce((total, venda) => {
-        if (venda.tipoComissao === 'fixa') {
-            return total + venda.comissao;
-        } else {
-            return total + (venda.valorReceber * venda.comissao) / 100;
-        }
-    }, 0);
-
-    data.push({
-        'Valor da Venda': `Total: ${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`,
-        'Valor Bruto a Receber': `Total: ${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`,
-        'Valor da Comissão': `Total: ${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}`
-    });
-
     const ws = XLSX.utils.json_to_sheet(data);
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, 'Relatório de Vendas');
+
+    // Configuração para orientação paisagem
+    ws['!pageSetup'] = { orientation: 'landscape' };
+
     XLSX.writeFile(wb, 'relatorio_vendas.xlsx');
 }
 
 // Função para exportar relatório em PDF
 function exportarRelatorioPDF() {
-    const doc = new jsPDF();
+    const doc = new jsPDF('landscape'); // Configura o PDF para modo paisagem
+
     const tabela = document.getElementById('tabelaRelatorio');
     const headers = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent);
     const rows = Array.from(tabela.querySelectorAll('tbody tr')).map(tr =>
