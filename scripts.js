@@ -106,6 +106,7 @@ function inicializarSortableRelatorio() {
             const ths = Array.from(tr.querySelectorAll('th'));
             const tbody = tabelaRelatorio.querySelector('tbody');
             const tfoot = tabelaRelatorio.querySelector('tfoot');
+            filtrarRelatorio();
 
             // Reorganizar as células das linhas do corpo da tabela
             if (tbody) {
@@ -282,10 +283,31 @@ function filtrarRelatorio() {
     });
 
     // Adicionar totais no rodapé
-    const tfoot = document.querySelector('#tabelaRelatorio tfoot');
-    tfoot.innerHTML = '';
+const tfoot = document.querySelector('#tabelaRelatorio tfoot');
+tfoot.innerHTML = ''; // Limpar rodapé anterior
 
-    const footerRow = document.createElement('tr');
+const footerRow = document.createElement('tr');
+
+// Adicionar células vazias para colunas sem totais
+colunas.forEach((coluna, index) => {
+    const cell = document.createElement('td');
+    cell.style.textAlign = 'right'; // Alinhar à direita para consistência
+
+    if (coluna.id === 'valorVenda') {
+        cell.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+    } else if (coluna.id === 'valorBrutoReceber') {
+        cell.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+    } else if (coluna.id === 'comissao') {
+        cell.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+    } else {
+        cell.innerHTML = ''; // Células sem totais permanecem vazias
+    }
+
+    footerRow.appendChild(cell);
+});
+
+tfoot.appendChild(footerRow);
+
 
     // Adicionar célula para o texto "Totais:"
     const cellTotais = document.createElement('td');
