@@ -759,6 +759,27 @@ function atualizarOpcoesServicos() {
     });
 }
 
+// Adiciona o evento de mudança ao campo de seleção de serviços
+document.getElementById('servicoVenda').addEventListener('change', function () {
+    const servicoId = this.value;
+    const tipoComissaoInfo = document.getElementById('tipoComissaoInfo');
+
+    if (servicoId) {
+        // Busca o serviço correspondente no array de dados
+        const servico = dados.servicos.find(s => s.id == servicoId);
+        if (servico) {
+            tipoComissaoInfo.textContent = `Tipo de Comissão: ${servico.tipoComissao === 'fixa' ? 'Fixa' : 'Porcentagem'}`;
+            tipoComissaoInfo.style.color = '#4f46e5'; // Opção de estilização
+        } else {
+            tipoComissaoInfo.textContent = 'Serviço não encontrado.';
+            tipoComissaoInfo.style.color = 'red';
+        }
+    } else {
+        tipoComissaoInfo.textContent = '';
+    }
+});
+
+
 // Função para atualizar as opções de empresas parceiras
 function atualizarOpcoesEmpresas() {
     const selectEmpresa = document.getElementById('empresaParceira');
