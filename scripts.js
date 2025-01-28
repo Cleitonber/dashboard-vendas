@@ -1330,6 +1330,23 @@ function formatarTelefone(input) {
 function formatarComissao(input) {
     const servicoId = document.getElementById('servicoVenda').value;
     const servico = dados.servicos.find(s => s.id == servicoId);
+// Atualizar o tipo de comissão com base no serviço selecionado
+document.getElementById('servicoVenda').addEventListener('change', function () {
+    const servicoId = this.value; // Obtém o ID do serviço selecionado
+    const servico = dados.servicos.find(s => s.id == servicoId); // Busca o serviço nos dados cadastrados
+    
+    const tipoComissaoInfo = document.getElementById('tipoComissaoInfo'); // Campo para exibir o tipo de comissão
+    
+    if (servico) {
+        // Define o texto baseado no tipo de comissão
+        tipoComissaoInfo.textContent = `Tipo de Comissão: ${servico.tipoComissao === 'fixa' ? 'Fixa' : 'Porcentagem'}`;
+        tipoComissaoInfo.style.display = 'block'; // Garante que o texto seja visível
+    } else {
+        // Limpa o campo caso nenhum serviço seja selecionado
+        tipoComissaoInfo.textContent = '';
+        tipoComissaoInfo.style.display = 'none';
+    }
+});
 
     if (servico) {
         if (servico.tipoComissao === 'fixa') {
