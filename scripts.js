@@ -330,7 +330,6 @@ function filtrarRelatorio() {
 
     // Inicializar o Sortable após preencher a tabela
     inicializarSortableRelatorio();
-}
 
 // Função para exportar relatório em Excel
 function exportarRelatorioExcel() {
