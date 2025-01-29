@@ -159,6 +159,61 @@ function filtrarRelatorio() {
     const dataFinal = document.getElementById('dataFinal').value;
     const vendedorId = filtroVendedor ? filtroVendedor.value : null;
     const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
+        const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
+    const dataFinalObj = dataFinal ? new Date(dataFinal.split('/').reverse().join('-')) : null;
+
+    const vendasFiltradas = dados.vendas.filter(venda => {
+        const dataVendaObj = new Date(venda.data.split('/').reverse().join('-'));
+
+        const filtroData = (!dataInicialObj || dataVendaObj >= dataInicialObj) &&
+                           (!dataFinalObj || dataVendaObj <= dataFinalObj);
+
+        const filtroVendedor = !vendedorId || venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
+
+        return filtroData && filtroVendedor;
+    });
+
+    // Criar corpo da tabela
+    const tbody = document.querySelector('#tabelaRelatorio tbody');
+    tbody.innerHTML = '';
+
+    let totalValorVenda = 0;
+    let totalValorBruto = 0;
+    let totalComissao = 0;
+
+    vendasFiltradas.forEach(venda => {
+        const row = document.createElement('tr');
+        colunas.forEach(coluna => {
+            if (colunasSelecionadas.includes(coluna.id)) {
+                const cell = document.createElement('td');
+                let valor = '';
+
+                switch (coluna.id) {
+                    case 'valorVenda':
+                        valor = venda.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                        totalValorVenda += venda.valorVenda;
+                        break;
+                    case 'valorBrutoReceber':
+                        valor = venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                        totalValorBruto += venda.valorReceber;
+                        break;
+                    case 'comissao':
+                        valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                        totalComissao += venda.comissao;
+                        break;
+                    default:
+                        valor = '-';
+                }
+                cell.textContent = valor;
+                row.appendChild(cell);
+            }
+        });
+        tbody.appendChild(row);
+    });
+
+    // 🚀 **Chamada da função para atualizar o rodapé corretamente alinhado**
+    atualizarRodapeRelatorio();
+}
 
     // Converter datas para o formato Date
     const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
@@ -335,8 +390,63 @@ tfoot.appendChild(footerRow);
 
     tfoot.appendChild(footerRow);
 
-    // Inicializar o Sortable após preencher a tabela
-    inicializarSortableRelatorio();
+// Função para inicializar a funcionalidade de arrastar e soltar na tabela de relatórios
+function inicializarSortableRelatorio() {
+    const tabelaRelatorio = document.getElementById('tabelaRelatorio');
+    if (!tabelaRelatorio) {
+        console.error('A tabela com o ID "tabelaRelatorio" não foi encontrada no DOM.');
+        return;
+    }
+
+    const thead = tabelaRelatorio.querySelector('thead');
+    if (!thead) {
+        console.error('O elemento <thead> não foi encontrado na tabela.');
+        return;
+    }
+
+    const tr = thead.querySelector('tr');
+    if (!tr) {
+        console.error('O elemento <tr> dentro do <thead> não foi encontrado.');
+        return;
+    }
+
+    // Inicializar o Sortable apenas se todos os elementos existirem
+    new Sortable(tr, {
+        animation: 150,
+        ghostClass: 'sortable-ghost',
+        onEnd: function (evt) {
+            const ths = Array.from(tr.querySelectorAll('th'));
+            const tbody = tabelaRelatorio.querySelector('tbody');
+            const tfoot = tabelaRelatorio.querySelector('tfoot');
+
+            // Reorganizar as células das linhas do corpo da tabela
+            if (tbody) {
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                rows.forEach(row => {
+                    const cells = Array.from(row.querySelectorAll('td'));
+                    const newCells = ths.map(th => cells[ths.indexOf(th)]);
+                    newCells.forEach((cell, index) => {
+                        row.appendChild(cell);
+                    });
+                });
+            }
+
+            // Reorganizar as células do rodapé da tabela para alinhar com as colunas
+            if (tfoot) {
+                const footerRow = tfoot.querySelector('tr');
+                if (footerRow) {
+                    const footerCells = Array.from(footerRow.querySelectorAll('td'));
+                    const newFooterCells = ths.map(th => footerCells[ths.indexOf(th)]);
+                    newFooterCells.forEach((cell, index) => {
+                        footerRow.appendChild(cell);
+                    });
+                }
+            }
+
+            // ✅ **Após reordenar colunas, atualizar os totais corretamente**
+            atualizarRodapeRelatorio();
+        }
+    });
 }
 
 // Função para exportar relatório em Excel
