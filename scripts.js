@@ -286,39 +286,47 @@ const tfoot = document.querySelector('#tabelaRelatorio tfoot');
 tfoot.innerHTML = '';
 const footerRow = document.createElement('tr');
 
-// Criar células vazias para as colunas antes dos valores
-const colunasAntesValores = colunasSelecionadas.indexOf('valorVenda');
-for (let i = 0; i < colunasAntesValores; i++) {
+// Calcular quantas células precisamos antes dos valores monetários
+const colunasAnteriores = colunasSelecionadas.filter(col => 
+    col !== 'valorVenda' && 
+    col !== 'valorBrutoReceber' && 
+    col !== 'comissao'
+).length;
+
+// Criar células vazias para colunas anteriores
+for (let i = 0; i < colunasAnteriores; i++) {
     const td = document.createElement('td');
     if (i === 0) {
         td.innerHTML = '<strong>Totais:</strong>';
+        td.style.textAlign = 'left';
     }
     footerRow.appendChild(td);
 }
 
-// Adicionar células para os totais apenas se as colunas estiverem selecionadas
+// Adicionar células para os totais monetários
 if (colunasSelecionadas.includes('valorVenda')) {
     const cellValorVenda = document.createElement('td');
+    cellValorVenda.setAttribute('data-tipo', 'monetario');
     cellValorVenda.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-    cellValorVenda.style.textAlign = 'right';
     footerRow.appendChild(cellValorVenda);
 }
 
 if (colunasSelecionadas.includes('valorBrutoReceber')) {
     const cellValorBruto = document.createElement('td');
+    cellValorBruto.setAttribute('data-tipo', 'monetario');
     cellValorBruto.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-    cellValorBruto.style.textAlign = 'right';
     footerRow.appendChild(cellValorBruto);
 }
 
 if (colunasSelecionadas.includes('comissao')) {
     const cellComissao = document.createElement('td');
+    cellComissao.setAttribute('data-tipo', 'monetario');
     cellComissao.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-    cellComissao.style.textAlign = 'right';
     footerRow.appendChild(cellComissao);
 }
 
 tfoot.appendChild(footerRow);
+
 
 
     // Inicializar o Sortable após preencher a tabela
