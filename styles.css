@@ -275,11 +275,27 @@ table {
     box-shadow: var(--shadow);
 }
 
+/* Garantir alinhamento do rodapé da tabela */
+#tabelaRelatorio tfoot td {
+    font-weight: bold;
+    background-color: var(--background);
+    text-align: right;
+    padding: 1rem;
+    border-top: 2px solid var(--border);
+}
+
+
 th, td {
     padding: 1rem;
-    text-align: left;
     border-bottom: 1px solid var(--border);
 }
+
+/* Alinhar colunas monetárias à direita */
+th:nth-child(8), th:nth-child(9), th:nth-child(10), 
+td:nth-child(8), td:nth-child(9), td:nth-child(10) {
+    text-align: right;
+}
+
 
 th {
     background: #f8fafc;
