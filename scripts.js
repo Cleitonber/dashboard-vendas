@@ -103,10 +103,14 @@ function inicializarSortableRelatorio() {
         animation: 150,
         ghostClass: 'sortable-ghost',
         onEnd: function (evt) {
+            atualizarRodapeRelatorio(); // Atualiza o rodapé após reorganizar colunas
+}
             const ths = Array.from(tr.querySelectorAll('th'));
             const tbody = tabelaRelatorio.querySelector('tbody');
             const tfoot = tabelaRelatorio.querySelector('tfoot');
             filtrarRelatorio();
+    atualizarRodapeRelatorio();
+
 
             // Reorganizar as células das linhas do corpo da tabela
             if (tbody) {
@@ -150,6 +154,8 @@ function limparFiltros() {
 
     // Atualizar a tabela de relatórios com os dados sem filtros
     filtrarRelatorio();
+    atualizarRodapeRelatorio();
+
 }
 
 // Função para filtrar e gerar o relatório
@@ -211,8 +217,36 @@ function filtrarRelatorio() {
         tbody.appendChild(row);
     });
 
-    // 🚀 **Chamada da função para atualizar o rodapé corretamente alinhado**
-    atualizarRodapeRelatorio();
+   // Atualiza o rodapé para garantir alinhamento correto e evitar duplicação de valores
+function atualizarRodapeRelatorio() {
+    const tfoot = document.querySelector('#tabelaRelatorio tfoot');
+    tfoot.innerHTML = ''; // Remove qualquer rodapé antigo antes de criar um novo
+
+    const footerRow = document.createElement('tr');
+
+    // Obtém a ordem real das colunas visíveis na tabela
+    const colunasVisiveis = Array.from(document.querySelectorAll('#tabelaRelatorio thead th'))
+        .map(th => th.getAttribute('data-coluna-id'));
+
+    colunasVisiveis.forEach((colunaId) => {
+        const cell = document.createElement('td');
+        cell.style.textAlign = 'right'; // Mantém alinhamento correto
+
+        // Insere os totais somente nas colunas corretas
+        if (colunaId === 'valorVenda') {
+            cell.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+        } else if (colunaId === 'valorBrutoReceber') {
+            cell.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+        } else if (colunaId === 'comissao') {
+            cell.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+        } else {
+            cell.innerHTML = ''; // Mantém a estrutura correta sem duplicações
+        }
+
+        footerRow.appendChild(cell);
+    });
+
+    tfoot.appendChild(footerRow);
 }
 
     // Converter datas para o formato Date
@@ -443,9 +477,37 @@ function inicializarSortableRelatorio() {
                 }
             }
 
-            // ✅ **Após reordenar colunas, atualizar os totais corretamente**
-            atualizarRodapeRelatorio();
+// Atualiza o rodapé para garantir alinhamento correto e evitar duplicação de valores
+function atualizarRodapeRelatorio() {
+    const tfoot = document.querySelector('#tabelaRelatorio tfoot');
+    tfoot.innerHTML = ''; // Remove qualquer rodapé antigo antes de criar um novo
+
+    const footerRow = document.createElement('tr');
+
+    // Obtém a ordem real das colunas visíveis na tabela
+    const colunasVisiveis = Array.from(document.querySelectorAll('#tabelaRelatorio thead th'))
+        .map(th => th.getAttribute('data-coluna-id'));
+
+    colunasVisiveis.forEach((colunaId) => {
+        const cell = document.createElement('td');
+        cell.style.textAlign = 'right'; // Mantém alinhamento correto
+
+        // Insere os totais somente nas colunas corretas
+        if (colunaId === 'valorVenda') {
+            cell.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+        } else if (colunaId === 'valorBrutoReceber') {
+            cell.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+        } else if (colunaId === 'comissao') {
+            cell.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+        } else {
+            cell.innerHTML = ''; // Mantém a estrutura correta sem duplicações
         }
+
+        footerRow.appendChild(cell);
+    });
+
+    tfoot.appendChild(footerRow);
+}
     });
 }
 
