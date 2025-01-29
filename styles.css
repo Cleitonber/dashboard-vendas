@@ -500,3 +500,39 @@ th:active {
     margin-right: 0.5rem;
     cursor: pointer;
 }
+
+/* Estilos específicos para a tabela de relatório */
+#tabelaRelatorio {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#tabelaRelatorio th,
+#tabelaRelatorio td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+/* Alinhar colunas monetárias à direita */
+#tabelaRelatorio th[data-tipo="monetario"],
+#tabelaRelatorio td[data-tipo="monetario"] {
+    text-align: right;
+}
+
+/* Estilos específicos para o rodapé */
+#tabelaRelatorio tfoot td {
+    font-weight: bold;
+    background-color: var(--background);
+    border-top: 2px solid var(--border);
+}
+
+/* Garantir que a primeira célula do rodapé (Totais) fique alinhada à esquerda */
+#tabelaRelatorio tfoot td:first-child {
+    text-align: left;
+}
+
+/* Garantir que as células de totais monetários fiquem alinhadas à direita */
+#tabelaRelatorio tfoot td[data-tipo="monetario"] {
+    text-align: right;
+}
