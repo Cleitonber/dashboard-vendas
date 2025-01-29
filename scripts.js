@@ -281,37 +281,45 @@ function filtrarRelatorio() {
         tbody.appendChild(row);
     });
 
-    // Adicionar totais no rodapé
-    const tfoot = document.querySelector('#tabelaRelatorio tfoot');
-    tfoot.innerHTML = '';
+   // Adicionar totais no rodapé
+const tfoot = document.querySelector('#tabelaRelatorio tfoot');
+tfoot.innerHTML = '';
+const footerRow = document.createElement('tr');
 
-    const footerRow = document.createElement('tr');
+// Criar células vazias para as colunas antes dos valores
+const colunasAntesValores = colunasSelecionadas.indexOf('valorVenda');
+for (let i = 0; i < colunasAntesValores; i++) {
+    const td = document.createElement('td');
+    if (i === 0) {
+        td.innerHTML = '<strong>Totais:</strong>';
+    }
+    footerRow.appendChild(td);
+}
 
-    // Adicionar célula para o texto "Totais:"
-    const cellTotais = document.createElement('td');
-    cellTotais.setAttribute('colspan', colunasSelecionadas.indexOf('valorVenda'));
-    cellTotais.innerHTML = '<strong>Totais:</strong>';
-    footerRow.appendChild(cellTotais);
-
-    // Adicionar célula para o total de "Valor da Venda"
+// Adicionar células para os totais apenas se as colunas estiverem selecionadas
+if (colunasSelecionadas.includes('valorVenda')) {
     const cellValorVenda = document.createElement('td');
     cellValorVenda.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-    cellValorVenda.style.textAlign = 'right'; // Alinhar à direita
+    cellValorVenda.style.textAlign = 'right';
     footerRow.appendChild(cellValorVenda);
+}
 
-    // Adicionar célula para o total de "Valor Bruto a Receber"
+if (colunasSelecionadas.includes('valorBrutoReceber')) {
     const cellValorBruto = document.createElement('td');
     cellValorBruto.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-    cellValorBruto.style.textAlign = 'right'; // Alinhar à direita
+    cellValorBruto.style.textAlign = 'right';
     footerRow.appendChild(cellValorBruto);
+}
 
-    // Adicionar célula para o total de "Valor da Comissão"
+if (colunasSelecionadas.includes('comissao')) {
     const cellComissao = document.createElement('td');
     cellComissao.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-    cellComissao.style.textAlign = 'right'; // Alinhar à direita
+    cellComissao.style.textAlign = 'right';
     footerRow.appendChild(cellComissao);
+}
 
-    tfoot.appendChild(footerRow);
+tfoot.appendChild(footerRow);
+
 
     // Inicializar o Sortable após preencher a tabela
     inicializarSortableRelatorio();
