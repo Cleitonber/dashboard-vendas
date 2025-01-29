@@ -281,55 +281,41 @@ function filtrarRelatorio() {
         tbody.appendChild(row);
     });
 
- // Criar rodapé da tabela com totais alinhados
+    // Adicionar totais no rodapé
     const tfoot = document.querySelector('#tabelaRelatorio tfoot');
     tfoot.innerHTML = '';
-    const tfootRow = document.createElement('tr');
 
-    // Criar células para cada coluna selecionada
-    colunasSelecionadas.forEach((coluna, index) => {
-        const td = document.createElement('td');
-        
-        // Verificar se é uma das colunas que precisam mostrar totais
-        if (coluna === 'valorBrutoReceber') {
-            td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-            td.style.textAlign = 'right';
-        } else if (coluna === 'comissao') {
-            td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-            td.style.textAlign = 'right';
-        } else if (index === 0) { // Primeira coluna
-            td.innerHTML = '<strong>Totais:</strong>';
-            td.style.textAlign = 'right';
-        } else {
-            td.innerHTML = ''; // Células vazias para outras colunas
-        }
-        
-        tfootRow.appendChild(td);
-    });
+    const footerRow = document.createElement('tr');
 
-    tfoot.appendChild(tfootRow);
-    
-    // Adicionar classes CSS para alinhamento
-    const tds = document.querySelectorAll('#tabelaRelatorio td');
-    tds.forEach(td => {
-        if (td.textContent.includes('R$')) {
-            td.style.textAlign = 'right';
-        }
-    });
+    // Adicionar célula para o texto "Totais:"
+    const cellTotais = document.createElement('td');
+    cellTotais.setAttribute('colspan', colunasSelecionadas.indexOf('valorVenda'));
+    cellTotais.innerHTML = '<strong>Totais:</strong>';
+    footerRow.appendChild(cellTotais);
 
-    // Alinhar cabeçalhos de colunas monetárias
-    const ths = document.querySelectorAll('#tabelaRelatorio th');
-    ths.forEach((th, index) => {
-        if (colunasSelecionadas[index] === 'valorBrutoReceber' || 
-            colunasSelecionadas[index] === 'comissao' || 
-            colunasSelecionadas[index] === 'valorVenda') {
-            th.style.textAlign = 'right';
-        }
-    });
-}
+    // Adicionar célula para o total de "Valor da Venda"
+    const cellValorVenda = document.createElement('td');
+    cellValorVenda.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+    cellValorVenda.style.textAlign = 'right'; // Alinhar à direita
+    footerRow.appendChild(cellValorVenda);
+
+    // Adicionar célula para o total de "Valor Bruto a Receber"
+    const cellValorBruto = document.createElement('td');
+    cellValorBruto.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+    cellValorBruto.style.textAlign = 'right'; // Alinhar à direita
+    footerRow.appendChild(cellValorBruto);
+
+    // Adicionar célula para o total de "Valor da Comissão"
+    const cellComissao = document.createElement('td');
+    cellComissao.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+    cellComissao.style.textAlign = 'right'; // Alinhar à direita
+    footerRow.appendChild(cellComissao);
+
+    tfoot.appendChild(footerRow);
 
     // Inicializar o Sortable após preencher a tabela
     inicializarSortableRelatorio();
+}
 
 // Função para exportar relatório em Excel
 function exportarRelatorioExcel() {
@@ -1650,35 +1636,3 @@ document.addEventListener('DOMContentLoaded', function () {
     inicializarGraficos();
     atualizarDashboard();
 });
-
-// Atualiza o rodapé para garantir alinhamento correto e evitar duplicação de valores
-function atualizarRodapeRelatorio() {
-    const tfoot = document.querySelector('#tabelaRelatorio tfoot');
-    tfoot.innerHTML = ''; // Remove qualquer rodapé antigo antes de criar um novo
-
-    const footerRow = document.createElement('tr');
-
-    // Obtém a ordem real das colunas visíveis na tabela
-    const colunasVisiveis = Array.from(document.querySelectorAll('#tabelaRelatorio thead th'))
-        .map(th => th.getAttribute('data-coluna-id'));
-
-    colunasVisiveis.forEach((colunaId) => {
-        const cell = document.createElement('td');
-        cell.style.textAlign = 'right'; // Mantém alinhamento correto
-
-        // Insere os totais somente nas colunas corretas
-        if (colunaId === 'valorVenda') {
-            cell.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-        } else if (colunaId === 'valorBrutoReceber') {
-            cell.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-        } else if (colunaId === 'comissao') {
-            cell.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-        } else {
-            cell.innerHTML = ''; // Mantém a estrutura correta sem duplicações
-        }
-
-        footerRow.appendChild(cell);
-    });
-
-    tfoot.appendChild(footerRow);
-}
