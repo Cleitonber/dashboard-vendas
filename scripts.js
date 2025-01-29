@@ -80,6 +80,9 @@ function preencherFiltroColunas() {
 
 // Função para inicializar a funcionalidade de arrastar e soltar na tabela de relatórios
 function inicializarSortableRelatorio() {
+    onEnd: function (evt) {
+    atualizarRodapeRelatorio(); // Atualiza o rodapé após reorganizar colunas
+}
     const tabelaRelatorio = document.getElementById('tabelaRelatorio');
     if (!tabelaRelatorio) {
         console.error('A tabela com o ID "tabelaRelatorio" não foi encontrada no DOM.');
@@ -155,7 +158,34 @@ function limparFiltros() {
     // Atualizar a tabela de relatórios com os dados sem filtros
     filtrarRelatorio();
     atualizarRodapeRelatorio();
+const tfoot = document.querySelector('#tabelaRelatorio tfoot');
+    tfoot.innerHTML = ''; // Remove qualquer rodapé antigo antes de criar um novo
 
+    const footerRow = document.createElement('tr');
+
+    // Obtém a ordem real das colunas visíveis na tabela
+    const colunasVisiveis = Array.from(document.querySelectorAll('#tabelaRelatorio thead th'))
+        .map(th => th.getAttribute('data-coluna-id'));
+
+    colunasVisiveis.forEach((colunaId) => {
+        const cell = document.createElement('td');
+        cell.style.textAlign = 'right'; // Mantém alinhamento correto
+
+        // Insere os totais somente nas colunas corretas
+        if (colunaId === 'valorVenda') {
+            cell.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+        } else if (colunaId === 'valorBrutoReceber') {
+            cell.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+        } else if (colunaId === 'comissao') {
+            cell.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+        } else {
+            cell.innerHTML = ''; // Mantém a estrutura correta sem duplicações
+        }
+
+        footerRow.appendChild(cell);
+    });
+
+    tfoot.appendChild(footerRow);
 }
 
 // Função para filtrar e gerar o relatório
@@ -177,6 +207,7 @@ function filtrarRelatorio() {
         const filtroVendedor = !vendedorId || venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
 
         return filtroData && filtroVendedor;
+        atualizarRodapeRelatorio()
     });
 
     // Criar corpo da tabela
