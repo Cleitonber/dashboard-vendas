@@ -344,7 +344,7 @@ thead.appendChild(headerRow);
         tbody.appendChild(row);
     });
 
-// Adicionar totais no rodapé (substituir o código atual do rodapé)
+// Adicionar totais no rodapé
 const tfoot = document.querySelector('#tabelaRelatorio tfoot');
 tfoot.innerHTML = '';
 const footerRow = document.createElement('tr');
@@ -358,14 +358,14 @@ colunasSelecionadas.forEach((colunaId) => {
         td.innerHTML = '<strong>Totais:</strong>';
         td.style.textAlign = 'left';
         totaisAdicionados = true;
-    } else if (colunaId === 'valorVenda') {
-        td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+    } else if (colunaId === 'comissao') {
+        td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
         td.setAttribute('data-tipo', 'monetario');
     } else if (colunaId === 'valorBrutoReceber') {
         td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
         td.setAttribute('data-tipo', 'monetario');
-    } else if (colunaId === 'comissao') {
-        td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+    } else if (colunaId === 'valorVenda') {
+        td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
         td.setAttribute('data-tipo', 'monetario');
     } else {
         td.innerHTML = '';
@@ -375,6 +375,7 @@ colunasSelecionadas.forEach((colunaId) => {
 });
 
 tfoot.appendChild(footerRow);
+
 inicializarOrdenacaoTabela();
 inicializarSortableRelatorio();
 
