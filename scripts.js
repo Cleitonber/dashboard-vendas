@@ -286,43 +286,34 @@ const tfoot = document.querySelector('#tabelaRelatorio tfoot');
 tfoot.innerHTML = '';
 const footerRow = document.createElement('tr');
 
-// Mapear índices das colunas monetárias
-const indexValorVenda = colunasSelecionadas.indexOf('valorVenda');
-const indexValorBruto = colunasSelecionadas.indexOf('valorBrutoReceber');
-const indexComissao = colunasSelecionadas.indexOf('comissao');
-
-// Criar células para cada coluna selecionada
-colunasSelecionadas.forEach((coluna, index) => {
+colunasSelecionadas.forEach((colunaId) => {
     const td = document.createElement('td');
     
-    if (index === 0) {
-        // Primeira coluna sempre mostra "Totais:"
-        td.innerHTML = '<strong>Totais:</strong>';
-        td.style.textAlign = 'left';
-    } else if (index === indexValorVenda) {
-        // Coluna de Valor da Venda
-        td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-        td.setAttribute('data-tipo', 'monetario');
-        td.style.textAlign = 'right';
-    } else if (index === indexValorBruto) {
-        // Coluna de Valor Bruto a Receber
-        td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-        td.setAttribute('data-tipo', 'monetario');
-        td.style.textAlign = 'right';
-    } else if (index === indexComissao) {
-        // Coluna de Comissão
-        td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-        td.setAttribute('data-tipo', 'monetario');
-        td.style.textAlign = 'right';
-    } else {
-        // Outras colunas ficam vazias
-        td.innerHTML = '';
+    switch (colunaId) {
+        case 'data':
+            td.innerHTML = '<strong>Totais:</strong>';
+            td.style.textAlign = 'left';
+            break;
+        case 'valorVenda':
+            td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+            td.setAttribute('data-tipo', 'monetario');
+            break;
+        case 'valorBrutoReceber':
+            td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+            td.setAttribute('data-tipo', 'monetario');
+            break;
+        case 'comissao':
+            td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+            td.setAttribute('data-tipo', 'monetario');
+            break;
+        default:
+            td.innerHTML = '';
     }
-    
     footerRow.appendChild(td);
 });
 
 tfoot.appendChild(footerRow);
+
 
     // Inicializar o Sortable após preencher a tabela
     inicializarSortableRelatorio();
