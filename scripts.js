@@ -1612,12 +1612,12 @@ function mudarPaginaVendas(direcao) {
 
 // Procure por "function filtrarVendas()" e substitua por:
 function filtrarVendas() {
-    const dataInicial = document.getElementById('filtroDataInicial').value;
-    const dataFinal = document.getElementById('filtroDataFinal').value;
-    const idVenda = document.getElementById('filtroIdVenda').value;
-    const vendedor = document.getElementById('filtroVendedor').value;
-    const servico = document.getElementById('filtroServico').value;
-    const empresa = document.getElementById('filtroEmpresa').value;
+    const dataInicial = document.getElementById('filtroDataInicialVendas')?.value || '';
+    const dataFinal = document.getElementById('filtroDataFinalVendas')?.value || '';
+    const idVenda = document.getElementById('filtroIdVendas')?.value || '';
+    const vendedor = document.getElementById('filtroVendedorVendas')?.value || '';
+    const servico = document.getElementById('filtroServicoVendas')?.value || '';
+    const empresa = document.getElementById('filtroEmpresaVendas')?.value || '';
     
     // Converter datas para comparação
     const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
@@ -1639,6 +1639,34 @@ function filtrarVendas() {
 
     exibirVendas(vendasFiltradas);
 }
+
+// Atualizar a função inicializarFiltros
+function inicializarFiltros() {
+    const vendedorSelect = document.getElementById('filtroVendedorVendas');
+    const servicoSelect = document.getElementById('filtroServicoVendas');
+    const empresaSelect = document.getElementById('filtroEmpresaVendas');
+
+    if (vendedorSelect && servicoSelect && empresaSelect) {
+        // Limpar opções existentes
+        vendedorSelect.innerHTML = '<option value="">Todos</option>';
+        servicoSelect.innerHTML = '<option value="">Todos</option>';
+        empresaSelect.innerHTML = '<option value="">Todas</option>';
+
+        // Preencher opções dos selects
+        dados.vendedores.forEach(vendedor => {
+            vendedorSelect.add(new Option(vendedor.nome, vendedor.nome));
+        });
+
+        dados.servicos.forEach(servico => {
+            servicoSelect.add(new Option(servico.nome, servico.nome));
+        });
+
+        dados.empresasParceiras.forEach(empresa => {
+            empresaSelect.add(new Option(empresa.nome, empresa.nome));
+        });
+    }
+}
+
 function exibirVendas(vendas) {
     const tbody = document.querySelector('#tabelaVendas tbody');
     const itensPorPagina = parseInt(document.getElementById('itensPorPagina').value);
