@@ -15,6 +15,50 @@ const itensPorPagina = 5;
 
 let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart;
 
+// scripts.js
+function inicializarAplicacao() {
+    try {
+        // Verificar elementos essenciais
+        const elementosFaltantes = verificarElementos();
+        
+        if (elementosFaltantes.length > 0) {
+            console.error('Elementos não encontrados:', elementosFaltantes);
+            mostrarErroInicializacao(elementosFaltantes);
+            return;
+        }
+
+        // Inicializar componentes
+        inicializarGraficos();
+        inicializarTabelas();
+        inicializarEventos();
+        atualizarDashboard();
+
+        console.log('Aplicação inicializada com sucesso');
+    } catch (erro) {
+        console.error('Erro na inicialização:', erro);
+        mostrarErroInicializacao();
+    }
+}
+
+function mostrarErroInicializacao(elementosFaltantes = null) {
+    const mensagem = elementosFaltantes 
+        ? `Elementos necessários não encontrados: ${elementosFaltantes.map(e => e.id).join(', ')}`
+        : 'Houve um erro ao inicializar a aplicação';
+
+    // Criar elemento de alerta
+    const alerta = document.createElement('div');
+    alerta.className = 'alerta-erro';
+    alerta.innerHTML = `
+        <div class="alerta-conteudo">
+            <h3>Erro de Inicialização</h3>
+            <p>${mensagem}</p>
+            <button onclick="window.location.reload()">Recarregar Página</button>
+        </div>
+    `;
+
+    document.body.appendChild(alerta);
+}
+
 // Definição global das colunas
 const colunas = [
     { id: 'data', label: 'Data da Venda' },
@@ -619,6 +663,52 @@ function atualizarGraficos(vendasFiltradas) {
 // Função para inicializar os gráficos
 function inicializarGraficos() {
     console.log('Inicializando gráficos...'); // Adicione este log para depuração
+    try {
+        const contextos = {
+            vendasServico: document.getElementById('vendasServicoChart')?.getContext('2d'),
+            desempenhoVendedores: document.getElementById('desempenhoVendedoresChart')?.getContext('2d'),
+            vendasCategoria: document.getElementById('vendasCategoriaChart')?.getContext('2d')
+        };
+
+        // Verificar contextos
+        Object.entries(contextos).forEach(([nome, contexto]) => {
+            if (!contexto) throw new Error(`Contexto não encontrado para ${nome}`);
+        });
+
+        // Inicializar gráficos
+        vendasServicoChart = criarGraficoVendasServico(contextos.vendasServico);
+        desempenhoVendedoresChart = criarGraficoDesempenho(contextos.desempenhoVendedores);
+        vendasCategoriaChart = criarGraficoCategoria(contextos.vendasCategoria);
+
+    } catch (erro) {
+        console.error('Erro ao inicializar gráficos:', erro);
+        throw erro;
+    }
+}
+
+// Inicialização das tabelas
+function inicializarTabelas() {
+    try {
+        const tabelas = {
+            relatorio: document.getElementById('tabelaRelatorio'),
+            vendas: document.getElementById('tabelaVendas')
+        };
+
+        // Verificar tabelas
+        Object.entries(tabelas).forEach(([nome, tabela]) => {
+            if (!tabela) throw new Error(`Tabela ${nome} não encontrada`);
+        });
+
+        // Inicializar funcionalidades das tabelas
+        inicializarSortableRelatorio();
+        inicializarOrdenacaoTabela();
+
+    } catch (erro) {
+        console.error('Erro ao inicializar tabelas:', erro);
+        throw erro;
+    }
+}
+    
 
     const ctxVendasServico = document.getElementById('vendasServicoChart').getContext('2d');
     const ctxDesempenhoVendedores = document.getElementById('desempenhoVendedoresChart').getContext('2d');
@@ -1645,10 +1735,15 @@ function atualizarFiltrosVendas() {
     });
 }
 
-// Inicialização quando o documento carrega
-document.addEventListener('DOMContentLoaded', function() {
-    inicializarGraficos();
-    atualizarDashboard();
+// Inicialização quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', () => {
+    try {
+        inicializarAplicacao();
+    } catch (erro) {
+        console.error('Erro fatal na inicialização:', erro);
+        mostrarErroInicializacao();
+    }
+});
     
     // Se estiver na aba de relatórios
     if (document.getElementById('relatoriosTab').classList.contains('active')) {
