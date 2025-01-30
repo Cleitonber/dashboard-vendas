@@ -1645,12 +1645,6 @@ function atualizarFiltrosVendas() {
     });
 }
 
-// Inicializar gráficos ao carregar a página
-document.addEventListener('DOMContentLoaded', function () {
-    inicializarGraficos();
-    atualizarDashboard();
-});
-
 // Inicialização quando o documento carrega
 document.addEventListener('DOMContentLoaded', function() {
     inicializarGraficos();
