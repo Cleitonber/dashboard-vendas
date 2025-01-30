@@ -561,14 +561,19 @@ function inicializarSortable() {
 // Função para exportar a tabela de vendas para Excel
 function exportarVendasExcel() {
     const tabela = document.getElementById('tabelaVendas');
-    const headers = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent);
+    const headers = Array.from(tabela.querySelectorAll('th'))
+        .slice(0, -1)  // Remover última coluna (Ações)
+        .map(th => th.textContent);
+    
     const data = [];
 
     document.querySelectorAll('#tabelaVendas tbody tr').forEach(row => {
         const rowData = {};
-        row.querySelectorAll('td').forEach((cell, index) => {
-            rowData[headers[index]] = cell.textContent;
-        });
+        row.querySelectorAll('td')
+            .slice(0, -1)  // Remover última coluna (Ações)
+            .forEach((cell, index) => {
+                rowData[headers[index]] = cell.textContent;
+            });
         data.push(rowData);
     });
 
@@ -578,14 +583,20 @@ function exportarVendasExcel() {
     XLSX.writeFile(wb, 'vendas.xlsx');
 }
 
-// Função para exportar a tabela de vendas para PDF
+// Substituir a função exportarVendasPDF() inteira por:
 function exportarVendasPDF() {
-    const doc = new jsPDF();
+    const doc = new jsPDF('landscape');  // Configurar paisagem
     const tabela = document.getElementById('tabelaVendas');
-    const headers = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent);
-    const rows = Array.from(tabela.querySelectorAll('tbody tr')).map(tr =>
-        Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
-    );
+    
+    const headers = Array.from(tabela.querySelectorAll('th'))
+        .slice(0, -1)  // Remover última coluna (Ações)
+        .map(th => th.textContent);
+    
+    const rows = Array.from(tabela.querySelectorAll('tbody tr'))
+        .map(tr => Array.from(tr.querySelectorAll('td'))
+            .slice(0, -1)  // Remover última coluna (Ações)
+            .map(td => td.textContent)
+        );
 
     doc.autoTable({
         head: [headers],
@@ -597,6 +608,7 @@ function exportarVendasPDF() {
 
     doc.save('vendas.pdf');
 }
+
 
 // Função para preencher os filtros de vendedores, serviços e empresas
 function preencherFiltrosVendas() {
@@ -1464,7 +1476,7 @@ document.getElementById('vendaForm').addEventListener('submit', function (e) {
         empresaParceira: empresaParceira.nome,
         valorVenda: valorVenda,
         valorReceber: valorReceber,
-        comissao: comissao,
+        comissao: comissaoCalculada,
         tipoComissao: servico.tipoComissao
     };
 
@@ -1576,9 +1588,14 @@ function esconderSpinner() {
 }
 
 // Função para listar as vendas
-function listarVendas(vendas = dados.vendas) {
+// Substituir a função inteira por:
+function listarVendas(vendas = []) {
     const tbody = document.querySelector('#tabelaVendas tbody');
     tbody.innerHTML = '';
+
+    if (vendas.length === 0) {
+        return; // Não lista nada se não houver vendas
+    }
 
     const itensPorPagina = parseInt(document.getElementById('itensPorPaginaVendas').value);
     const inicio = (paginaAtualVendas - 1) * itensPorPagina;
