@@ -1739,6 +1739,11 @@ function atualizarFiltrosVendas() {
 document.addEventListener('DOMContentLoaded', () => {
     try {
         inicializarAplicacao();
+        
+        // Se estiver na aba de relatórios
+        if (document.getElementById('relatoriosTab').classList.contains('active')) {
+            inicializarSortableRelatorio();
+        }
     } catch (erro) {
         console.error('Erro fatal na inicialização:', erro);
         mostrarErroInicializacao();
