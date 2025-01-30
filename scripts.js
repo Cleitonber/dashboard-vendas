@@ -1700,35 +1700,47 @@ function inicializarFiltros() {
 }
 
 function exibirVendas(vendas) {
-    const tbody = document.querySelector('#tabelaVendas tbody');
-    const itensPorPagina = parseInt(document.getElementById('itensPorPagina').value);
-    const inicio = (paginaAtual - 1) * itensPorPagina;
-    const fim = inicio + itensPorPagina;
-    const vendasPaginadas = vendas.slice(inicio, fim);
+    try {
+        const tbody = document.querySelector('#tabelaVendas tbody');
+        if (!tbody) {
+            console.error('Elemento tbody não encontrado');
+            return;
+        }
 
-    tbody.innerHTML = '';
+        const itensPorPaginaElement = document.getElementById('itensPorPaginaVendas');
+        const itensPorPagina = itensPorPaginaElement ? parseInt(itensPorPaginaElement.value) : 5;
 
-    vendasPaginadas.forEach(venda => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${venda.data}</td>
-            <td>${venda.id}</td>
-            <td>${venda.vendedor}</td>
-            <td>${venda.servico}</td>
-            <td>${venda.nomeCliente}</td>
-            <td>${venda.empresaParceira}</td>
-            <td>${venda.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-            <td>${venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-            <td>${venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-            <td>
-                <button class="btn btn-sm btn-secondary" onclick="editarVenda(${venda.id})">Editar</button>
-                <button class="btn btn-sm btn-danger" onclick="excluirVenda(${venda.id})">Excluir</button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
+        const inicio = (paginaAtual - 1) * itensPorPagina;
+        const fim = inicio + itensPorPagina;
+        const vendasPaginadas = vendas.slice(inicio, fim);
 
-    atualizarPaginacao(vendas.length, itensPorPagina);
+        tbody.innerHTML = '';
+
+        vendasPaginadas.forEach(venda => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${venda.data}</td>
+                <td>${venda.id}</td>
+                <td>${venda.vendedor}</td>
+                <td>${venda.servico}</td>
+                <td>${venda.nomeCliente}</td>
+                <td>${venda.empresaParceira}</td>
+                <td>${venda.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                <td>${venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                <td>${venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                <td>
+                    <button class="btn btn-sm btn-secondary" onclick="editarVenda(${venda.id})">Editar</button>
+                    <button class="btn btn-sm btn-danger" onclick="excluirVenda(${venda.id})">Excluir</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        atualizarPaginacao(vendas.length, itensPorPagina);
+    } catch (error) {
+        console.error('Erro ao exibir vendas:', error);
+        alert('Ocorreu um erro ao exibir as vendas.');
+    }
 }
 
 function atualizarPaginacao(totalItens, itensPorPagina) {
