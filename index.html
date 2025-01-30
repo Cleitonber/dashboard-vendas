@@ -308,6 +308,7 @@
             </div>
 
           <!-- Seção de Listagem de Vendas -->
+<!-- Seção de Listagem de Vendas -->
 <div class="card mb-4">
     <div class="card-header">
         <h5 class="mb-0">Listagem de Vendas</h5>
@@ -316,45 +317,45 @@
         <!-- Filtros -->
         <div class="row mb-3">
             <div class="col-md-2">
-                <label for="filtroDataInicial">Data Inicial</label>
-                <input type="text" class="form-control" id="filtroDataInicial" oninput="formatarDataInput(this)">
+                <label for="filtroDataInicialVendas">Data Inicial</label>
+                <input type="text" class="form-control" id="filtroDataInicialVendas" oninput="formatarDataInput(this)">
             </div>
             <div class="col-md-2">
-                <label for="filtroDataFinal">Data Final</label>
-                <input type="text" class="form-control" id="filtroDataFinal" oninput="formatarDataInput(this)">
+                <label for="filtroDataFinalVendas">Data Final</label>
+                <input type="text" class="form-control" id="filtroDataFinalVendas" oninput="formatarDataInput(this)">
             </div>
             <div class="col-md-2">
-                <label for="filtroIdVenda">ID da Venda</label>
-                <input type="number" class="form-control" id="filtroIdVenda">
+                <label for="filtroIdVendas">ID da Venda</label>
+                <input type="number" class="form-control" id="filtroIdVendas">
             </div>
             <div class="col-md-2">
-                <label for="filtroVendedor">Vendedor</label>
-                <select class="form-control" id="filtroVendedor">
+                <label for="filtroVendedorVendas">Vendedor</label>
+                <select class="form-control" id="filtroVendedorVendas">
                     <option value="">Todos</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <label for="filtroServico">Serviço</label>
-                <select class="form-control" id="filtroServico">
+                <label for="filtroServicoVendas">Serviço</label>
+                <select class="form-control" id="filtroServicoVendas">
                     <option value="">Todos</option>
                 </select>
             </div>
             <div class="col-md-2">
-                <label for="filtroEmpresa">Empresa</label>
-                <select class="form-control" id="filtroEmpresa">
+                <label for="filtroEmpresaVendas">Empresa</label>
+                <select class="form-control" id="filtroEmpresaVendas">
                     <option value="">Todas</option>
                 </select>
             </div>
         </div>
         
-        <!-- Botão Gerar e Seletor de Itens por Página -->
+        <!-- Botões e Itens por Página -->
         <div class="row mb-3">
             <div class="col-md-2">
                 <button class="btn btn-primary" onclick="filtrarVendas()">Gerar Listagem</button>
             </div>
             <div class="col-md-2">
-                <label for="itensPorPagina">Itens por página:</label>
-                <select class="form-control" id="itensPorPagina" onchange="filtrarVendas()">
+                <label for="itensPorPaginaVendas">Itens por página:</label>
+                <select class="form-control" id="itensPorPaginaVendas" onchange="filtrarVendas()">
                     <option value="5">5</option>
                     <option value="10">10</option>
                     <option value="20">20</option>
@@ -363,18 +364,6 @@
             </div>
         </div>
 
-<div class="row mb-3">
-    <div class="col-md-2">
-        <label for="itensPorPaginaVendas">Itens por página:</label>
-        <select class="form-control" id="itensPorPaginaVendas">
-            <option value="5">5</option>
-            <option value="10">10</option>
-            <option value="20">20</option>
-            <option value="50">50</option>
-        </select>
-    </div>
-</div>
-        
         <!-- Tabela de Vendas -->
         <div class="table-responsive">
             <table class="table table-striped" id="tabelaVendas">
@@ -395,15 +384,13 @@
                 <tbody></tbody>
             </table>
         </div>
-        
+
         <!-- Paginação -->
         <div class="d-flex justify-content-between align-items-center mt-3">
-    <div id="controlesPaginacaoVendas"></div>
-</div>
+            <div id="controlesPaginacaoVendas"></div>
         </div>
     </div>
 </div>
-
 
         <!-- Relatórios -->
         <div id="relatorios" class="tab-content">
