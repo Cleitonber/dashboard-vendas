@@ -78,36 +78,53 @@ function preencherFiltroColunas() {
     });
 }
 
-// Função para inicializar a funcionalidade de arrastar e soltar na tabela de relatórios
 function inicializarSortableRelatorio() {
     const table = document.getElementById('tabelaRelatorio');
+    if (!table) return;
+
+    // Destruir instância anterior se existir
+    if (table.sortableInstance) {
+        table.sortableInstance.destroy();
+    }
+
     const thead = table.querySelector('thead tr');
-    
-    new Sortable(thead, {
+    if (!thead) return;
+
+    table.sortableInstance = new Sortable(thead, {
         animation: 150,
         ghostClass: 'sortable-ghost',
+        onStart: function(evt) {
+            // Salvar o estado inicial da tabela
+            const table = evt.item.closest('table');
+            table.originalHTML = table.innerHTML;
+        },
         onEnd: function (evt) {
+            if (!evt.item) return;
+            
+            const table = evt.item.closest('table');
             const from = evt.oldIndex;
             const to = evt.newIndex;
             
-            // Reordenar células em todas as linhas (incluindo tbody e tfoot)
+            // Reordenar todas as linhas
             const allRows = table.querySelectorAll('tbody tr, tfoot tr');
+            
             allRows.forEach(row => {
+                if (!row || !row.children) return;
+                
                 const cells = Array.from(row.children);
-                const cell = cells[from];
-                
-                // Remover a célula da posição atual
-                row.removeChild(cell);
-                
-                // Inserir a célula na nova posição
-                if (to >= cells.length) {
-                    row.appendChild(cell);
-                } else {
-                    row.insertBefore(cell, cells[to]);
+                if (from >= 0 && from < cells.length) {
+                    const cell = cells[from];
+                    row.removeChild(cell);
+                    
+                    if (to >= cells.length) {
+                        row.appendChild(cell);
+                    } else {
+                        row.insertBefore(cell, cells[to]);
+                    }
                 }
             });
-            
-            // Atualizar os data-tipos das colunas
+
+            // Atualizar os atributos data-tipo e alinhamentos
             const headers = thead.querySelectorAll('th');
             headers.forEach((header, index) => {
                 const tipo = header.getAttribute('data-tipo');
@@ -134,10 +151,37 @@ function inicializarSortableRelatorio() {
                     }
                 }
             });
+
+            // Verificar se a reordenação foi bem-sucedida
+            const currentRows = table.querySelectorAll('tr');
+            const allRowsHaveSameLength = Array.from(currentRows).every(row => 
+                row.children.length === thead.children.length
+            );
+
+            if (!allRowsHaveSameLength) {
+                // Restaurar estado original se algo deu errado
+                table.innerHTML = table.originalHTML;
+                inicializarSortableRelatorio(); // Reinicializar
+            }
         }
     });
 }
 
+// Adicionar listener para reinicializar quando mudar de aba
+function showTab(tabId) {
+    const tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    
+    const buttons = document.querySelectorAll('.nav-button');
+    buttons.forEach(button => button.classList.remove('active'));
+    document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+
+    // Reinicializar Sortable se estiver na aba de relatórios
+    if (tabId === 'relatoriosTab') {
+        setTimeout(inicializarSortableRelatorio, 100);
+    }
+}
 
 // Função para limpar os filtros e recarregar a tabela de relatórios
 function limparFiltros() {
