@@ -79,6 +79,7 @@ function preencherFiltroColunas() {
 }
 
 function inicializarSortableRelatorio() {
+function inicializarSortableRelatorio() {
     const table = document.getElementById('tabelaRelatorio');
     if (!table) return;
 
@@ -94,80 +95,57 @@ function inicializarSortableRelatorio() {
         animation: 150,
         ghostClass: 'sortable-ghost',
         onStart: function(evt) {
-            // Salvar o estado inicial da tabela
-            const table = evt.item.closest('table');
-            table.originalHTML = table.innerHTML;
+            // Salvar índices originais
+            const cells = Array.from(evt.item.parentElement.children);
+            cells.forEach((cell, index) => {
+                cell.dataset.originalIndex = index;
+            });
         },
-        onEnd: function (evt) {
-            if (!evt.item) return;
+        onEnd: function(evt) {
+            const from = parseInt(evt.item.dataset.originalIndex);
+            const to = Array.from(evt.item.parentElement.children).indexOf(evt.item);
             
-            const table = evt.item.closest('table');
-            const from = evt.oldIndex;
-            const to = evt.newIndex;
-            
-            // Reordenar todas as linhas
-            const allRows = table.querySelectorAll('tbody tr, tfoot tr');
-            
-            allRows.forEach(row => {
-                if (!row || !row.children) return;
-                
+            // Reordenar todas as linhas (tbody e tfoot)
+            const rows = table.querySelectorAll('tbody tr, tfoot tr');
+            rows.forEach(row => {
                 const cells = Array.from(row.children);
-                if (from >= 0 && from < cells.length) {
-                    const cell = cells[from];
-                    row.removeChild(cell);
-                    
-                    if (to >= cells.length) {
-                        row.appendChild(cell);
-                    } else {
-                        row.insertBefore(cell, cells[to]);
-                    }
+                const cell = cells[from];
+                row.removeChild(cell);
+                if (to >= cells.length) {
+                    row.appendChild(cell);
+                } else {
+                    row.insertBefore(cell, cells[to]);
                 }
             });
 
-            // Atualizar os atributos data-tipo e alinhamentos
-            const headers = thead.querySelectorAll('th');
-            headers.forEach((header, index) => {
-                const tipo = header.getAttribute('data-tipo');
-                const colunasBody = table.querySelectorAll(`tbody tr td:nth-child(${index + 1})`);
-                const colunaFoot = table.querySelector(`tfoot tr td:nth-child(${index + 1})`);
-                
-                colunasBody.forEach(cell => {
-                    if (tipo === 'monetario') {
-                        cell.setAttribute('data-tipo', 'monetario');
-                        cell.style.textAlign = 'right';
-                    } else {
-                        cell.removeAttribute('data-tipo');
-                        cell.style.textAlign = 'left';
-                    }
-                });
-                
-                if (colunaFoot) {
-                    if (tipo === 'monetario') {
-                        colunaFoot.setAttribute('data-tipo', 'monetario');
-                        colunaFoot.style.textAlign = 'right';
-                    } else {
-                        colunaFoot.removeAttribute('data-tipo');
-                        colunaFoot.style.textAlign = 'left';
-                    }
-                }
-            });
-
-            // Verificar se a reordenação foi bem-sucedida
-            const currentRows = table.querySelectorAll('tr');
-            const allRowsHaveSameLength = Array.from(currentRows).every(row => 
-                row.children.length === thead.children.length
-            );
-
-            if (!allRowsHaveSameLength) {
-                // Restaurar estado original se algo deu errado
-                table.innerHTML = table.originalHTML;
-                inicializarSortableRelatorio(); // Reinicializar
-            }
+            // Atualizar atributos data-tipo
+            updateColumnAttributes();
         }
     });
 }
 
-// Adicionar listener para reinicializar quando mudar de aba
+// Função auxiliar para atualizar atributos das colunas
+function updateColumnAttributes() {
+    const table = document.getElementById('tabelaRelatorio');
+    const headers = table.querySelectorAll('thead th');
+    
+    headers.forEach((header, index) => {
+        const isMonetary = header.getAttribute('data-tipo') === 'monetario';
+        const cells = table.querySelectorAll(`tbody tr td:nth-child(${index + 1}), tfoot tr td:nth-child(${index + 1})`);
+        
+        cells.forEach(cell => {
+            if (isMonetary) {
+                cell.setAttribute('data-tipo', 'monetario');
+                cell.style.textAlign = 'right';
+            } else {
+                cell.removeAttribute('data-tipo');
+                cell.style.textAlign = 'left';
+            }
+        });
+    });
+}
+
+// Adicionar chamada para reinicializar quando mudar de aba
 function showTab(tabId) {
     const tabs = document.querySelectorAll('.tab-content');
     tabs.forEach(tab => tab.classList.remove('active'));
@@ -179,7 +157,10 @@ function showTab(tabId) {
 
     // Reinicializar Sortable se estiver na aba de relatórios
     if (tabId === 'relatoriosTab') {
-        setTimeout(inicializarSortableRelatorio, 100);
+setTimeout(() => {
+            inicializarSortableRelatorio();
+            updateColumnAttributes();
+        }, 100);
     }
 }
 
@@ -393,28 +374,30 @@ const tfoot = document.querySelector('#tabelaRelatorio tfoot');
 tfoot.innerHTML = '';
 const footerRow = document.createElement('tr');
 
-let totaisAdicionados = false;
-
+// Criar células para cada coluna selecionada
 colunasSelecionadas.forEach((colunaId) => {
     const td = document.createElement('td');
     
-    if (!totaisAdicionados && colunaId === colunasSelecionadas[0]) {
-        td.innerHTML = '<strong>Totais:</strong>';
-        td.style.textAlign = 'left';
-        totaisAdicionados = true;
-    } else if (colunaId === 'comissao') {
-        td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-        td.setAttribute('data-tipo', 'monetario');
-    } else if (colunaId === 'valorBrutoReceber') {
-        td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-        td.setAttribute('data-tipo', 'monetario');
-    } else if (colunaId === 'valorVenda') {
-        td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-        td.setAttribute('data-tipo', 'monetario');
-    } else {
-        td.innerHTML = '';
+    switch (colunaId) {
+        case 'data':
+            td.innerHTML = '<strong>Totais:</strong>';
+            td.style.textAlign = 'left';
+            break;
+        case 'valorVenda':
+            td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+            td.setAttribute('data-tipo', 'monetario');
+            break;
+        case 'valorBrutoReceber':
+            td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+            td.setAttribute('data-tipo', 'monetario');
+            break;
+        case 'comissao':
+            td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+            td.setAttribute('data-tipo', 'monetario');
+            break;
+        default:
+            td.innerHTML = '';
     }
-    
     footerRow.appendChild(td);
 });
 
