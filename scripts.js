@@ -327,38 +327,6 @@ function limparFiltros() {
     filtrarRelatorio();
 }
 
-// Criar células para cada coluna selecionada
-colunasSelecionadas.forEach((colunaId) => {
-    const td = document.createElement('td');
-    
-    switch (colunaId) {
-        case 'data':
-            td.innerHTML = '<strong>Totais:</strong>';
-            td.style.textAlign = 'left';
-            break;
-        case 'valorVenda':
-            td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-            td.setAttribute('data-tipo', 'monetario');
-            break;
-        case 'valorBrutoReceber':
-            td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-            td.setAttribute('data-tipo', 'monetario');
-            break;
-        case 'comissao':
-            td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-            td.setAttribute('data-tipo', 'monetario');
-            break;
-        default:
-            td.innerHTML = '';
-    }
-    footerRow.appendChild(td);
-});
-
-tfoot.appendChild(footerRow);
-
-inicializarOrdenacaoTabela();
-inicializarSortableRelatorio();
-
     // Inicializar o Sortable após preencher a tabela
     inicializarSortableRelatorio();
 }
