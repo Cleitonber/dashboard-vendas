@@ -561,19 +561,25 @@ function inicializarSortable() {
 // Função para exportar a tabela de vendas para Excel
 function exportarVendasExcel() {
     const tabela = document.getElementById('tabelaVendas');
+    
+    // Converter os cabeçalhos para array e remover a última coluna
     const headers = Array.from(tabela.querySelectorAll('th'))
         .slice(0, -1)  // Remover última coluna (Ações)
         .map(th => th.textContent);
-    
-    const data = [];
 
-    document.querySelectorAll('#tabelaVendas tbody tr').forEach(row => {
+    const data = [];
+    
+    // Converter NodeList para array usando Array.from()
+    Array.from(document.querySelectorAll('#tabelaVendas tbody tr')).forEach(row => {
         const rowData = {};
-        row.querySelectorAll('td')
+        
+        // Converter NodeList para array e remover última coluna
+        Array.from(row.querySelectorAll('td'))
             .slice(0, -1)  // Remover última coluna (Ações)
             .forEach((cell, index) => {
                 rowData[headers[index]] = cell.textContent;
             });
+        
         data.push(rowData);
     });
 
