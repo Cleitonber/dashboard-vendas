@@ -376,12 +376,15 @@ thead.appendChild(headerRow);
                         cell.style.textAlign = 'right'; // Alinhar à direita
                         break;
                     case 'percentualComissao':
-                        if (venda.tipoComissao === 'fixa') {
-                            valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                        } else {
-                            valor = `${venda.comissao}%`;
-                        }
-                        break;
+    if (venda.tipoComissao === 'fixa') {
+        valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    } else {
+        valor = venda.comissao.toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        }).replace('.', ',') + '%';
+    }
+    break;
                     default:
                         valor = '-';
                 }
