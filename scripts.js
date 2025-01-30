@@ -807,7 +807,6 @@ function inicializarGraficos() {
         console.error('Erro ao inicializar gráficos:', erro);
         throw erro;
     }
-}
 
 // Inicialização das tabelas
 function inicializarTabelas() {
