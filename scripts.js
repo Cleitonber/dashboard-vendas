@@ -379,8 +379,12 @@ thead.appendChild(headerRow);
     if (venda.tipoComissao === 'fixa') {
         valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     } else {
-        valor = venda.comissao.toLocaleString('pt-BR', {
-            minimumFractionDigits: 2,
+        // Remove o símbolo de % e converte para número
+        const comissaoValor = parseFloat(venda.comissao.replace('%', '').replace(',', '.'));
+        
+        // Formata com duas casas decimais e adiciona %
+        valor = comissaoValor.toLocaleString('pt-BR', {
+            minimumFractionDigits: 2, 
             maximumFractionDigits: 2
         }).replace('.', ',') + '%';
     }
@@ -1482,11 +1486,15 @@ document.getElementById('vendaForm').addEventListener('submit', function (e) {
     }
 
 let comissaoCalculada;
-    if (servico.tipoComissao === 'porcentagem') {
-        comissaoCalculada = (valorReceber * (comissao / 100));
-    } else {
-        comissaoCalculada = comissao;
-    }
+if (servico.tipoComissao === 'porcentagem') {
+    // Remove o % e converte para número
+    const comissaoPercentual = parseFloat(
+        comissao.toString().replace('%', '').replace(',', '.')
+    );
+    comissaoCalculada = (valorReceber * (comissaoPercentual / 100));
+} else {
+    comissaoCalculada = comissao;
+}
     
     if (servico.tipoComissao === 'fixa' && comissao > valorReceber) {
         alert('A comissão em reais não pode ser maior que o valor a receber.');
@@ -1502,7 +1510,7 @@ let comissaoCalculada;
         empresaParceira: empresaParceira.nome,
         valorVenda: valorVenda,
         valorReceber: valorReceber,
-        comissao: comissaoCalculada,
+        comissao: comissao,
         tipoComissao: servico.tipoComissao
     };
 
