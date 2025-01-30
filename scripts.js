@@ -805,19 +805,20 @@ function inicializarGraficos() {
             if (!contexto) throw new Error(`Contexto não encontrado para ${nome}`);
         });
 
-        // Inicializar gráficos
-        vendasServicoChart = criarGraficoVendasServico(contextos.vendasServico);
-        desempenhoVendedoresChart = criarGraficoDesempenho(contextos.desempenhoVendedores);
-        vendasCategoriaChart = criarGraficoCategoria(contextos.vendasCategoria);
+    // Inicializar gráficos
+    vendasServicoChart = criarGraficoVendasServico(contextos.vendasServico);
+    desempenhoVendedoresChart = criarGraficoDesempenho(contextos.desempenhoVendedores);
+    vendasCategoriaChart = criarGraficoCategoria(contextos.vendasCategoria);
 
-    } catch (erro) {
-        console.error('Erro ao inicializar gráficos:', erro);
-        throw erro;
-    }
+    console.log('Gráficos inicializados com sucesso!');
+} catch (erro) {
+    console.error('Erro ao inicializar gráficos:', erro);
+    throw erro;
 }
 
 // Inicialização das tabelas
 function inicializarTabelas() {
+
     try {
         const tabelas = {
             relatorio: document.getElementById('tabelaRelatorio'),
