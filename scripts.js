@@ -1612,30 +1612,62 @@ function mudarPaginaVendas(direcao) {
 
 // Procure por "function filtrarVendas()" e substitua por:
 function filtrarVendas() {
-    const dataInicial = document.getElementById('filtroDataInicialVendas')?.value || '';
-    const dataFinal = document.getElementById('filtroDataFinalVendas')?.value || '';
-    const idVenda = document.getElementById('filtroIdVendas')?.value || '';
-    const vendedor = document.getElementById('filtroVendedorVendas')?.value || '';
-    const servico = document.getElementById('filtroServicoVendas')?.value || '';
-    const empresa = document.getElementById('filtroEmpresaVendas')?.value || '';
-    
-    // Converter datas para comparação
-    const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
-    const dataFinalObj = dataFinal ? new Date(dataFinal.split('/').reverse().join('-')) : null;
+    try {
+        // Obter elementos com verificação de existência
+        const elementos = {
+            dataInicial: document.getElementById('filtroDataInicialVendas'),
+            dataFinal: document.getElementById('filtroDataFinalVendas'),
+            idVenda: document.getElementById('filtroIdVendas'),
+            vendedor: document.getElementById('filtroVendedorVendas'),
+            servico: document.getElementById('filtroServicoVendas'),
+            empresa: document.getElementById('filtroEmpresaVendas')
+        };
 
-    // Filtrar vendas
-    const vendasFiltradas = dados.vendas.filter(venda => {
-        const dataVendaObj = new Date(venda.data.split('/').reverse().join('-'));
-        
-        const filtroData = (!dataInicialObj || dataVendaObj >= dataInicialObj) && 
-                          (!dataFinalObj || dataVendaObj <= dataFinalObj);
-        const filtroId = !idVenda || venda.id.toString() === idVenda;
-        const filtroVendedor = !vendedor || venda.vendedor === vendedor;
-        const filtroServico = !servico || venda.servico === servico;
-        const filtroEmpresa = !empresa || venda.empresaParceira === empresa;
+        // Verificar se todos os elementos necessários existem
+        const elementosFaltantes = Object.entries(elementos)
+            .filter(([key, element]) => !element)
+            .map(([key]) => key);
 
-        return filtroData && filtroId && filtroVendedor && filtroServico && filtroEmpresa;
-    });
+        if (elementosFaltantes.length > 0) {
+            console.error('Elementos não encontrados:', elementosFaltantes);
+            return;
+        }
+
+        // Obter valores dos elementos
+        const filtros = {
+            dataInicial: elementos.dataInicial.value || '',
+            dataFinal: elementos.dataFinal.value || '',
+            idVenda: elementos.idVenda.value || '',
+            vendedor: elementos.vendedor.value || '',
+            servico: elementos.servico.value || '',
+            empresa: elementos.empresa.value || ''
+        };
+
+        // Converter datas para comparação
+        const dataInicialObj = filtros.dataInicial ? new Date(filtros.dataInicial.split('/').reverse().join('-')) : null;
+        const dataFinalObj = filtros.dataFinal ? new Date(filtros.dataFinal.split('/').reverse().join('-')) : null;
+
+        // Filtrar vendas
+        const vendasFiltradas = dados.vendas.filter(venda => {
+            const dataVendaObj = new Date(venda.data.split('/').reverse().join('-'));
+            
+            const filtroData = (!dataInicialObj || dataVendaObj >= dataInicialObj) && 
+                              (!dataFinalObj || dataVendaObj <= dataFinalObj);
+            const filtroId = !filtros.idVenda || venda.id.toString() === filtros.idVenda;
+            const filtroVendedor = !filtros.vendedor || venda.vendedor === filtros.vendedor;
+            const filtroServico = !filtros.servico || venda.servico === filtros.servico;
+            const filtroEmpresa = !filtros.empresa || venda.empresaParceira === filtros.empresa;
+
+            return filtroData && filtroId && filtroVendedor && filtroServico && filtroEmpresa;
+        });
+
+        exibirVendas(vendasFiltradas);
+    } catch (error) {
+        console.error('Erro ao filtrar vendas:', error);
+        alert('Ocorreu um erro ao filtrar as vendas. Por favor, verifique se todos os campos estão preenchidos corretamente.');
+    }
+}
+
 
     exibirVendas(vendasFiltradas);
 }
