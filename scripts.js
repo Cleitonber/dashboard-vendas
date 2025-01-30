@@ -1559,7 +1559,10 @@ function listarVendas(vendas = dados.vendas) {
     const tbody = document.querySelector('#tabelaVendas tbody');
     tbody.innerHTML = '';
 
-    const itensPorPagina = parseInt(document.getElementById('itensPorPaginaVendas').value);
+    // Adicionar verificação para o elemento
+    const itensPorPaginaElement = document.getElementById('itensPorPaginaVendas');
+    const itensPorPagina = itensPorPaginaElement ? parseInt(itensPorPaginaElement.value) : 5; // valor padrão é 5
+
     const inicio = (paginaAtualVendas - 1) * itensPorPagina;
     const fim = inicio + itensPorPagina;
     const vendasPaginadas = vendas.slice(inicio, fim);
@@ -1586,12 +1589,20 @@ function listarVendas(vendas = dados.vendas) {
 
     // Atualizar controles de paginação
     const totalPaginas = Math.ceil(vendas.length / itensPorPagina);
-    document.getElementById('controlesPaginacaoVendas').innerHTML = `
-        <button class="btn btn-secondary" onclick="mudarPaginaVendas(-1)" ${paginaAtualVendas === 1 ? 'disabled' : ''}>Anterior</button>
-        <span>Página ${paginaAtualVendas} de ${totalPaginas}</span>
-        <button class="btn btn-secondary" onclick="mudarPaginaVendas(1)" ${paginaAtualVendas === totalPaginas ? 'disabled' : ''}>Próxima</button>
-    `;
+    const controlesPaginacao = document.getElementById('controlesPaginacaoVendas');
+    if (controlesPaginacao) {
+        controlesPaginacao.innerHTML = `
+            <button class="btn btn-secondary" onclick="mudarPaginaVendas(-1)" ${paginaAtualVendas === 1 ? 'disabled' : ''}>
+                Anterior
+            </button>
+            <span class="mx-3">Página ${paginaAtualVendas} de ${totalPaginas}</span>
+            <button class="btn btn-secondary" onclick="mudarPaginaVendas(1)" ${paginaAtualVendas === totalPaginas ? 'disabled' : ''}>
+                Próxima
+            </button>
+        `;
+    }
 }
+
 
 // Função para mudar a página de vendas
 function mudarPaginaVendas(direcao) {
