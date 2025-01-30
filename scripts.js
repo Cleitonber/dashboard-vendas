@@ -822,6 +822,18 @@ function inicializarTabelas() {
             if (!tabela) throw new Error(`Tabela ${nome} não encontrada`);
         });
 
+       function inicializarTabelas() {
+    try {
+        const tabelas = {
+            relatorio: document.getElementById('tabelaRelatorio'),
+            vendas: document.getElementById('tabelaVendas')
+        };
+
+        // Verificar tabelas
+        Object.entries(tabelas).forEach(([nome, tabela]) => {
+            if (!tabela) throw new Error(`Tabela ${nome} não encontrada`);
+        });
+
         // Inicializar funcionalidades das tabelas
         inicializarSortableRelatorio();
         inicializarOrdenacaoTabela();
@@ -832,19 +844,27 @@ function inicializarTabelas() {
     }
 }
 
-const ctxVendasServico = document.getElementById('vendasServicoChart').getContext('2d');
-const ctxDesempenhoVendedores = document.getElementById('desempenhoVendedoresChart').getContext('2d');
-const ctxVendasCategoria = document.getElementById('vendasCategoriaChart').getContext('2d');
+function inicializarContextosGraficos() {
+    const ctxVendasServico = document.getElementById('vendasServicoChart').getContext('2d');
+    const ctxDesempenhoVendedores = document.getElementById('desempenhoVendedoresChart').getContext('2d');
+    const ctxVendasCategoria = document.getElementById('vendasCategoriaChart').getContext('2d');
 
-// Destruir gráficos existentes, se houver
-if (vendasServicoChart) {
-    vendasServicoChart.destroy();
-}
-if (desempenhoVendedoresChart) {
-    desempenhoVendedoresChart.destroy();
-}
-if (vendasCategoriaChart) {
-    vendasCategoriaChart.destroy();
+    // Destruir gráficos existentes, se houver
+    if (vendasServicoChart) {
+        vendasServicoChart.destroy();
+    }
+    if (desempenhoVendedoresChart) {
+        desempenhoVendedoresChart.destroy();
+    }
+    if (vendasCategoriaChart) {
+        vendasCategoriaChart.destroy();
+    }
+
+    return {
+        vendasServico: ctxVendasServico,
+        desempenhoVendedores: ctxDesempenhoVendedores,
+        vendasCategoria: ctxVendasCategoria
+    };
 }
     // Inicializar gráfico de Vendas por Serviço
     vendasServicoChart = new Chart(ctxVendasServico, {
