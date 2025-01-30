@@ -80,59 +80,28 @@ function preencherFiltroColunas() {
 
 // Função para inicializar a funcionalidade de arrastar e soltar na tabela de relatórios
 function inicializarSortableRelatorio() {
-    const tabelaRelatorio = document.getElementById('tabelaRelatorio');
-    if (!tabelaRelatorio) {
-        console.error('A tabela com o ID "tabelaRelatorio" não foi encontrada no DOM.');
-        return;
-    }
-
-    const thead = tabelaRelatorio.querySelector('thead');
-    if (!thead) {
-        console.error('O elemento <thead> não foi encontrado na tabela.');
-        return;
-    }
-
-    const tr = thead.querySelector('tr');
-    if (!tr) {
-        console.error('O elemento <tr> dentro do <thead> não foi encontrado.');
-        return;
-    }
-
-    // Inicializar o Sortable apenas se todos os elementos existirem
-    new Sortable(tr, {
+    const table = document.getElementById('tabelaRelatorio');
+    const thead = table.querySelector('thead tr');
+    
+    new Sortable(thead, {
         animation: 150,
         ghostClass: 'sortable-ghost',
         onEnd: function (evt) {
-            const ths = Array.from(tr.querySelectorAll('th'));
-            const tbody = tabelaRelatorio.querySelector('tbody');
-            const tfoot = tabelaRelatorio.querySelector('tfoot');
-
-            // Reorganizar as células das linhas do corpo da tabela
-            if (tbody) {
-                const rows = Array.from(tbody.querySelectorAll('tr'));
-                rows.forEach(row => {
-                    const cells = Array.from(row.querySelectorAll('td'));
-                    const newCells = ths.map(th => cells[ths.indexOf(th)]);
-                    newCells.forEach((cell, index) => {
-                        row.appendChild(cell);
-                    });
-                });
-            }
-
-            // Reorganizar as células do rodapé da tabela
-            if (tfoot) {
-                const footerRow = tfoot.querySelector('tr');
-                if (footerRow) {
-                    const footerCells = Array.from(footerRow.querySelectorAll('td'));
-                    const newFooterCells = ths.map(th => footerCells[ths.indexOf(th)]);
-                    newFooterCells.forEach((cell, index) => {
-                        footerRow.appendChild(cell);
-                    });
-                }
-            }
+            const from = evt.oldIndex;
+            const to = evt.newIndex;
+            
+            // Reordenar células em todas as linhas
+            const rows = table.querySelectorAll('tr');
+            rows.forEach(row => {
+                const cells = Array.from(row.children);
+                const cell = cells[from];
+                row.removeChild(cell);
+                row.insertBefore(cell, cells[to]);
+            });
         }
     });
 }
+
 
 // Função para limpar os filtros e recarregar a tabela de relatórios
 function limparFiltros() {
@@ -158,6 +127,59 @@ function filtrarRelatorio() {
     const dataFinal = document.getElementById('dataFinal').value;
     const vendedorId = filtroVendedor ? filtroVendedor.value : null;
     const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
+    // Adicionar após a função filtrarRelatorio()
+
+function inicializarOrdenacaoTabela() {
+    const thead = document.querySelector('#tabelaRelatorio thead');
+    const ths = thead.querySelectorAll('th');
+    
+    ths.forEach((th, index) => {
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', () => ordenarTabela(index));
+        // Adicionar indicador de ordenação
+        th.dataset.ordem = 'nenhuma';
+    });
+}
+
+function ordenarTabela(colIndex) {
+    const tbody = document.querySelector('#tabelaRelatorio tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const th = document.querySelector(`#tabelaRelatorio th:nth-child(${colIndex + 1})`);
+    const isMonetario = th.getAttribute('data-tipo') === 'monetario';
+    
+    // Alternar ordem
+    const ordem = th.dataset.ordem === 'asc' ? 'desc' : 'asc';
+    // Resetar ordem das outras colunas
+    document.querySelectorAll('#tabelaRelatorio th').forEach(header => {
+        header.dataset.ordem = 'nenhuma';
+    });
+    th.dataset.ordem = ordem;
+
+    rows.sort((a, b) => {
+        let valorA = a.cells[colIndex].textContent.trim();
+        let valorB = b.cells[colIndex].textContent.trim();
+        
+        if (isMonetario) {
+            // Converter valores monetários para números
+            valorA = parseFloat(valorA.replace(/[R$\s.]/g, '').replace(',', '.'));
+            valorB = parseFloat(valorB.replace(/[R$\s.]/g, '').replace(',', '.'));
+        } else if (!isNaN(Date.parse(valorA))) {
+            // Ordenação de datas
+            valorA = new Date(valorA.split('/').reverse().join('-'));
+            valorB = new Date(valorB.split('/').reverse().join('-'));
+        }
+        
+        if (ordem === 'asc') {
+            return valorA > valorB ? 1 : -1;
+        } else {
+            return valorA < valorB ? 1 : -1;
+        }
+    });
+
+    // Reordenar linhas
+    rows.forEach(row => tbody.appendChild(row));
+}
+
 
     // Converter datas para o formato Date
     const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
@@ -313,7 +335,8 @@ colunasSelecionadas.forEach((colunaId) => {
 });
 
 tfoot.appendChild(footerRow);
-
+inicializarOrdenacaoTabela();
+inicializarSortableRelatorio();
 
     // Inicializar o Sortable após preencher a tabela
     inicializarSortableRelatorio();
