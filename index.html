@@ -423,20 +423,20 @@
                         <button class="btn btn-primary" onclick="filtrarRelatorio()">Gerar</button>
                         <button id="btnLimparFiltros" class="btn btn-secondary" onclick="limparFiltros()">Limpar Filtros</button>
                     </div>
-                 <table id="tabelaRelatorio">
+ <table id="tabelaRelatorio">
     <thead>
         <tr>
-            <th>Data da Venda</th>
-            <th>ID da Venda</th>
-            <th>Nome do Vendedor</th>
-            <th>Serviço Vendido</th>
-            <th>Tipo de Comissão</th>
-            <th>Nome do Cliente</th>
-            <th>Empresa Parceira</th>
+            <th data-tipo="texto">Data da Venda</th>
+            <th data-tipo="texto">ID da Venda</th>
+            <th data-tipo="texto">Nome do Vendedor</th>
+            <th data-tipo="texto">Serviço Vendido</th>
+            <th data-tipo="texto">Tipo de Comissão</th>
+            <th data-tipo="texto">Nome do Cliente</th>
+            <th data-tipo="texto">Empresa Parceira</th>
             <th data-tipo="monetario">Valor da Venda</th>
             <th data-tipo="monetario">Valor Bruto a Receber</th>
             <th data-tipo="monetario">Valor da Comissão</th>
-            <th>Variável da Comissão</th>
+            <th data-tipo="texto">Variável da Comissão</th>
         </tr>
     </thead>
     <tbody>
@@ -446,7 +446,6 @@
         </tr>
     </tfoot>
 </table>
-
 
                     <div class="mt-3">
                         <button class="btn btn-secondary" onclick="exportarRelatorioExcel()">Exportar Excel</button>
