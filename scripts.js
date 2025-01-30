@@ -12,7 +12,6 @@ let paginaAtualServicos = 1;
 let paginaAtualEmpresas = 1;
 let paginaAtualVendas = 1;
 const itensPorPagina = 5;
-let paginaAtual = 1;
 
 let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart;
 
@@ -1559,10 +1558,7 @@ function listarVendas(vendas = dados.vendas) {
     const tbody = document.querySelector('#tabelaVendas tbody');
     tbody.innerHTML = '';
 
-    // Adicionar verificação para o elemento
-    const itensPorPaginaElement = document.getElementById('itensPorPaginaVendas');
-    const itensPorPagina = itensPorPaginaElement ? parseInt(itensPorPaginaElement.value) : 5; // valor padrão é 5
-
+    const itensPorPagina = parseInt(document.getElementById('itensPorPaginaVendas').value);
     const inicio = (paginaAtualVendas - 1) * itensPorPagina;
     const fim = inicio + itensPorPagina;
     const vendasPaginadas = vendas.slice(inicio, fim);
@@ -1589,20 +1585,12 @@ function listarVendas(vendas = dados.vendas) {
 
     // Atualizar controles de paginação
     const totalPaginas = Math.ceil(vendas.length / itensPorPagina);
-    const controlesPaginacao = document.getElementById('controlesPaginacaoVendas');
-    if (controlesPaginacao) {
-        controlesPaginacao.innerHTML = `
-            <button class="btn btn-secondary" onclick="mudarPaginaVendas(-1)" ${paginaAtualVendas === 1 ? 'disabled' : ''}>
-                Anterior
-            </button>
-            <span class="mx-3">Página ${paginaAtualVendas} de ${totalPaginas}</span>
-            <button class="btn btn-secondary" onclick="mudarPaginaVendas(1)" ${paginaAtualVendas === totalPaginas ? 'disabled' : ''}>
-                Próxima
-            </button>
-        `;
-    }
+    document.getElementById('controlesPaginacaoVendas').innerHTML = `
+        <button class="btn btn-secondary" onclick="mudarPaginaVendas(-1)" ${paginaAtualVendas === 1 ? 'disabled' : ''}>Anterior</button>
+        <span>Página ${paginaAtualVendas} de ${totalPaginas}</span>
+        <button class="btn btn-secondary" onclick="mudarPaginaVendas(1)" ${paginaAtualVendas === totalPaginas ? 'disabled' : ''}>Próxima</button>
+    `;
 }
-
 
 // Função para mudar a página de vendas
 function mudarPaginaVendas(direcao) {
@@ -1610,177 +1598,77 @@ function mudarPaginaVendas(direcao) {
     listarVendas();
 }
 
-// Procure por "function filtrarVendas()" e substitua por:
+// Função para filtrar as vendas por período
 function filtrarVendas() {
-    try {
-        // Obter elementos com verificação de existência
-        const elementos = {
-            dataInicial: document.getElementById('filtroDataInicialVendas'),
-            dataFinal: document.getElementById('filtroDataFinalVendas'),
-            idVenda: document.getElementById('filtroIdVendas'),
-            vendedor: document.getElementById('filtroVendedorVendas'),
-            servico: document.getElementById('filtroServicoVendas'),
-            empresa: document.getElementById('filtroEmpresaVendas')
-        };
+    const dataInicial = document.getElementById('filtroDataInicial').value;
+    const dataFinal = document.getElementById('filtroDataFinal').value;
+    const vendedorId = document.getElementById('filtroVendedorVendas').value;
+    const servicoId = document.getElementById('filtroServicoVendas').value;
+    const empresaId = document.getElementById('filtroEmpresaVendas').value;
 
-        // Verificar se todos os elementos necessários existem
-        const elementosFaltantes = Object.entries(elementos)
-            .filter(([key, element]) => !element)
-            .map(([key]) => key);
+    const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
+    const dataFinalObj = dataFinal ? new Date(dataFinal.split('/').reverse().join('-')) : null;
 
-        if (elementosFaltantes.length > 0) {
-            console.error('Elementos não encontrados:', elementosFaltantes);
-            return;
-        }
+    const vendasFiltradas = dados.vendas.filter(venda => {
+        const dataVendaObj = new Date(venda.data.split('/').reverse().join('-'));
 
-        // Obter valores dos elementos
-        const filtros = {
-            dataInicial: elementos.dataInicial.value || '',
-            dataFinal: elementos.dataFinal.value || '',
-            idVenda: elementos.idVenda.value || '',
-            vendedor: elementos.vendedor.value || '',
-            servico: elementos.servico.value || '',
-            empresa: elementos.empresa.value || ''
-        };
+        const filtroData = (!dataInicialObj || dataVendaObj >= dataInicialObj) &&
+                           (!dataFinalObj || dataVendaObj <= dataFinalObj);
 
-        // Converter datas para comparação
-        const dataInicialObj = filtros.dataInicial ? new Date(filtros.dataInicial.split('/').reverse().join('-')) : null;
-        const dataFinalObj = filtros.dataFinal ? new Date(filtros.dataFinal.split('/').reverse().join('-')) : null;
+        const filtroVendedor = !vendedorId || venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
+        const filtroServico = !servicoId || venda.servico === dados.servicos.find(s => s.id == servicoId).nome;
+        const filtroEmpresa = !empresaId || venda.empresaParceira === dados.empresasParceiras.find(e => e.id == empresaId).nome;
 
-        // Filtrar vendas
-        const vendasFiltradas = dados.vendas.filter(venda => {
-            const dataVendaObj = new Date(venda.data.split('/').reverse().join('-'));
-            
-            const filtroData = (!dataInicialObj || dataVendaObj >= dataInicialObj) && 
-                              (!dataFinalObj || dataVendaObj <= dataFinalObj);
-            const filtroId = !filtros.idVenda || venda.id.toString() === filtros.idVenda;
-            const filtroVendedor = !filtros.vendedor || venda.vendedor === filtros.vendedor;
-            const filtroServico = !filtros.servico || venda.servico === filtros.servico;
-            const filtroEmpresa = !filtros.empresa || venda.empresaParceira === filtros.empresa;
+        return filtroData && filtroVendedor && filtroServico && filtroEmpresa;
+    });
 
-            return filtroData && filtroId && filtroVendedor && filtroServico && filtroEmpresa;
-        });
-
-        exibirVendas(vendasFiltradas);
-    } catch (error) {
-        console.error('Erro ao filtrar vendas:', error);
-        alert('Ocorreu um erro ao filtrar as vendas. Por favor, verifique se todos os campos estão preenchidos corretamente.');
-    }
+    listarVendas(vendasFiltradas);
 }
 
-
-    exibirVendas(vendasFiltradas);
-}
-
-// Atualizar a função inicializarFiltros
-function inicializarFiltros() {
-    const vendedorSelect = document.getElementById('filtroVendedorVendas');
-    const servicoSelect = document.getElementById('filtroServicoVendas');
-    const empresaSelect = document.getElementById('filtroEmpresaVendas');
-
-    if (vendedorSelect && servicoSelect && empresaSelect) {
-        // Limpar opções existentes
-        vendedorSelect.innerHTML = '<option value="">Todos</option>';
-        servicoSelect.innerHTML = '<option value="">Todos</option>';
-        empresaSelect.innerHTML = '<option value="">Todas</option>';
-
-        // Preencher opções dos selects
-        dados.vendedores.forEach(vendedor => {
-            vendedorSelect.add(new Option(vendedor.nome, vendedor.nome));
-        });
-
-        dados.servicos.forEach(servico => {
-            servicoSelect.add(new Option(servico.nome, servico.nome));
-        });
-
-        dados.empresasParceiras.forEach(empresa => {
-            empresaSelect.add(new Option(empresa.nome, empresa.nome));
-        });
-    }
-}
-
-function exibirVendas(vendas) {
-    try {
-        const tbody = document.querySelector('#tabelaVendas tbody');
-        if (!tbody) {
-            console.error('Elemento tbody não encontrado');
-            return;
-        }
-
-        const itensPorPaginaElement = document.getElementById('itensPorPaginaVendas');
-        const itensPorPagina = itensPorPaginaElement ? parseInt(itensPorPaginaElement.value) : 5;
-
-        const inicio = (paginaAtual - 1) * itensPorPagina;
-        const fim = inicio + itensPorPagina;
-        const vendasPaginadas = vendas.slice(inicio, fim);
-
-        tbody.innerHTML = '';
-
-        vendasPaginadas.forEach(venda => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${venda.data}</td>
-                <td>${venda.id}</td>
-                <td>${venda.vendedor}</td>
-                <td>${venda.servico}</td>
-                <td>${venda.nomeCliente}</td>
-                <td>${venda.empresaParceira}</td>
-                <td>${venda.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                <td>${venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                <td>${venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
-                <td>
-                    <button class="btn btn-sm btn-secondary" onclick="editarVenda(${venda.id})">Editar</button>
-                    <button class="btn btn-sm btn-danger" onclick="excluirVenda(${venda.id})">Excluir</button>
-                </td>
-            `;
-            tbody.appendChild(tr);
-        });
-
-        atualizarPaginacao(vendas.length, itensPorPagina);
-    } catch (error) {
-        console.error('Erro ao exibir vendas:', error);
-        alert('Ocorreu um erro ao exibir as vendas.');
-    }
-}
-
-function atualizarPaginacao(totalItens, itensPorPagina) {
-    const totalPaginas = Math.ceil(totalItens / itensPorPagina);
-    const controlesPaginacao = document.getElementById('controlesPaginacao');
-
-    controlesPaginacao.innerHTML = `
-        <button class="btn btn-secondary" onclick="mudarPagina(-1)" ${paginaAtual === 1 ? 'disabled' : ''}>
-            Anterior
-        </button>
-        <span class="mx-3">Página ${paginaAtual} de ${totalPaginas}</span>
-        <button class="btn btn-secondary" onclick="mudarPagina(1)" ${paginaAtual === totalPaginas ? 'disabled' : ''}>
-            Próxima
-        </button>
-    `;
-}
-
-
+// Função para editar uma venda
 function editarVenda(id) {
     const venda = dados.vendas.find(v => v.id === id);
-    if (!venda) return;
+    if (venda) {
+        const tbody = document.querySelector('#tabelaVendas tbody');
+        tbody.innerHTML = '';
 
-    const tr = document.querySelector(`#tabelaVendas tbody tr:nth-child(${dados.vendas.indexOf(venda) + 1})`);
-    tr.innerHTML = `
-        <td><input type="text" class="form-control" value="${venda.data}" onchange="formatarDataInput(this)"></td>
-        <td>${venda.id}</td>
-        <td><select class="form-control">${gerarOpcoesVendedores(venda.vendedor)}</select></td>
-        <td><select class="form-control">${gerarOpcoesServicos(venda.servico)}</select></td>
-        <td><input type="text" class="form-control" value="${venda.nomeCliente}"></td>
-        <td><select class="form-control">${gerarOpcoesEmpresas(venda.empresaParceira)}</select></td>
-        <td><input type="text" class="form-control" value="${venda.valorVenda}" onchange="formatarMoeda(this)"></td>
-        <td><input type="text" class="form-control" value="${venda.valorReceber}" onchange="formatarMoeda(this)"></td>
-        <td><input type="text" class="form-control" value="${venda.comissao}" onchange="formatarMoeda(this)"></td>
-        <td>
-            <button class="btn btn-sm btn-success" onclick="salvarEdicao(${venda.id})">Salvar</button>
-            <button class="btn btn-sm btn-danger" onclick="cancelarEdicao()">Cancelar</button>
-        </td>
-    `;
+        dados.vendas.forEach(v => {
+            const row = document.createElement('tr');
+            if (v.id === id) {
+                row.innerHTML = `
+                    <td><input type="text" value="${v.data}" oninput="formatarDataInput(this)"></td>
+                    <td><input type="text" value="${v.vendedor}"></td>
+                    <td><input type="text" value="${v.servico}"></td>
+                    <td><input type="text" value="${v.nomeCliente}"></td>
+                    <td><input type="text" value="${v.empresaParceira}"></td>
+                    <td><input type="text" value="${v.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}" oninput="formatarMoeda(this)"></td>
+                    <td><input type="text" value="${v.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}" oninput="formatarMoeda(this)"></td>
+                    <td><input type="text" value="${v.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}" oninput="formatarComissao(this)"></td>
+                    <td>
+                        <button class="btn btn-sm btn-success" onclick="salvarEdicaoVenda(${v.id})">Salvar</button>
+                        <button class="btn btn-sm btn-danger" onclick="cancelarEdicaoVenda()">Cancelar</button>
+                    </td>
+                `;
+            } else {
+                row.innerHTML = `
+                    <td>${v.data}</td>
+                    <td>${v.vendedor}</td>
+                    <td>${v.servico}</td>
+                    <td>${v.nomeCliente}</td>
+                    <td>${v.empresaParceira}</td>
+                    <td>${v.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td>${v.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td>${v.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td>
+                    <td>
+                        <button class="btn btn-sm btn-secondary" onclick="editarVenda(${v.id})">Editar</button>
+                        <button class="btn btn-sm btn-danger" onclick="excluirVenda(${v.id})">Excluir</button>
+                    </td>
+                `;
+            }
+            tbody.appendChild(row);
+        });
+    }
 }
-
 
 // Função para salvar a edição de uma venda
 function salvarEdicaoVenda(id) {
@@ -1875,42 +1763,3 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     preencherFiltroColunas(); // Preenche o filtro de colunas ao carregar a página
 });
-
-document.addEventListener('DOMContentLoaded', inicializarFiltros);
-
-function gerarOpcoesVendedores(selecionado) {
-    return dados.vendedores.map(v => 
-        `<option value="${v.nome}" ${v.nome === selecionado ? 'selected' : ''}>${v.nome}</option>`
-    ).join('');
-}
-
-function gerarOpcoesServicos(selecionado) {
-    return dados.servicos.map(s => 
-        `<option value="${s.nome}" ${s.nome === selecionado ? 'selected' : ''}>${s.nome}</option>`
-    ).join('');
-}
-
-function gerarOpcoesEmpresas(selecionada) {
-    return dados.empresasParceiras.map(e => 
-        `<option value="${e.nome}" ${e.nome === selecionada ? 'selected' : ''}>${e.nome}</option>`
-    ).join('');
-}
-
-function inicializarFiltros() {
-    const vendedorSelect = document.getElementById('filtroVendedor');
-    const servicoSelect = document.getElementById('filtroServico');
-    const empresaSelect = document.getElementById('filtroEmpresa');
-
-    // Preencher opções dos selects
-    dados.vendedores.forEach(vendedor => {
-        vendedorSelect.add(new Option(vendedor.nome, vendedor.nome));
-    });
-
-    dados.servicos.forEach(servico => {
-        servicoSelect.add(new Option(servico.nome, servico.nome));
-    });
-
-    dados.empresasParceiras.forEach(empresa => {
-        empresaSelect.add(new Option(empresa.nome, empresa.nome));
-    });
-}
