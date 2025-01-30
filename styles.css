@@ -603,3 +603,26 @@ th:active {
     background-color: #f1f5f9;
 }
 
+/* Estilos para arrastar e soltar */
+#tabelaRelatorio th.sortable-ghost {
+    background-color: var(--primary-light);
+    opacity: 0.8;
+    position: relative;
+}
+
+#tabelaRelatorio th.sortable-ghost::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(79, 70, 229, 0.1);
+    pointer-events: none;
+}
+
+#tabelaRelatorio th {
+    cursor: move;
+    user-select: none;
+    position: relative;
+}
