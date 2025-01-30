@@ -822,7 +822,7 @@ function inicializarTabelas() {
             if (!tabela) throw new Error(`Tabela ${nome} não encontrada`);
         });
 
-       function inicializarTabelas() {
+function inicializarTabelas() {
     try {
         const tabelas = {
             relatorio: document.getElementById('tabelaRelatorio'),
