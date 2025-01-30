@@ -15,8 +15,20 @@ const itensPorPagina = 5;
 
 let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart;
 
-// Função para alternar entre as abas
-
+// Definição global das colunas
+const colunas = [
+    { id: 'data', label: 'Data da Venda' },
+    { id: 'id', label: 'ID da Venda' },
+    { id: 'vendedor', label: 'Nome do Vendedor' },
+    { id: 'servico', label: 'Serviço Vendido' },
+    { id: 'tipoComissao', label: 'Tipo de Comissão' },
+    { id: 'nomeCliente', label: 'Nome do Cliente' },
+    { id: 'empresaParceira', label: 'Empresa Parceira' },
+    { id: 'valorVenda', label: 'Valor da Venda' },
+    { id: 'valorBrutoReceber', label: 'Valor Bruto a Receber' },
+    { id: 'comissao', label: 'Valor da Comissão' },
+    { id: 'percentualComissao', label: 'Variável da Comissão' }
+];
 
 // Função para alternar a exibição das listas
 function toggleList(listId) {
@@ -43,21 +55,6 @@ function toggleList(listId) {
 function preencherFiltroColunas() {
     const filtroColunas = document.getElementById('filtroColunas');
     filtroColunas.innerHTML = ''; // Limpa o filtro de colunas
-
-    // Definir a ordem das colunas
-    const colunas = [
-        { id: 'data', label: 'Data da Venda' },
-        { id: 'id', label: 'ID da Venda' },
-        { id: 'vendedor', label: 'Nome do Vendedor' },
-        { id: 'servico', label: 'Serviço Vendido' },
-        { id: 'tipoComissao', label: 'Tipo de Comissão' },
-        { id: 'nomeCliente', label: 'Nome do Cliente' },
-        { id: 'empresaParceira', label: 'Empresa Parceira' },
-        { id: 'valorVenda', label: 'Valor da Venda' },
-        { id: 'valorBrutoReceber', label: 'Valor Bruto a Receber' },
-        { id: 'comissao', label: 'Valor da Comissão' },
-        { id: 'percentualComissao', label: 'Variável da Comissão' }
-    ];
 
     // Adicionar as colunas ao filtro na ordem correta
     colunas.forEach(coluna => {
@@ -159,23 +156,6 @@ function showTab(tabId) {
     }
 }
 
-// Função para limpar os filtros e recarregar a tabela de relatórios
-function limparFiltros() {
-    // Limpar os valores dos filtros
-    document.getElementById('dataInicial').value = ''; // Limpa a data inicial
-    document.getElementById('dataFinal').value = ''; // Limpa a data final
-    document.getElementById('filtroVendedor').value = ''; // Limpa o filtro de vendedor
-
-    // Deselecionar todas as colunas no filtro de colunas
-    const filtroColunas = document.getElementById('filtroColunas');
-    Array.from(filtroColunas.options).forEach(option => {
-        option.selected = true; // Seleciona todas as colunas por padrão
-    });
-
-    // Atualizar a tabela de relatórios com os dados sem filtros
-    filtrarRelatorio();
-}
-
 // Função para filtrar e gerar o relatório
 function filtrarRelatorio() {
     const filtroVendedor = document.getElementById('filtroVendedor');
@@ -192,15 +172,10 @@ function filtrarRelatorio() {
     // Filtrar vendas
     const vendasFiltradas = dados.vendas.filter(venda => {
         const dataVendaObj = new Date(venda.data.split('/').reverse().join('-'));
-
-        // Filtro por data
         const filtroData = (!dataInicialObj || dataVendaObj >= dataInicialObj) && 
                           (!dataFinalObj || dataVendaObj <= dataFinalObj);
-
-        // Filtro por vendedor
         const filtroVendedor = !vendedorId || 
                              venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
-
         return filtroData && filtroVendedor;
     });
 
@@ -334,6 +309,23 @@ function filtrarRelatorio() {
     inicializarOrdenacaoTabela();
 }
 
+
+// Função para limpar os filtros e recarregar a tabela de relatórios
+function limparFiltros() {
+    // Limpar os valores dos filtros
+    document.getElementById('dataInicial').value = ''; // Limpa a data inicial
+    document.getElementById('dataFinal').value = ''; // Limpa a data final
+    document.getElementById('filtroVendedor').value = ''; // Limpa o filtro de vendedor
+
+    // Deselecionar todas as colunas no filtro de colunas
+    const filtroColunas = document.getElementById('filtroColunas');
+    Array.from(filtroColunas.options).forEach(option => {
+        option.selected = true; // Seleciona todas as colunas por padrão
+    });
+
+    // Atualizar a tabela de relatórios com os dados sem filtros
+    filtrarRelatorio();
+}
 
 // Criar células para cada coluna selecionada
 colunasSelecionadas.forEach((colunaId) => {
