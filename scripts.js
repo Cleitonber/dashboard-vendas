@@ -15,6 +15,112 @@ const itensPorPagina = 5;
 
 let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart;
 
+// Funções para criar gráficos
+function criarGraficoVendasServico(contexto) {
+    return new Chart(contexto, {
+        type: 'bar',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Vendas',
+                data: [],
+                backgroundColor: 'rgba(79, 70, 229, 0.6)',
+                borderColor: 'rgba(79, 70, 229, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            }
+        }
+    });
+}
+
+function criarGraficoDesempenho(contexto) {
+    return new Chart(contexto, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Vendas',
+                data: [],
+                borderColor: 'rgba(239, 68, 68, 1)',
+                borderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            }
+        }
+    });
+}
+
+function criarGraficoCategoria(contexto) {
+    return new Chart(contexto, {
+        type: 'pie',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Vendas',
+                data: [],
+                backgroundColor: [
+                    'rgba(79, 70, 229, 0.6)',
+                    'rgba(239, 68, 68, 0.6)',
+                    'rgba(34, 197, 94, 0.6)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                tooltip: {
+                    enabled: true,
+                    mode: 'index',
+                    intersect: false,
+                },
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                }
+            },
+            animation: {
+                duration: 1000,
+                easing: 'easeInOutQuad'
+            }
+        }
+    });
+}
+
 // scripts.js
 function inicializarAplicacao() {
     try {
@@ -662,13 +768,37 @@ function atualizarGraficos(vendasFiltradas) {
 
 // Função para inicializar os gráficos
 function inicializarGraficos() {
-    console.log('Inicializando gráficos...'); // Adicione este log para depuração
+    console.log('Inicializando gráficos...');
     try {
+        // Destruir instâncias anteriores se existirem
+        if (vendasServicoChart) vendasServicoChart.destroy();
+        if (desempenhoVendedoresChart) desempenhoVendedoresChart.destroy();
+        if (vendasCategoriaChart) vendasCategoriaChart.destroy();
+
+        // Obter contextos
         const contextos = {
             vendasServico: document.getElementById('vendasServicoChart')?.getContext('2d'),
             desempenhoVendedores: document.getElementById('desempenhoVendedoresChart')?.getContext('2d'),
             vendasCategoria: document.getElementById('vendasCategoriaChart')?.getContext('2d')
         };
+
+        // Verificar contextos
+        Object.entries(contextos).forEach(([nome, contexto]) => {
+            if (!contexto) throw new Error(`Contexto não encontrado para ${nome}`);
+        });
+
+        // Criar novos gráficos
+        vendasServicoChart = criarGraficoVendasServico(contextos.vendasServico);
+        desempenhoVendedoresChart = criarGraficoDesempenho(contextos.desempenhoVendedores);
+        vendasCategoriaChart = criarGraficoCategoria(contextos.vendasCategoria);
+
+        console.log('Gráficos inicializados com sucesso!');
+    } catch (erro) {
+        console.error('Erro ao inicializar gráficos:', erro);
+        throw erro;
+    }
+}
+
 
         // Verificar contextos
         Object.entries(contextos).forEach(([nome, contexto]) => {
@@ -1741,18 +1871,13 @@ document.addEventListener('DOMContentLoaded', () => {
         inicializarAplicacao();
         
         // Se estiver na aba de relatórios
-        if (document.getElementById('relatoriosTab').classList.contains('active')) {
+        const relatoriosTab = document.getElementById('relatoriosTab');
+        if (relatoriosTab?.classList.contains('active')) {
             inicializarSortableRelatorio();
         }
     } catch (erro) {
         console.error('Erro fatal na inicialização:', erro);
         mostrarErroInicializacao();
-    }
-});
-    
-    // Se estiver na aba de relatórios
-    if (document.getElementById('relatoriosTab').classList.contains('active')) {
-        inicializarSortableRelatorio();
     }
 });
 
