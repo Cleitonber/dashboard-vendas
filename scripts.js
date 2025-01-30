@@ -15,6 +15,40 @@ const itensPorPagina = 5;
 
 let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart;
 
+// Função para alternar entre as abas
+function showTab(tabId) {
+    // Remover classe active de todas as abas
+    const tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => tab.classList.remove('active'));
+
+    // Adicionar classe active na aba selecionada
+    const selectedTab = document.getElementById(tabId);
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+    }
+
+    // Atualizar botões de navegação
+    const buttons = document.querySelectorAll('.nav-button');
+    buttons.forEach(button => button.classList.remove('active'));
+    const activeButton = document.querySelector(`[onclick="showTab('${tabId}')"]`);
+    if (activeButton) {
+        activeButton.classList.add('active');
+    }
+
+    // Reinicializar Sortable se estiver na aba de relatórios
+    if (tabId === 'relatoriosTab') {
+        setTimeout(() => {
+            inicializarSortableRelatorio();
+            updateColumnAttributes();
+        }, 100);
+    }
+
+    // Atualizar dashboard se estiver na aba dashboard
+    if (tabId === 'dashboardTab') {
+        atualizarDashboard();
+    }
+}
+
 // Funções para criar gráficos
 function criarGraficoVendasServico(contexto) {
     return new Chart(contexto, {
@@ -280,30 +314,6 @@ function updateColumnAttributes() {
             }
         });
     });
-}
-
-// Adicionar chamada para reinicializar quando mudar de aba
-// Função para alternar entre as abas
-function showTab(tabId) {
-    // Remover classe active de todas as abas
-    const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => tab.classList.remove('active'));
-    
-    // Adicionar classe active na aba selecionada
-    document.getElementById(tabId).classList.add('active');
-    
-    // Atualizar botões de navegação
-    const buttons = document.querySelectorAll('.nav-button');
-    buttons.forEach(button => button.classList.remove('active'));
-    document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
-
-    // Reinicializar Sortable se estiver na aba de relatórios
-    if (tabId === 'relatoriosTab') {
-        setTimeout(() => {
-            inicializarSortableRelatorio();
-            updateColumnAttributes();
-        }, 100);
-    }
 }
 
 // Função para filtrar e gerar o relatório
