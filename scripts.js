@@ -1763,7 +1763,3 @@ document.addEventListener('DOMContentLoaded', function () {
 document.addEventListener('DOMContentLoaded', function () {
     preencherFiltroColunas(); // Preenche o filtro de colunas ao carregar a página
 });
-
-document.querySelector('[onclick="showTab(\'relatoriosTab\')"]').addEventListener('click', function () {
-    preencherFiltroColunas(); // Preenche o filtro de colunas ao abrir a aba de relatórios
-});
