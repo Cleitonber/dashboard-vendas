@@ -832,37 +832,20 @@ function inicializarTabelas() {
     }
 }
 
-        // Verificar tabelas
-        Object.entries(tabelas).forEach(([nome, tabela]) => {
-        if (!tabela) throw new Error(`Tabela ${nome} não encontrada`);
-        });
+const ctxVendasServico = document.getElementById('vendasServicoChart').getContext('2d');
+const ctxDesempenhoVendedores = document.getElementById('desempenhoVendedoresChart').getContext('2d');
+const ctxVendasCategoria = document.getElementById('vendasCategoriaChart').getContext('2d');
 
-        // Inicializar funcionalidades das tabelas
-        inicializarSortableRelatorio();
-        inicializarOrdenacaoTabela();
-
-    } catch (erro) {
-        console.error('Erro ao inicializar tabelas:', erro);
-        throw erro;
-    }
+// Destruir gráficos existentes, se houver
+if (vendasServicoChart) {
+    vendasServicoChart.destroy();
 }
-    
-
-    const ctxVendasServico = document.getElementById('vendasServicoChart').getContext('2d');
-    const ctxDesempenhoVendedores = document.getElementById('desempenhoVendedoresChart').getContext('2d');
-    const ctxVendasCategoria = document.getElementById('vendasCategoriaChart').getContext('2d');
-
-    // Destruir gráficos existentes, se houver
-    if (vendasServicoChart) {
-        vendasServicoChart.destroy();
-    }
-    if (desempenhoVendedoresChart) {
-        desempenhoVendedoresChart.destroy();
-    }
-    if (vendasCategoriaChart) {
-        vendasCategoriaChart.destroy();
-    }
-
+if (desempenhoVendedoresChart) {
+    desempenhoVendedoresChart.destroy();
+}
+if (vendasCategoriaChart) {
+    vendasCategoriaChart.destroy();
+}
     // Inicializar gráfico de Vendas por Serviço
     vendasServicoChart = new Chart(ctxVendasServico, {
         type: 'bar',
