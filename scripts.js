@@ -477,10 +477,15 @@ function exportarRelatorioPDF() {
     const doc = new jsPDF('landscape'); // Configura o PDF para modo paisagem
 
     const tabela = document.getElementById('tabelaRelatorio');
+    if (!tabela) {
+        console.error('Tabela de relatório não encontrada!');
+        return;
+    }
+
     const headers = Array.from(tabela.querySelectorAll('th')).map(th => th.textContent);
-    const rows = Array.from(tabela.querySelectorAll('tbody tr')).map(tr =>
-        Array.from(tr.querySelectorAll('td')).map(td => td.textContent)
-    );
+    const rows = Array.from(tabela.querySelectorAll('tbody tr')).map(tr => {
+        return Array.from(tr.querySelectorAll('td')).map(td => td.textContent);
+    });
 
     // Adicionar o total das comissões, valor bruto e valor da venda
     const totalValorVenda = dados.vendas.reduce((total, venda) => total + venda.valorVenda, 0);
@@ -493,7 +498,11 @@ function exportarRelatorioPDF() {
         }
     }, 0);
 
-    rows.push(['Totais:', '', '', '', '', '', '', totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })]);
+    rows.push(['Totais:', '', '', '', '', '', '', 
+        totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), 
+        totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }), 
+        totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+    ]);
 
     doc.autoTable({
         head: [headers],
