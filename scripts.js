@@ -959,6 +959,7 @@ document.getElementById('vendedorForm').addEventListener('submit', function (e) 
     dados.vendedores.push(novoVendedor);
     atualizarListaVendedores();
     atualizarOpcoesVendedores();
+    atualizarFiltrosVendas();
     alert('Vendedor cadastrado com sucesso!');
     limparCamposVendedor();
 });
@@ -1115,6 +1116,7 @@ document.getElementById('servicoForm').addEventListener('submit', function (e) {
     dados.servicos.push(novoServico);
     atualizarListaServicos();
     atualizarOpcoesServicos();
+    atualizarFiltrosVendas();
     alert('Serviço cadastrado com sucesso!');
     limparCamposServico();
 });
@@ -1274,6 +1276,7 @@ document.getElementById('empresaForm').addEventListener('submit', function (e) {
     dados.empresasParceiras.push(novaEmpresa);
     atualizarListaEmpresas();
     atualizarOpcoesEmpresas();
+     atualizarFiltrosVendas();
     alert('Empresa cadastrada com sucesso!');
     limparCamposEmpresa();
 });
@@ -1754,10 +1757,12 @@ function atualizarFiltrosVendas() {
     });
 }
 
+
 // Inicializar gráficos ao carregar a página
 document.addEventListener('DOMContentLoaded', function () {
     inicializarGraficos();
     atualizarDashboard();
+    atualizarFiltrosVendas();
 });
 
 document.addEventListener('DOMContentLoaded', function () {
