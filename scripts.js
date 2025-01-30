@@ -808,8 +808,6 @@ function inicializarGraficos() {
         throw erro;
     }
 }
-
-
         // Verificar contextos
         Object.entries(contextos).forEach(([nome, contexto]) => {
             if (!contexto) throw new Error(`Contexto não encontrado para ${nome}`);
