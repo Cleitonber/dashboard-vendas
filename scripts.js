@@ -90,13 +90,49 @@ function inicializarSortableRelatorio() {
             const from = evt.oldIndex;
             const to = evt.newIndex;
             
-            // Reordenar células em todas as linhas
-            const rows = table.querySelectorAll('tr');
-            rows.forEach(row => {
+            // Reordenar células em todas as linhas (incluindo tbody e tfoot)
+            const allRows = table.querySelectorAll('tbody tr, tfoot tr');
+            allRows.forEach(row => {
                 const cells = Array.from(row.children);
                 const cell = cells[from];
+                
+                // Remover a célula da posição atual
                 row.removeChild(cell);
-                row.insertBefore(cell, cells[to]);
+                
+                // Inserir a célula na nova posição
+                if (to >= cells.length) {
+                    row.appendChild(cell);
+                } else {
+                    row.insertBefore(cell, cells[to]);
+                }
+            });
+            
+            // Atualizar os data-tipos das colunas
+            const headers = thead.querySelectorAll('th');
+            headers.forEach((header, index) => {
+                const tipo = header.getAttribute('data-tipo');
+                const colunasBody = table.querySelectorAll(`tbody tr td:nth-child(${index + 1})`);
+                const colunaFoot = table.querySelector(`tfoot tr td:nth-child(${index + 1})`);
+                
+                colunasBody.forEach(cell => {
+                    if (tipo === 'monetario') {
+                        cell.setAttribute('data-tipo', 'monetario');
+                        cell.style.textAlign = 'right';
+                    } else {
+                        cell.removeAttribute('data-tipo');
+                        cell.style.textAlign = 'left';
+                    }
+                });
+                
+                if (colunaFoot) {
+                    if (tipo === 'monetario') {
+                        colunaFoot.setAttribute('data-tipo', 'monetario');
+                        colunaFoot.style.textAlign = 'right';
+                    } else {
+                        colunaFoot.removeAttribute('data-tipo');
+                        colunaFoot.style.textAlign = 'left';
+                    }
+                }
             });
         }
     });
