@@ -214,19 +214,24 @@ function ordenarTabela(colIndex) {
         { id: 'percentualComissao', label: 'Variável da Comissão' }
     ];
 
-    // Criar cabeçalho da tabela
-    const thead = document.querySelector('#tabelaRelatorio thead');
-    thead.innerHTML = '';
+// Criar cabeçalho da tabela
+const thead = document.querySelector('#tabelaRelatorio thead');
+thead.innerHTML = '';
+const headerRow = document.createElement('tr');
 
-    const headerRow = document.createElement('tr');
-    colunas.forEach(coluna => {
-        if (colunasSelecionadas.includes(coluna.id)) {
-            const th = document.createElement('th');
-            th.textContent = coluna.label;
-            headerRow.appendChild(th);
-        }
-    });
-    thead.appendChild(headerRow);
+colunas.forEach(coluna => {
+    if (colunasSelecionadas.includes(coluna.id)) {
+        const th = document.createElement('th');
+        th.textContent = coluna.label;
+        th.setAttribute('data-tipo', 
+            ['valorVenda', 'valorBrutoReceber', 'comissao'].includes(coluna.id) 
+            ? 'monetario' : 'texto'
+        );
+        headerRow.appendChild(th);
+    }
+});
+
+thead.appendChild(headerRow);
 
     // Criar corpo da tabela
     const tbody = document.querySelector('#tabelaRelatorio tbody');
@@ -303,34 +308,33 @@ function ordenarTabela(colIndex) {
         tbody.appendChild(row);
     });
 
-// Adicionar totais no rodapé
+// Adicionar totais no rodapé (substituir o código atual do rodapé)
 const tfoot = document.querySelector('#tabelaRelatorio tfoot');
 tfoot.innerHTML = '';
 const footerRow = document.createElement('tr');
 
+let totaisAdicionados = false;
+
 colunasSelecionadas.forEach((colunaId) => {
     const td = document.createElement('td');
     
-    switch (colunaId) {
-        case 'data':
-            td.innerHTML = '<strong>Totais:</strong>';
-            td.style.textAlign = 'left';
-            break;
-        case 'valorVenda':
-            td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-            td.setAttribute('data-tipo', 'monetario');
-            break;
-        case 'valorBrutoReceber':
-            td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-            td.setAttribute('data-tipo', 'monetario');
-            break;
-        case 'comissao':
-            td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-            td.setAttribute('data-tipo', 'monetario');
-            break;
-        default:
-            td.innerHTML = '';
+    if (!totaisAdicionados && colunaId === colunasSelecionadas[0]) {
+        td.innerHTML = '<strong>Totais:</strong>';
+        td.style.textAlign = 'left';
+        totaisAdicionados = true;
+    } else if (colunaId === 'valorVenda') {
+        td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+        td.setAttribute('data-tipo', 'monetario');
+    } else if (colunaId === 'valorBrutoReceber') {
+        td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+        td.setAttribute('data-tipo', 'monetario');
+    } else if (colunaId === 'comissao') {
+        td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+        td.setAttribute('data-tipo', 'monetario');
+    } else {
+        td.innerHTML = '';
     }
+    
     footerRow.appendChild(td);
 });
 
