@@ -16,16 +16,7 @@ const itensPorPagina = 5;
 let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart;
 
 // Função para alternar entre as abas
-function showTab(tabId) {
-    const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => tab.classList.remove('active'));
 
-    document.getElementById(tabId).classList.add('active');
-
-    const buttons = document.querySelectorAll('.nav-button');
-    buttons.forEach(button => button.classList.remove('active'));
-    document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
-}
 
 // Função para alternar a exibição das listas
 function toggleList(listId) {
@@ -78,7 +69,6 @@ function preencherFiltroColunas() {
     });
 }
 
-function inicializarSortableRelatorio() {
 function inicializarSortableRelatorio() {
     const table = document.getElementById('tabelaRelatorio');
     if (!table) return;
@@ -146,18 +136,23 @@ function updateColumnAttributes() {
 }
 
 // Adicionar chamada para reinicializar quando mudar de aba
+// Função para alternar entre as abas
 function showTab(tabId) {
+    // Remover classe active de todas as abas
     const tabs = document.querySelectorAll('.tab-content');
     tabs.forEach(tab => tab.classList.remove('active'));
+    
+    // Adicionar classe active na aba selecionada
     document.getElementById(tabId).classList.add('active');
     
+    // Atualizar botões de navegação
     const buttons = document.querySelectorAll('.nav-button');
     buttons.forEach(button => button.classList.remove('active'));
     document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
 
     // Reinicializar Sortable se estiver na aba de relatórios
     if (tabId === 'relatoriosTab') {
-setTimeout(() => {
+        setTimeout(() => {
             inicializarSortableRelatorio();
             updateColumnAttributes();
         }, 100);
@@ -315,38 +310,38 @@ function filtrarRelatorio() {
         tbody.appendChild(row);
     });
 
-    // Adicionar totais no rodapé
-    const tfoot = document.querySelector('#tabelaRelatorio tfoot');
-    tfoot.innerHTML = '';
-    const footerRow = document.createElement('tr');
+   // Adicionar totais no rodapé
+const tfoot = document.querySelector('#tabelaRelatorio tfoot');
+tfoot.innerHTML = '';
+const footerRow = document.createElement('tr');
 
-    colunasSelecionadas.forEach((colunaId) => {
-        const td = document.createElement('td');
-        
-        switch (colunaId) {
-            case 'data':
-                td.innerHTML = '<strong>Totais:</strong>';
-                td.style.textAlign = 'left';
-                break;
-            case 'valorVenda':
-                td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-                td.setAttribute('data-tipo', 'monetario');
-                break;
-            case 'valorBrutoReceber':
-                td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-                td.setAttribute('data-tipo', 'monetario');
-                break;
-            case 'comissao':
-                td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-                td.setAttribute('data-tipo', 'monetario');
-                break;
-            default:
-                td.innerHTML = '';
-        }
-        footerRow.appendChild(td);
-    });
+colunasSelecionadas.forEach((colunaId) => {
+    const td = document.createElement('td');
+    
+    switch (colunaId) {
+        case 'data':
+            td.innerHTML = '<strong>Totais:</strong>';
+            td.style.textAlign = 'left';
+            break;
+        case 'valorVenda':
+            td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+            td.setAttribute('data-tipo', 'monetario');
+            break;
+        case 'valorBrutoReceber':
+            td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+            td.setAttribute('data-tipo', 'monetario');
+            break;
+        case 'comissao':
+            td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+            td.setAttribute('data-tipo', 'monetario');
+            break;
+        default:
+            td.innerHTML = '';
+    }
+    footerRow.appendChild(td);
+});
 
-    tfoot.appendChild(footerRow);
+tfoot.appendChild(footerRow);
 
     // Inicializar funcionalidades após atualizar a tabela
     inicializarSortableRelatorio();
@@ -1708,3 +1703,15 @@ document.addEventListener('DOMContentLoaded', function () {
     inicializarGraficos();
     atualizarDashboard();
 });
+
+// Inicialização quando o documento carrega
+document.addEventListener('DOMContentLoaded', function() {
+    inicializarGraficos();
+    atualizarDashboard();
+    
+    // Se estiver na aba de relatórios
+    if (document.getElementById('relatoriosTab').classList.contains('active')) {
+        inicializarSortableRelatorio();
+    }
+});
+
