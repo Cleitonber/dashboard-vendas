@@ -24,10 +24,10 @@
 
 body {
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
-    background: var(--secondary);
+    background: var(--secondary); /* Usar a cor secundária como background */
     color: var(--text);
     line-height: 1.5;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease; /* Adicionar transição suave */
 }
 
 .container {
@@ -51,7 +51,7 @@ body {
     font-size: 1.875rem;
     font-weight: 700;
     color: var(--text);
-    letter-spacing: 0.025em;
+    letter-spacing: -0.025em;
 }
 
 .navigation {
@@ -84,39 +84,6 @@ body {
     color: white;
 }
 
-.grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 1.5rem;
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.filters {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    background: var(--surface);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-}
-
-.tab-content {
-    display: none;
-}
-
-.tab-content.active {
-    display: block;
-}
-
-/* Cards */
 .card {
     background: var(--surface);
     border-radius: var(--radius);
@@ -143,51 +110,12 @@ body {
     padding: 1.5rem;
 }
 
-/* Botões */
-.btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0.75rem 1.5rem;
-    border: none;
-    border-radius: var(--radius);
-    font-weight: 500;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    gap: 0.5rem;
-    background: var(--primary);
-    color: white;
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
 }
 
-.btn:hover {
-    background: var(--primary-dark);
-}
-
-.btn-secondary {
-    background: var(--primary);
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: var(--primary-dark);
-}
-
-.btn-success {
-    background: var(--success);
-    color: white;
-}
-
-.btn-success:hover {
-    opacity: 0.9;
-}
-
-.btn-sm {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.875rem;
-}
-
-/* Forms */
 .form-group {
     margin-bottom: 1.25rem;
 }
@@ -238,232 +166,71 @@ body {
     box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
-/* Badges */
-.badge {
+.btn {
     display: inline-flex;
     align-items: center;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-    font-size: 0.875rem;
-    font-weight: 500;
-}
-
-.badge-success {
-    background: rgba(34, 197, 94, 0.1);
-    color: var(--success);
-}
-
-.badge-warning {
-    background: rgba(245, 158, 11, 0.1);
-    color: var(--warning);
-}
-
-.badge-danger {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--danger);
-}
-/* Tabela Base */
-table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--surface);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-}
-
-th, td {
-    padding: 1rem;
-    border-bottom: 1px solid var(--border);
-}
-
-/* Tabela de Relatório */
-#tabelaRelatorio {
-    width: 100%;
-    border-collapse: collapse;
-    table-layout: auto;
-}
-
-#tabelaRelatorio th,
-#tabelaRelatorio td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-    white-space: normal;
-    overflow: visible;
-}
-
-#tabelaRelatorio th[data-tipo="monetario"],
-#tabelaRelatorio td[data-tipo="monetario"] {
-    text-align: right !important;
-}
-
-#tabelaRelatorio tfoot td {
-    font-weight: bold;
-    background-color: var(--background);
-    border-top: 2px solid var(--border);
-}
-
-#tabelaRelatorio tfoot td:first-child {
-    text-align: left !important;
-}
-
-/* Estilos para arrastar e soltar */
-.sortable-ghost {
-    opacity: 0.8;
-    background-color: var(--primary-light) !important;
-}
-
-#tabelaRelatorio th {
-    cursor: move;
-    user-select: none;
-    position: relative;
-    padding-right: 25px;
-    background: #f8fafc;
-    font-weight: 500;
-    color: var(--text-light);
-}
-
-#tabelaRelatorio th:hover {
-    background-color: #f1f5f9;
-}
-
-#tabelaRelatorio th::after {
-    content: '';
-    position: absolute;
-    right: 8px;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-#tabelaRelatorio th[data-ordem="asc"]::after {
-    content: '▲';
-}
-
-#tabelaRelatorio th[data-ordem="desc"]::after {
-    content: '▼';
-}
-
-/* Tabela de Vendas */
-#tabelaVendas {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--surface);
-    border-radius: var(--radius);
-    overflow: hidden;
-    box-shadow: var(--shadow);
-}
-
-#tabelaVendas th,
-#tabelaVendas td {
-    padding: 1rem;
-    text-align: left;
-    border-bottom: 1px solid var(--border);
-}
-
-#tabelaVendas th {
-    background: #f8fafc;
-    font-weight: 500;
-    color: var(--text-light);
-    cursor: pointer;
-}
-
-#tabelaVendas tbody tr:hover {
-    background-color: #f1f5f9;
-}
-
-#tabelaVendas input {
-    width: 100%;
-    padding: 0.5rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    font-size: 1rem;
-    transition: all 0.2s;
-    color: var(--text);
-}
-
-#tabelaVendas input:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-/* Controles de Paginação */
-.controles-paginacao {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 1rem;
-}
-
-.controles-paginacao button {
-    padding: 0.5rem 1rem;
+    justify-content: center;
+    padding: 0.75rem 1.5rem;
     border: none;
     border-radius: var(--radius);
-    background: var(--primary);
-    color: white;
+    font-weight: 500;
+    font-size: 1rem;
     cursor: pointer;
     transition: all 0.2s;
+    gap: 0.5rem;
+    background: var(--primary); /* Todos os botões usam a cor primária */
+    color: white;
 }
 
-.controles-paginacao button:hover {
+.btn:hover {
+    background: var(--primary-dark); /* Efeito hover com a cor primária escura */
+}
+
+.btn-primary {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-primary:hover {
     background: var(--primary-dark);
 }
 
-.controles-paginacao button:disabled {
-    background: var(--primary);
-    opacity: 0.5;
-    cursor: not-allowed;
+.btn-secondary {
+    background: var(--primary); /* Alterado para usar a cor primária */
+    color: white;
 }
 
-/* Utilitários */
-.d-none {
-    display: none;
+.btn-secondary:hover {
+    background: var(--primary-dark); /* Efeito hover com a cor primária escura */
 }
 
-.list-group {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+.btn-success {
+    background: var(--success);
+    color: white;
 }
 
-.list-group-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 1rem;
-    border-bottom: 1px solid var(--border);
-    transition: all 0.2s;
+.btn-success:hover {
+    opacity: 0.9;
 }
 
-.list-group-item:hover {
-    background-color: #f1f5f9;
+.btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
 }
 
-/* Animações */
-.spinner-border {
-    width: 2rem;
-    height: 2rem;
-    border: 0.25em solid currentColor;
-    border-right-color: transparent;
-    border-radius: 50%;
-    animation: spinner-border 0.75s linear infinite;
-}
-
-@keyframes spinner-border {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
-/* Chart Container */
 .chart-container {
     position: relative;
     height: 300px;
     margin: 1rem 0;
 }
 
-/* Stats Cards */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
 .stat-card {
     background: var(--surface);
     padding: 1.5rem;
@@ -499,7 +266,91 @@ th, td {
     color: var(--danger);
 }
 
-/* Responsividade */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+/* Garantir alinhamento do rodapé da tabela */
+#tabelaRelatorio tfoot td {
+    font-weight: bold;
+    background-color: var(--background);
+    text-align: right;
+    padding: 1rem;
+    border-top: 2px solid var(--border);
+}
+
+
+th, td {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+/* Alinhar colunas monetárias à direita */
+th:nth-child(8), th:nth-child(9), th:nth-child(10), 
+td:nth-child(8), td:nth-child(9), td:nth-child(10) {
+    text-align: right;
+}
+
+
+th {
+    background: #f8fafc;
+    font-weight: 500;
+    color: var(--text-light);
+    cursor: pointer;
+}
+
+th:active {
+    cursor: grabbing;
+}
+
+.filters {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: var(--surface);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.badge-success {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--success);
+}
+
+.badge-warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--warning);
+}
+
+.badge-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--danger);
+}
+
 @media (max-width: 768px) {
     .container {
         padding: 1rem;
@@ -514,30 +365,75 @@ th, td {
         width: 100%;
         overflow-x: auto;
     }
+}
 
-    .grid {
-        grid-template-columns: 1fr;
-    }
+.d-none {
+    display: none;
+}
 
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
+.spinner-border {
+    width: 2rem;
+    height: 2rem;
+    border: 0.25em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+    animation: spinner-border 0.75s linear infinite;
+}
 
-    .filters {
-        grid-template-columns: 1fr;
-    }
-
-    #tabelaRelatorio {
-        display: block;
-        overflow-x: auto;
-    }
-
-    .form-group {
-        margin-bottom: 1rem;
+@keyframes spinner-border {
+    to {
+        transform: rotate(360deg);
     }
 }
 
-/* Edição Direta */
+/* Estilos para a tabela de vendas */
+#tabelaVendas {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--surface);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+#tabelaVendas th, #tabelaVendas td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+}
+
+#tabelaVendas th {
+    background: #f8fafc;
+    font-weight: 500;
+    color: var(--text-light);
+    cursor: pointer;
+}
+
+#tabelaVendas th:active {
+    cursor: grabbing;
+}
+
+#tabelaVendas tbody tr:hover {
+    background-color: #f1f5f9;
+}
+
+#tabelaVendas input {
+    width: 100%;
+    padding: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 1rem;
+    transition: all 0.2s;
+    color: var(--text);
+}
+
+#tabelaVendas input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Estilos para edição direta */
 .editable {
     padding: 0.25rem;
     border: 1px solid transparent;
@@ -551,39 +447,182 @@ th, td {
     background-color: #f1f5f9;
 }
 
-/* Form Check */
+/* Estilos para listas */
+.list-group {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.list-group-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid var(--border);
+    transition: all 0.2s;
+}
+
+.list-group-item:hover {
+    background-color: #f1f5f9;
+}
+
+/* Estilos para controles de paginação */
+.controles-paginacao {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+.controles-paginacao button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--primary); /* Alterado para usar a cor primária */
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.controles-paginacao button:hover {
+    background: var(--primary-dark); /* Efeito hover com a cor primária escura */
+}
+
+.controles-paginacao button:disabled {
+    background: var(--primary); /* Alterado para usar a cor primária */
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Estilos para checkboxes */
 .form-check-input {
     margin-right: 0.5rem;
     cursor: pointer;
 }
 
-/* Acessibilidade */
-@media (prefers-reduced-motion: reduce) {
-    * {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-    }
+/* Estilos específicos para a tabela de relatório */
+#tabelaRelatorio {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-/* Print Styles */
-@media print {
-    .no-print {
-        display: none !important;
-    }
+#tabelaRelatorio th,
+#tabelaRelatorio td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: normal; /* Alterado de nowrap para normal */
+    overflow: visible; /* Alterado de hidden para visible */
+    /* removido text-overflow: ellipsis */
+}
 
-    body {
-        background: white;
-    }
+/* Ajuste para melhor visualização */
+#tabelaRelatorio {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto; /* Alterado de fixed para auto */
+}
 
-    .container {
-        max-width: none;
-        padding: 0;
-    }
+/* Alinhar colunas monetárias à direita */
+#tabelaRelatorio th[data-tipo="monetario"],
+#tabelaRelatorio td[data-tipo="monetario"] {
+    text-align: right;
+}
 
-    #tabelaRelatorio {
-        box-shadow: none;
-        border: 1px solid #ddd;
-    }
+/* Estilos específicos para a tabela de relatório */
+#tabelaRelatorio {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+}
+
+#tabelaRelatorio th,
+#tabelaRelatorio td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    white-space: normal;
+    overflow: visible;
+}
+
+/* Alinhar colunas monetárias à direita */
+#tabelaRelatorio th[data-tipo="monetario"],
+#tabelaRelatorio td[data-tipo="monetario"] {
+    text-align: right;
+}
+
+/* Estilos para o rodapé */
+#tabelaRelatorio tfoot td {
+    font-weight: bold;
+    background-color: var(--background);
+    border-top: 2px solid var(--border);
+}
+
+/* Primeira célula do rodapé (Totais) alinhada à esquerda */
+#tabelaRelatorio tfoot tr td:first-child {
+    text-align: left;
+}
+
+/* Ordenação */
+#tabelaRelatorio th {
+    position: relative;
+    cursor: pointer;
+    padding-right: 25px;
+}
+
+#tabelaRelatorio th::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#tabelaRelatorio th[data-ordem="asc"]::after {
+    content: '▲';
+}
+
+#tabelaRelatorio th[data-ordem="desc"]::after {
+    content: '▼';
+}
+
+
+/* Estilos para o arrastar e soltar */
+#tabelaRelatorio th.sortable-ghost {
+    background-color: var(--primary-light);
+    opacity: 0.8;
+}
+
+#tabelaRelatorio th {
+    cursor: move;
+    user-select: none;
+}
+
+#tabelaRelatorio th:hover {
+    background-color: #f1f5f9;
+}
+
+/* Estilos para arrastar e soltar */
+#tabelaRelatorio th.sortable-ghost {
+    background-color: var(--primary-light);
+    opacity: 0.8;
+    position: relative;
+}
+
+#tabelaRelatorio th.sortable-ghost::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(79, 70, 229, 0.1);
+    pointer-events: none;
+}
+
+#tabelaRelatorio th {
+    cursor: move;
+    user-select: none;
+    position: relative;
 }
