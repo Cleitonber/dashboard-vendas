@@ -512,6 +512,16 @@ th:active {
     padding: 1rem;
     text-align: left;
     border-bottom: 1px solid var(--border);
+    white-space: normal; /* Alterado de nowrap para normal */
+    overflow: visible; /* Alterado de hidden para visible */
+    /* removido text-overflow: ellipsis */
+}
+
+/* Ajuste para melhor visualização */
+#tabelaRelatorio {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto; /* Alterado de fixed para auto */
 }
 
 /* Alinhar colunas monetárias à direita */
@@ -559,3 +569,26 @@ th:active {
 #tabelaRelatorio td:empty {
     padding: 1rem;
 }
+
+/* Estilos para indicadores de ordenação */
+#tabelaRelatorio th {
+    position: relative;
+    cursor: pointer;
+}
+
+#tabelaRelatorio th::after {
+    content: '';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+#tabelaRelatorio th[data-ordem="asc"]::after {
+    content: '▲';
+}
+
+#tabelaRelatorio th[data-ordem="desc"]::after {
+    content: '▼';
+}
+
