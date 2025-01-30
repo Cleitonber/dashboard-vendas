@@ -809,17 +809,6 @@ function inicializarGraficos() {
     }
 }
 
-    // Inicializar gráficos
-    vendasServicoChart = criarGraficoVendasServico(contextos.vendasServico);
-    desempenhoVendedoresChart = criarGraficoDesempenho(contextos.desempenhoVendedores);
-    vendasCategoriaChart = criarGraficoCategoria(contextos.vendasCategoria);
-
-    console.log('Gráficos inicializados com sucesso!');
-} catch (erro) {
-    console.error('Erro ao inicializar gráficos:', erro);
-    throw erro;
-}
-
 // Inicialização das tabelas
 function inicializarTabelas() {
 
