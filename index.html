@@ -430,8 +430,8 @@
         </div>
         <!-- Tab Relatórios -->
         <div id="relatoriosTab" class="tab-content">
-             <h2>Relatório de Vendas</h2>
-    <select id="filtroColunas" multiple></select> <!-- Adicione esta linha -->
+    <h2>Relatório de Vendas</h2>
+    <select id="filtroColunas" multiple></select>
     <table id="tabelaRelatorio">
         <thead>
             <tr>
@@ -451,6 +451,10 @@
         <tbody></tbody>
         <tfoot></tfoot>
     </table>
+    <div style="margin-top: 1rem;">
+        <button class="btn btn-secondary" onclick="exportarRelatorioExcel()">Exportar Excel</button>
+        <button class="btn btn-secondary" onclick="exportarRelatorioPDF()">Exportar PDF</button>
+    </div>
 </div>
             <div class="card">
                 <div class="card-header">
