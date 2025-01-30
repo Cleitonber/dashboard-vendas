@@ -182,7 +182,8 @@ function filtrarRelatorio() {
     const dataInicial = document.getElementById('dataInicial').value;
     const dataFinal = document.getElementById('dataFinal').value;
     const vendedorId = filtroVendedor ? filtroVendedor.value : null;
-    const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
+    const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions)
+        .map(option => option.value);
 
     // Converter datas para o formato Date
     const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
@@ -202,21 +203,6 @@ function filtrarRelatorio() {
 
         return filtroData && filtroVendedor;
     });
-
-    // Definir a ordem das colunas
-    const colunas = [
-        { id: 'data', label: 'Data da Venda' },
-        { id: 'id', label: 'ID da Venda' },
-        { id: 'vendedor', label: 'Nome do Vendedor' },
-        { id: 'servico', label: 'Serviço Atendido' },
-        { id: 'tipoComissao', label: 'Tipo de Comissão' },
-        { id: 'nomeCliente', label: 'Nome do Cliente' },
-        { id: 'empresaParceira', label: 'Empresa Parceira' },
-        { id: 'valorVenda', label: 'Valor da Venda' },
-        { id: 'valorBrutoReceber', label: 'Valor Bruto a Receber' },
-        { id: 'comissao', label: 'Valor da Comissão' },
-        { id: 'percentualComissao', label: 'Variável da Comissão' }
-    ];
 
     // Criar cabeçalho da tabela
     const thead = document.querySelector('#tabelaRelatorio thead');
@@ -310,43 +296,44 @@ function filtrarRelatorio() {
         tbody.appendChild(row);
     });
 
-   // Adicionar totais no rodapé
-const tfoot = document.querySelector('#tabelaRelatorio tfoot');
-tfoot.innerHTML = '';
-const footerRow = document.createElement('tr');
+    // Adicionar totais no rodapé
+    const tfoot = document.querySelector('#tabelaRelatorio tfoot');
+    tfoot.innerHTML = '';
+    const footerRow = document.createElement('tr');
 
-colunasSelecionadas.forEach((colunaId) => {
-    const td = document.createElement('td');
-    
-    switch (colunaId) {
-        case 'data':
-            td.innerHTML = '<strong>Totais:</strong>';
-            td.style.textAlign = 'left';
-            break;
-        case 'valorVenda':
-            td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-            td.setAttribute('data-tipo', 'monetario');
-            break;
-        case 'valorBrutoReceber':
-            td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-            td.setAttribute('data-tipo', 'monetario');
-            break;
-        case 'comissao':
-            td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-            td.setAttribute('data-tipo', 'monetario');
-            break;
-        default:
-            td.innerHTML = '';
-    }
-    footerRow.appendChild(td);
-});
+    colunasSelecionadas.forEach((colunaId) => {
+        const td = document.createElement('td');
+        
+        switch (colunaId) {
+            case 'data':
+                td.innerHTML = '<strong>Totais:</strong>';
+                td.style.textAlign = 'left';
+                break;
+            case 'valorVenda':
+                td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+                td.setAttribute('data-tipo', 'monetario');
+                break;
+            case 'valorBrutoReceber':
+                td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+                td.setAttribute('data-tipo', 'monetario');
+                break;
+            case 'comissao':
+                td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+                td.setAttribute('data-tipo', 'monetario');
+                break;
+            default:
+                td.innerHTML = '';
+        }
+        footerRow.appendChild(td);
+    });
 
-tfoot.appendChild(footerRow);
+    tfoot.appendChild(footerRow);
 
     // Inicializar funcionalidades após atualizar a tabela
     inicializarSortableRelatorio();
     inicializarOrdenacaoTabela();
 }
+
 
 // Criar células para cada coluna selecionada
 colunasSelecionadas.forEach((colunaId) => {
