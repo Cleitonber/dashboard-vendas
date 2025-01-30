@@ -691,7 +691,10 @@ function atualizarDashboard() {
 
     // Filtrar vendas pelo mês e ano selecionados
     const vendasFiltradas = dados.vendas.filter(venda => {
+        // Converter data da venda para objeto Date
         const [dia, mes, ano] = venda.data.split('/').map(Number);
+        
+        // Verificar se mês e ano correspondem aos selecionados
         return mes - 1 === mesSelecionado && ano === anoSelecionado;
     });
 
@@ -1734,18 +1737,38 @@ function salvarEdicaoVenda(id) {
     const venda = dados.vendas.find(v => v.id === id);
     if (venda) {
         const row = document.querySelector(`#tabelaVendas tbody tr:nth-child(${dados.vendas.indexOf(venda) + 1})`);
+        
+        // Atualizar dados da venda (código existente)
         venda.data = row.querySelector('td:nth-child(1) input').value;
         venda.vendedor = row.querySelector('td:nth-child(2) input').value;
         venda.servico = row.querySelector('td:nth-child(3) input').value;
         venda.nomeCliente = row.querySelector('td:nth-child(4) input').value;
         venda.empresaParceira = row.querySelector('td:nth-child(5) input').value;
-        venda.valorVenda = parseFloat(row.querySelector('td:nth-child(6) input').value.replace(/[^0-9,]/g, '').replace(',', '.'));
-        venda.valorReceber = parseFloat(row.querySelector('td:nth-child(7) input').value.replace(/[^0-9,]/g, '').replace(',', '.'));
-        venda.comissao = parseFloat(row.querySelector('td:nth-child(8) input').value.replace(/[^0-9,]/g, '').replace(',', '.'));
+        
+        // Converter valores monetários (código existente)
+        venda.valorVenda = parseFloat(
+            row.querySelector('td:nth-child(6) input').value
+                .replace(/[^0-9,]/g, '')
+                .replace(',', '.')
+        );
+        venda.valorReceber = parseFloat(
+            row.querySelector('td:nth-child(7) input').value
+                .replace(/[^0-9,]/g, '')
+                .replace(',', '.')
+        );
+        venda.comissao = parseFloat(
+            row.querySelector('td:nth-child(8) input').value
+                .replace(/[^0-9,]/g, '')
+                .replace(',', '.')
+        );
 
+        // Atualizar lista de vendas
         listarVendas();
-        preencherAnos(); // Atualiza os anos disponíveis
-        atualizarDashboard(); // Atualiza o dashboard
+        
+        // Adicionar chamadas para atualizar dashboards
+        preencherAnos();
+        atualizarDashboard();
+        
         alert('Venda atualizada com sucesso!');
     }
 }
@@ -1758,11 +1781,22 @@ function cancelarEdicaoVenda() {
 // Função para excluir uma venda
 function excluirVenda(id) {
     if (confirm('Tem certeza que deseja excluir esta venda?')) {
-        dados.vendas = dados.vendas.filter(v => v.id !== id);
-        listarVendas();
-        preencherAnos(); // Atualiza os anos disponíveis
-        atualizarDashboard(); // Atualiza o dashboard
-        alert('Venda excluída com sucesso!');
+        // Encontrar o índice da venda a ser excluída
+        const indiceVenda = dados.vendas.findIndex(v => v.id === id);
+        
+        if (indiceVenda !== -1) {
+            // Remover a venda do array
+            dados.vendas.splice(indiceVenda, 1);
+            
+            // Atualizar lista de vendas
+            listarVendas();
+            
+            // Adicionar chamadas para atualizar dashboards
+            preencherAnos();
+            atualizarDashboard();
+            
+            alert('Venda excluída com sucesso!');
+        }
     }
 }
 
@@ -1827,4 +1861,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
 document.addEventListener('DOMContentLoaded', function () {
     preencherFiltroColunas(); // Preenche o filtro de colunas ao carregar a página
+});
+
+// Adicionar event listeners para atualização automática do dashboard
+document.addEventListener('DOMContentLoaded', function() {
+    // Selecionar elementos de filtro
+    const mesFiltro = document.getElementById('mesFiltro');
+    const anoFiltro = document.getElementById('anoFiltro');
+
+    // Adicionar event listener para mudança de mês
+    mesFiltro.addEventListener('change', function() {
+        atualizarDashboard();
+    });
+
+    // Adicionar event listener para mudança de ano
+    anoFiltro.addEventListener('change', function() {
+        atualizarDashboard();
+    });
+
+    // Inicialização inicial
+    inicializarGraficos();
+    preencherAnos();
+    atualizarDashboard();
 });
