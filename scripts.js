@@ -1141,12 +1141,6 @@ document.getElementById('servicoForm').addEventListener('submit', function (e) {
     atualizarListaServicos();
     atualizarOpcoesServicos();
     atualizarFiltrosVendas();
- const filtroServicos = document.getElementById('filtroServicoVendas');
-    const option = document.createElement('option');
-    option.value = novoServico.id;
-    option.textContent = novoServico.nome;
-    filtroServicos.appendChild(option);
-
     alert('Serviço cadastrado com sucesso!');
     limparCamposServico();
 });
