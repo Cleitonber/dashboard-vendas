@@ -796,7 +796,8 @@ function inicializarGraficos() {
         Object.entries(contextos).forEach(([nome, contexto]) => {
             if (!contexto) throw new Error(`Contexto não encontrado para ${nome}`);
         });
-
+function inicializarGraficos() {  // Adicionando a função que estava faltando
+    try {
         // Criar novos gráficos
 vendasServicoChart = criarGraficoVendasServico(contextos.vendasServico);
 desempenhoVendedoresChart = criarGraficoDesempenho(contextos.desempenhoVendedores);
