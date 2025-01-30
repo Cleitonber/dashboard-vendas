@@ -188,59 +188,6 @@ function filtrarRelatorio() {
     const dataFinal = document.getElementById('dataFinal').value;
     const vendedorId = filtroVendedor ? filtroVendedor.value : null;
     const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
-    // Adicionar após a função filtrarRelatorio()
-
-function inicializarOrdenacaoTabela() {
-    const thead = document.querySelector('#tabelaRelatorio thead');
-    const ths = thead.querySelectorAll('th');
-    
-    ths.forEach((th, index) => {
-        th.style.cursor = 'pointer';
-        th.addEventListener('click', () => ordenarTabela(index));
-        // Adicionar indicador de ordenação
-        th.dataset.ordem = 'nenhuma';
-    });
-}
-
-function ordenarTabela(colIndex) {
-    const tbody = document.querySelector('#tabelaRelatorio tbody');
-    const rows = Array.from(tbody.querySelectorAll('tr'));
-    const th = document.querySelector(`#tabelaRelatorio th:nth-child(${colIndex + 1})`);
-    const isMonetario = th.getAttribute('data-tipo') === 'monetario';
-    
-    // Alternar ordem
-    const ordem = th.dataset.ordem === 'asc' ? 'desc' : 'asc';
-    // Resetar ordem das outras colunas
-    document.querySelectorAll('#tabelaRelatorio th').forEach(header => {
-        header.dataset.ordem = 'nenhuma';
-    });
-    th.dataset.ordem = ordem;
-
-    rows.sort((a, b) => {
-        let valorA = a.cells[colIndex].textContent.trim();
-        let valorB = b.cells[colIndex].textContent.trim();
-        
-        if (isMonetario) {
-            // Converter valores monetários para números
-            valorA = parseFloat(valorA.replace(/[R$\s.]/g, '').replace(',', '.'));
-            valorB = parseFloat(valorB.replace(/[R$\s.]/g, '').replace(',', '.'));
-        } else if (!isNaN(Date.parse(valorA))) {
-            // Ordenação de datas
-            valorA = new Date(valorA.split('/').reverse().join('-'));
-            valorB = new Date(valorB.split('/').reverse().join('-'));
-        }
-        
-        if (ordem === 'asc') {
-            return valorA > valorB ? 1 : -1;
-        } else {
-            return valorA < valorB ? 1 : -1;
-        }
-    });
-
-    // Reordenar linhas
-    rows.forEach(row => tbody.appendChild(row));
-}
-
 
     // Converter datas para o formato Date
     const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
@@ -251,11 +198,12 @@ function ordenarTabela(colIndex) {
         const dataVendaObj = new Date(venda.data.split('/').reverse().join('-'));
 
         // Filtro por data
-        const filtroData = (!dataInicialObj || dataVendaObj >= dataInicialObj) &&
-                           (!dataFinalObj || dataVendaObj <= dataFinalObj);
+        const filtroData = (!dataInicialObj || dataVendaObj >= dataInicialObj) && 
+                          (!dataFinalObj || dataVendaObj <= dataFinalObj);
 
         // Filtro por vendedor
-        const filtroVendedor = !vendedorId || venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
+        const filtroVendedor = !vendedorId || 
+                             venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
 
         return filtroData && filtroVendedor;
     });
@@ -275,24 +223,24 @@ function ordenarTabela(colIndex) {
         { id: 'percentualComissao', label: 'Variável da Comissão' }
     ];
 
-// Criar cabeçalho da tabela
-const thead = document.querySelector('#tabelaRelatorio thead');
-thead.innerHTML = '';
-const headerRow = document.createElement('tr');
+    // Criar cabeçalho da tabela
+    const thead = document.querySelector('#tabelaRelatorio thead');
+    thead.innerHTML = '';
+    const headerRow = document.createElement('tr');
 
-colunas.forEach(coluna => {
-    if (colunasSelecionadas.includes(coluna.id)) {
-        const th = document.createElement('th');
-        th.textContent = coluna.label;
-        th.setAttribute('data-tipo', 
-            ['valorVenda', 'valorBrutoReceber', 'comissao'].includes(coluna.id) 
-            ? 'monetario' : 'texto'
-        );
-        headerRow.appendChild(th);
-    }
-});
+    colunas.forEach(coluna => {
+        if (colunasSelecionadas.includes(coluna.id)) {
+            const th = document.createElement('th');
+            th.textContent = coluna.label;
+            th.setAttribute('data-tipo', 
+                ['valorVenda', 'valorBrutoReceber', 'comissao'].includes(coluna.id) 
+                ? 'monetario' : 'texto'
+            );
+            headerRow.appendChild(th);
+        }
+    });
 
-thead.appendChild(headerRow);
+    thead.appendChild(headerRow);
 
     // Criar corpo da tabela
     const tbody = document.querySelector('#tabelaRelatorio tbody');
@@ -334,12 +282,12 @@ thead.appendChild(headerRow);
                     case 'valorVenda':
                         valor = venda.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                         totalValorVenda += venda.valorVenda;
-                        cell.style.textAlign = 'right'; // Alinhar à direita
+                        cell.setAttribute('data-tipo', 'monetario');
                         break;
                     case 'valorBrutoReceber':
                         valor = venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                         totalValorBruto += venda.valorReceber;
-                        cell.style.textAlign = 'right'; // Alinhar à direita
+                        cell.setAttribute('data-tipo', 'monetario');
                         break;
                     case 'comissao':
                         if (venda.tipoComissao === 'fixa') {
@@ -350,14 +298,12 @@ thead.appendChild(headerRow);
                             valor = comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                             totalComissao += comissao;
                         }
-                        cell.style.textAlign = 'right'; // Alinhar à direita
+                        cell.setAttribute('data-tipo', 'monetario');
                         break;
                     case 'percentualComissao':
-                        if (venda.tipoComissao === 'fixa') {
-                            valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-                        } else {
-                            valor = `${venda.comissao}%`;
-                        }
+                        valor = venda.tipoComissao === 'fixa' 
+                            ? venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+                            : `${venda.comissao}%`;
                         break;
                     default:
                         valor = '-';
@@ -369,10 +315,43 @@ thead.appendChild(headerRow);
         tbody.appendChild(row);
     });
 
-// Adicionar totais no rodapé
-const tfoot = document.querySelector('#tabelaRelatorio tfoot');
-tfoot.innerHTML = '';
-const footerRow = document.createElement('tr');
+    // Adicionar totais no rodapé
+    const tfoot = document.querySelector('#tabelaRelatorio tfoot');
+    tfoot.innerHTML = '';
+    const footerRow = document.createElement('tr');
+
+    colunasSelecionadas.forEach((colunaId) => {
+        const td = document.createElement('td');
+        
+        switch (colunaId) {
+            case 'data':
+                td.innerHTML = '<strong>Totais:</strong>';
+                td.style.textAlign = 'left';
+                break;
+            case 'valorVenda':
+                td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+                td.setAttribute('data-tipo', 'monetario');
+                break;
+            case 'valorBrutoReceber':
+                td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+                td.setAttribute('data-tipo', 'monetario');
+                break;
+            case 'comissao':
+                td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+                td.setAttribute('data-tipo', 'monetario');
+                break;
+            default:
+                td.innerHTML = '';
+        }
+        footerRow.appendChild(td);
+    });
+
+    tfoot.appendChild(footerRow);
+
+    // Inicializar funcionalidades após atualizar a tabela
+    inicializarSortableRelatorio();
+    inicializarOrdenacaoTabela();
+}
 
 // Criar células para cada coluna selecionada
 colunasSelecionadas.forEach((colunaId) => {
