@@ -586,3 +586,20 @@ th:active {
 #tabelaRelatorio th[data-ordem="desc"]::after {
     content: '▼';
 }
+
+
+/* Estilos para o arrastar e soltar */
+#tabelaRelatorio th.sortable-ghost {
+    background-color: var(--primary-light);
+    opacity: 0.8;
+}
+
+#tabelaRelatorio th {
+    cursor: move;
+    user-select: none;
+}
+
+#tabelaRelatorio th:hover {
+    background-color: #f1f5f9;
+}
+
