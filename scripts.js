@@ -375,12 +375,14 @@ thead.appendChild(headerRow);
                         }
                         cell.style.textAlign = 'right'; // Alinhar à direita
                         break;
-                    case 'percentualComissao':
+                   case 'percentualComissao':
     if (venda.tipoComissao === 'fixa') {
         valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     } else {
-        // Remove o símbolo de % e converte para número
-        const comissaoValor = parseFloat(venda.comissao.replace('%', '').replace(',', '.'));
+        // Verifica o tipo de venda.comissao e formata adequadamente
+        const comissaoValor = typeof venda.comissao === 'string' 
+            ? parseFloat(venda.comissao.replace('%', '').replace(',', '.'))
+            : venda.comissao;
         
         // Formata com duas casas decimais e adiciona %
         valor = comissaoValor.toLocaleString('pt-BR', {
