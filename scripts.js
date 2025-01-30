@@ -70,7 +70,7 @@ function inicializarSortableRelatorio() {
     const table = document.getElementById('tabelaRelatorio');
     if (!table) return;
 
-    // Destruir instância anterior se existir 
+    // Destruir instância anterior se existir
     if (table.sortableInstance) {
         table.sortableInstance.destroy();
     }
@@ -111,14 +111,13 @@ function inicializarSortableRelatorio() {
     });
 }
 
-
-// Função auxiliar para atualizar atributos das colunas 
-function updateColumnAttributes() { 
-    const table = document.getElementById('tabelaRelatorio'); 
+// Função auxiliar para atualizar atributos das colunas
+function updateColumnAttributes() {
+    const table = document.getElementById('tabelaRelatorio');
     const headers = table.querySelectorAll('thead th');
 
-    headers.forEach((header, index) => { 
-        const isMonetary = header.getAttribute('data-tipo') === 'monetario'; 
+    headers.forEach((header, index) => {
+        const isMonetary = header.getAttribute('data-tipo') === 'monetario';
         const cells = table.querySelectorAll(`tbody tr td:nth-child(${index + 1}), tfoot tr td:nth-child(${index + 1})`);
 
         cells.forEach(cell => {
@@ -132,7 +131,6 @@ function updateColumnAttributes() {
         });
     });
 }
-
 
 // Adicionar chamada para reinicializar quando mudar de aba
 // Função para alternar entre as abas
