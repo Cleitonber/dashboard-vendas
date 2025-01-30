@@ -17,202 +17,15 @@ let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart;
 
 // Função para alternar entre as abas
 function showTab(tabId) {
-    // Remover classe active de todas as abas
     const tabs = document.querySelectorAll('.tab-content');
     tabs.forEach(tab => tab.classList.remove('active'));
 
-    // Adicionar classe active na aba selecionada
-    const selectedTab = document.getElementById(tabId);
-    if (selectedTab) {
-        selectedTab.classList.add('active');
-    }
+    document.getElementById(tabId).classList.add('active');
 
-    // Atualizar botões de navegação
     const buttons = document.querySelectorAll('.nav-button');
     buttons.forEach(button => button.classList.remove('active'));
-    const activeButton = document.querySelector(`[onclick="showTab('${tabId}')"]`);
-    if (activeButton) {
-        activeButton.classList.add('active');
-    }
-
-    // Reinicializar Sortable se estiver na aba de relatórios
-    if (tabId === 'relatoriosTab') {
-        setTimeout(() => {
-            inicializarSortableRelatorio();
-            updateColumnAttributes();
-        }, 100);
-    }
-
-    // Atualizar dashboard se estiver na aba dashboard
-    if (tabId === 'dashboardTab') {
-        atualizarDashboard();
-    }
+    document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
 }
-
-// Funções para criar gráficos
-function criarGraficoVendasServico(contexto) {
-    return new Chart(contexto, {
-        type: 'bar',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Vendas',
-                data: [],
-                backgroundColor: 'rgba(79, 70, 229, 0.6)',
-                borderColor: 'rgba(79, 70, 229, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                tooltip: {
-                    enabled: true,
-                    mode: 'index',
-                    intersect: false,
-                },
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                }
-            },
-            animation: {
-                duration: 1000,
-                easing: 'easeInOutQuad'
-            }
-        }
-    });
-}
-
-function criarGraficoDesempenho(contexto) {
-    return new Chart(contexto, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Vendas',
-                data: [],
-                borderColor: 'rgba(239, 68, 68, 1)',
-                borderWidth: 2,
-                fill: false
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                tooltip: {
-                    enabled: true,
-                    mode: 'index',
-                    intersect: false,
-                },
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                }
-            },
-            animation: {
-                duration: 1000,
-                easing: 'easeInOutQuad'
-            }
-        }
-    });
-}
-
-function criarGraficoCategoria(contexto) {
-    return new Chart(contexto, {
-        type: 'pie',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'Vendas',
-                data: [],
-                backgroundColor: [
-                    'rgba(79, 70, 229, 0.6)',
-                    'rgba(239, 68, 68, 0.6)',
-                    'rgba(34, 197, 94, 0.6)'
-                ],
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                tooltip: {
-                    enabled: true,
-                    mode: 'index',
-                    intersect: false,
-                },
-                legend: {
-                    display: true,
-                    position: 'bottom',
-                }
-            },
-            animation: {
-                duration: 1000,
-                easing: 'easeInOutQuad'
-            }
-        }
-    });
-}
-
-// scripts.js
-function inicializarAplicacao() {
-    try {
-        // Verificar elementos essenciais
-        const elementosFaltantes = verificarElementos();
-        
-        if (elementosFaltantes.length > 0) {
-            console.error('Elementos não encontrados:', elementosFaltantes);
-            mostrarErroInicializacao(elementosFaltantes);
-            return;
-        }
-
-        // Inicializar componentes
-        inicializarGraficos();
-        inicializarTabelas();
-        inicializarEventos();
-        atualizarDashboard();
-
-        console.log('Aplicação inicializada com sucesso');
-    } catch (erro) {
-        console.error('Erro na inicialização:', erro);
-        mostrarErroInicializacao();
-    }
-}
-
-function mostrarErroInicializacao(elementosFaltantes = null) {
-    const mensagem = elementosFaltantes 
-        ? `Elementos necessários não encontrados: ${elementosFaltantes.map(e => e.id).join(', ')}`
-        : 'Houve um erro ao inicializar a aplicação';
-
-    // Criar elemento de alerta
-    const alerta = document.createElement('div');
-    alerta.className = 'alerta-erro';
-    alerta.innerHTML = `
-        <div class="alerta-conteudo">
-            <h3>Erro de Inicialização</h3>
-            <p>${mensagem}</p>
-            <button onclick="window.location.reload()">Recarregar Página</button>
-        </div>
-    `;
-
-    document.body.appendChild(alerta);
-}
-
-// Definição global das colunas
-const colunas = [
-    { id: 'data', label: 'Data da Venda' },
-    { id: 'id', label: 'ID da Venda' },
-    { id: 'vendedor', label: 'Nome do Vendedor' },
-    { id: 'servico', label: 'Serviço Vendido' },
-    { id: 'tipoComissao', label: 'Tipo de Comissão' },
-    { id: 'nomeCliente', label: 'Nome do Cliente' },
-    { id: 'empresaParceira', label: 'Empresa Parceira' },
-    { id: 'valorVenda', label: 'Valor da Venda' },
-    { id: 'valorBrutoReceber', label: 'Valor Bruto a Receber' },
-    { id: 'comissao', label: 'Valor da Comissão' },
-    { id: 'percentualComissao', label: 'Variável da Comissão' }
-];
 
 // Função para alternar a exibição das listas
 function toggleList(listId) {
@@ -240,6 +53,21 @@ function preencherFiltroColunas() {
     const filtroColunas = document.getElementById('filtroColunas');
     filtroColunas.innerHTML = ''; // Limpa o filtro de colunas
 
+    // Definir a ordem das colunas
+    const colunas = [
+        { id: 'data', label: 'Data da Venda' },
+        { id: 'id', label: 'ID da Venda' },
+        { id: 'vendedor', label: 'Nome do Vendedor' },
+        { id: 'servico', label: 'Serviço Vendido' },
+        { id: 'tipoComissao', label: 'Tipo de Comissão' },
+        { id: 'nomeCliente', label: 'Nome do Cliente' },
+        { id: 'empresaParceira', label: 'Empresa Parceira' },
+        { id: 'valorVenda', label: 'Valor da Venda' },
+        { id: 'valorBrutoReceber', label: 'Valor Bruto a Receber' },
+        { id: 'comissao', label: 'Valor da Comissão' },
+        { id: 'percentualComissao', label: 'Variável da Comissão' }
+    ];
+
     // Adicionar as colunas ao filtro na ordem correta
     colunas.forEach(coluna => {
         const option = document.createElement('option');
@@ -266,54 +94,110 @@ function inicializarSortableRelatorio() {
         animation: 150,
         ghostClass: 'sortable-ghost',
         onStart: function(evt) {
-            // Salvar índices originais
-            const cells = Array.from(evt.item.parentElement.children);
-            cells.forEach((cell, index) => {
-                cell.dataset.originalIndex = index;
-            });
+            // Salvar o estado inicial da tabela
+            const table = evt.item.closest('table');
+            table.originalHTML = table.innerHTML;
         },
-        onEnd: function(evt) {
-            const from = parseInt(evt.item.dataset.originalIndex);
-            const to = Array.from(evt.item.parentElement.children).indexOf(evt.item);
-
-            // Reordenar todas as linhas (tbody e tfoot)
-            const rows = table.querySelectorAll('tbody tr, tfoot tr');
-            rows.forEach(row => {
+        onEnd: function (evt) {
+            if (!evt.item) return;
+            
+            const table = evt.item.closest('table');
+            const from = evt.oldIndex;
+            const to = evt.newIndex;
+            
+            // Reordenar todas as linhas
+            const allRows = table.querySelectorAll('tbody tr, tfoot tr');
+            
+            allRows.forEach(row => {
+                if (!row || !row.children) return;
+                
                 const cells = Array.from(row.children);
-                const cell = cells[from];
-                row.removeChild(cell);
-                if (to >= cells.length) {
-                    row.appendChild(cell);
-                } else {
-                    row.insertBefore(cell, cells[to]);
+                if (from >= 0 && from < cells.length) {
+                    const cell = cells[from];
+                    row.removeChild(cell);
+                    
+                    if (to >= cells.length) {
+                        row.appendChild(cell);
+                    } else {
+                        row.insertBefore(cell, cells[to]);
+                    }
                 }
             });
 
-            // Atualizar atributos data-tipo
-            updateColumnAttributes();
+            // Atualizar os atributos data-tipo e alinhamentos
+            const headers = thead.querySelectorAll('th');
+            headers.forEach((header, index) => {
+                const tipo = header.getAttribute('data-tipo');
+                const colunasBody = table.querySelectorAll(`tbody tr td:nth-child(${index + 1})`);
+                const colunaFoot = table.querySelector(`tfoot tr td:nth-child(${index + 1})`);
+                
+                colunasBody.forEach(cell => {
+                    if (tipo === 'monetario') {
+                        cell.setAttribute('data-tipo', 'monetario');
+                        cell.style.textAlign = 'right';
+                    } else {
+                        cell.removeAttribute('data-tipo');
+                        cell.style.textAlign = 'left';
+                    }
+                });
+                
+                if (colunaFoot) {
+                    if (tipo === 'monetario') {
+                        colunaFoot.setAttribute('data-tipo', 'monetario');
+                        colunaFoot.style.textAlign = 'right';
+                    } else {
+                        colunaFoot.removeAttribute('data-tipo');
+                        colunaFoot.style.textAlign = 'left';
+                    }
+                }
+            });
+
+            // Verificar se a reordenação foi bem-sucedida
+            const currentRows = table.querySelectorAll('tr');
+            const allRowsHaveSameLength = Array.from(currentRows).every(row => 
+                row.children.length === thead.children.length
+            );
+
+            if (!allRowsHaveSameLength) {
+                // Restaurar estado original se algo deu errado
+                table.innerHTML = table.originalHTML;
+                inicializarSortableRelatorio(); // Reinicializar
+            }
         }
     });
 }
 
-// Função auxiliar para atualizar atributos das colunas
-function updateColumnAttributes() {
-    const table = document.getElementById('tabelaRelatorio');
-    const headers = table.querySelectorAll('thead th');
+// Adicionar listener para reinicializar quando mudar de aba
+function showTab(tabId) {
+    const tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => tab.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    
+    const buttons = document.querySelectorAll('.nav-button');
+    buttons.forEach(button => button.classList.remove('active'));
+    document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
 
-    headers.forEach((header, index) => {
-        const isMonetary = header.getAttribute('data-tipo') === 'monetario';
-        const cells = table.querySelectorAll(`tbody tr td:nth-child(${index + 1}), tfoot tr td:nth-child(${index + 1})`);
+    // Reinicializar Sortable se estiver na aba de relatórios
+    if (tabId === 'relatoriosTab') {
+        setTimeout(inicializarSortableRelatorio, 100);
+    }
+}
 
-        cells.forEach(cell => {
-            if (isMonetary) {
-                cell.setAttribute('data-tipo', 'monetario');
-                cell.style.textAlign = 'right';
-            } else {
-                cell.removeAttribute('data-tipo');
-                cell.style.textAlign = 'left';
-            }
-        });
+// Função para limpar os filtros e recarregar a tabela de relatórios
+function limparFiltros() {
+    // Limpar os valores dos filtros
+    document.getElementById('dataInicial').value = ''; // Limpa a data inicial
+    document.getElementById('dataFinal').value = ''; // Limpa a data final
+    document.getElementById('filtroVendedor').value = ''; // Limpa o filtro de vendedor
+
+    // Deselecionar todas as colunas no filtro de colunas
+    const filtroColunas = document.getElementById('filtroColunas');
+    Array.from(filtroColunas.options).forEach(option => {
+        option.selected = true; // Seleciona todas as colunas por padrão
     });
+
+    // Atualizar a tabela de relatórios com os dados sem filtros
+    filtrarRelatorio();
 }
 
 // Função para filtrar e gerar o relatório
@@ -322,8 +206,60 @@ function filtrarRelatorio() {
     const dataInicial = document.getElementById('dataInicial').value;
     const dataFinal = document.getElementById('dataFinal').value;
     const vendedorId = filtroVendedor ? filtroVendedor.value : null;
-    const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions)
-        .map(option => option.value);
+    const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
+    // Adicionar após a função filtrarRelatorio()
+
+function inicializarOrdenacaoTabela() {
+    const thead = document.querySelector('#tabelaRelatorio thead');
+    const ths = thead.querySelectorAll('th');
+    
+    ths.forEach((th, index) => {
+        th.style.cursor = 'pointer';
+        th.addEventListener('click', () => ordenarTabela(index));
+        // Adicionar indicador de ordenação
+        th.dataset.ordem = 'nenhuma';
+    });
+}
+
+function ordenarTabela(colIndex) {
+    const tbody = document.querySelector('#tabelaRelatorio tbody');
+    const rows = Array.from(tbody.querySelectorAll('tr'));
+    const th = document.querySelector(`#tabelaRelatorio th:nth-child(${colIndex + 1})`);
+    const isMonetario = th.getAttribute('data-tipo') === 'monetario';
+    
+    // Alternar ordem
+    const ordem = th.dataset.ordem === 'asc' ? 'desc' : 'asc';
+    // Resetar ordem das outras colunas
+    document.querySelectorAll('#tabelaRelatorio th').forEach(header => {
+        header.dataset.ordem = 'nenhuma';
+    });
+    th.dataset.ordem = ordem;
+
+    rows.sort((a, b) => {
+        let valorA = a.cells[colIndex].textContent.trim();
+        let valorB = b.cells[colIndex].textContent.trim();
+        
+        if (isMonetario) {
+            // Converter valores monetários para números
+            valorA = parseFloat(valorA.replace(/[R$\s.]/g, '').replace(',', '.'));
+            valorB = parseFloat(valorB.replace(/[R$\s.]/g, '').replace(',', '.'));
+        } else if (!isNaN(Date.parse(valorA))) {
+            // Ordenação de datas
+            valorA = new Date(valorA.split('/').reverse().join('-'));
+            valorB = new Date(valorB.split('/').reverse().join('-'));
+        }
+        
+        if (ordem === 'asc') {
+            return valorA > valorB ? 1 : -1;
+        } else {
+            return valorA < valorB ? 1 : -1;
+        }
+    });
+
+    // Reordenar linhas
+    rows.forEach(row => tbody.appendChild(row));
+}
+
 
     // Converter datas para o formato Date
     const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
@@ -332,31 +268,50 @@ function filtrarRelatorio() {
     // Filtrar vendas
     const vendasFiltradas = dados.vendas.filter(venda => {
         const dataVendaObj = new Date(venda.data.split('/').reverse().join('-'));
-        const filtroData = (!dataInicialObj || dataVendaObj >= dataInicialObj) && 
-                          (!dataFinalObj || dataVendaObj <= dataFinalObj);
-        const filtroVendedor = !vendedorId || 
-                             venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
+
+        // Filtro por data
+        const filtroData = (!dataInicialObj || dataVendaObj >= dataInicialObj) &&
+                           (!dataFinalObj || dataVendaObj <= dataFinalObj);
+
+        // Filtro por vendedor
+        const filtroVendedor = !vendedorId || venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
+
         return filtroData && filtroVendedor;
     });
 
-    // Criar cabeçalho da tabela
-    const thead = document.querySelector('#tabelaRelatorio thead');
-    thead.innerHTML = '';
-    const headerRow = document.createElement('tr');
+    // Definir a ordem das colunas
+    const colunas = [
+        { id: 'data', label: 'Data da Venda' },
+        { id: 'id', label: 'ID da Venda' },
+        { id: 'vendedor', label: 'Nome do Vendedor' },
+        { id: 'servico', label: 'Serviço Atendido' },
+        { id: 'tipoComissao', label: 'Tipo de Comissão' },
+        { id: 'nomeCliente', label: 'Nome do Cliente' },
+        { id: 'empresaParceira', label: 'Empresa Parceira' },
+        { id: 'valorVenda', label: 'Valor da Venda' },
+        { id: 'valorBrutoReceber', label: 'Valor Bruto a Receber' },
+        { id: 'comissao', label: 'Valor da Comissão' },
+        { id: 'percentualComissao', label: 'Variável da Comissão' }
+    ];
 
-    colunas.forEach(coluna => {
-        if (colunasSelecionadas.includes(coluna.id)) {
-            const th = document.createElement('th');
-            th.textContent = coluna.label;
-            th.setAttribute('data-tipo', 
-                ['valorVenda', 'valorBrutoReceber', 'comissao'].includes(coluna.id) 
-                ? 'monetario' : 'texto'
-            );
-            headerRow.appendChild(th);
-        }
-    });
+// Criar cabeçalho da tabela
+const thead = document.querySelector('#tabelaRelatorio thead');
+thead.innerHTML = '';
+const headerRow = document.createElement('tr');
 
-    thead.appendChild(headerRow);
+colunas.forEach(coluna => {
+    if (colunasSelecionadas.includes(coluna.id)) {
+        const th = document.createElement('th');
+        th.textContent = coluna.label;
+        th.setAttribute('data-tipo', 
+            ['valorVenda', 'valorBrutoReceber', 'comissao'].includes(coluna.id) 
+            ? 'monetario' : 'texto'
+        );
+        headerRow.appendChild(th);
+    }
+});
+
+thead.appendChild(headerRow);
 
     // Criar corpo da tabela
     const tbody = document.querySelector('#tabelaRelatorio tbody');
@@ -398,12 +353,12 @@ function filtrarRelatorio() {
                     case 'valorVenda':
                         valor = venda.valorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                         totalValorVenda += venda.valorVenda;
-                        cell.setAttribute('data-tipo', 'monetario');
+                        cell.style.textAlign = 'right'; // Alinhar à direita
                         break;
                     case 'valorBrutoReceber':
                         valor = venda.valorReceber.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                         totalValorBruto += venda.valorReceber;
-                        cell.setAttribute('data-tipo', 'monetario');
+                        cell.style.textAlign = 'right'; // Alinhar à direita
                         break;
                     case 'comissao':
                         if (venda.tipoComissao === 'fixa') {
@@ -414,12 +369,14 @@ function filtrarRelatorio() {
                             valor = comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
                             totalComissao += comissao;
                         }
-                        cell.setAttribute('data-tipo', 'monetario');
+                        cell.style.textAlign = 'right'; // Alinhar à direita
                         break;
                     case 'percentualComissao':
-                        valor = venda.tipoComissao === 'fixa' 
-                            ? venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-                            : `${venda.comissao}%`;
+                        if (venda.tipoComissao === 'fixa') {
+                            valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                        } else {
+                            valor = `${venda.comissao}%`;
+                        }
                         break;
                     default:
                         valor = '-';
@@ -431,65 +388,44 @@ function filtrarRelatorio() {
         tbody.appendChild(row);
     });
 
-    // Adicionar totais no rodapé
-    const tfoot = document.querySelector('#tabelaRelatorio tfoot');
-    tfoot.innerHTML = '';
-    const footerRow = document.createElement('tr');
+// Adicionar totais no rodapé
+const tfoot = document.querySelector('#tabelaRelatorio tfoot');
+tfoot.innerHTML = '';
+const footerRow = document.createElement('tr');
 
-    colunasSelecionadas.forEach((colunaId) => {
-        const td = document.createElement('td');
-        
-        switch (colunaId) {
-            case 'data':
-                td.innerHTML = '<strong>Totais:</strong>';
-                td.style.textAlign = 'left';
-                break;
-            case 'valorVenda':
-                td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-                td.setAttribute('data-tipo', 'monetario');
-                break;
-            case 'valorBrutoReceber':
-                td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-                td.setAttribute('data-tipo', 'monetario');
-                break;
-            case 'comissao':
-                td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
-                td.setAttribute('data-tipo', 'monetario');
-                break;
-            default:
-                td.innerHTML = '';
-        }
-        footerRow.appendChild(td);
-    });
+let totaisAdicionados = false;
 
-    tfoot.appendChild(footerRow);
+colunasSelecionadas.forEach((colunaId) => {
+    const td = document.createElement('td');
+    
+    if (!totaisAdicionados && colunaId === colunasSelecionadas[0]) {
+        td.innerHTML = '<strong>Totais:</strong>';
+        td.style.textAlign = 'left';
+        totaisAdicionados = true;
+    } else if (colunaId === 'comissao') {
+        td.innerHTML = `<strong>${totalComissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+        td.setAttribute('data-tipo', 'monetario');
+    } else if (colunaId === 'valorBrutoReceber') {
+        td.innerHTML = `<strong>${totalValorBruto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+        td.setAttribute('data-tipo', 'monetario');
+    } else if (colunaId === 'valorVenda') {
+        td.innerHTML = `<strong>${totalValorVenda.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong>`;
+        td.setAttribute('data-tipo', 'monetario');
+    } else {
+        td.innerHTML = '';
+    }
+    
+    footerRow.appendChild(td);
+});
 
-    // Inicializar funcionalidades após atualizar a tabela
-    inicializarSortableRelatorio();
-    inicializarOrdenacaoTabela();
-}
+tfoot.appendChild(footerRow);
 
-
-// Função para limpar os filtros e recarregar a tabela de relatórios
-function limparFiltros() {
-    // Limpar os valores dos filtros
-    document.getElementById('dataInicial').value = ''; // Limpa a data inicial
-    document.getElementById('dataFinal').value = ''; // Limpa a data final
-    document.getElementById('filtroVendedor').value = ''; // Limpa o filtro de vendedor
-
-    // Deselecionar todas as colunas no filtro de colunas
-    const filtroColunas = document.getElementById('filtroColunas');
-    Array.from(filtroColunas.options).forEach(option => {
-        option.selected = true; // Seleciona todas as colunas por padrão
-    });
-
-    // Atualizar a tabela de relatórios com os dados sem filtros
-    filtrarRelatorio();
+inicializarOrdenacaoTabela();
+inicializarSortableRelatorio();
 
     // Inicializar o Sortable após preencher a tabela
     inicializarSortableRelatorio();
-} // <-- Fechamento correto da função
-
+}
 
 // Função para exportar relatório em Excel
 function exportarRelatorioExcel() {
@@ -778,73 +714,8 @@ function atualizarGraficos(vendasFiltradas) {
 
 // Função para inicializar os gráficos
 function inicializarGraficos() {
-    console.log('Inicializando gráficos...');
-    try {
-        // Destruir instâncias anteriores se existirem
-        if (vendasServicoChart) vendasServicoChart.destroy();
-        if (desempenhoVendedoresChart) desempenhoVendedoresChart.destroy();
-        if (vendasCategoriaChart) vendasCategoriaChart.destroy();
+    console.log('Inicializando gráficos...'); // Adicione este log para depuração
 
-        // Obter contextos
-        const contextos = {
-            vendasServico: document.getElementById('vendasServicoChart')?.getContext('2d'),
-            desempenhoVendedores: document.getElementById('desempenhoVendedoresChart')?.getContext('2d'),
-            vendasCategoria: document.getElementById('vendasCategoriaChart')?.getContext('2d')
-        };
-
-        // Verificar contextos
-        Object.entries(contextos).forEach(([nome, contexto]) => {
-            if (!contexto) throw new Error(`Contexto não encontrado para ${nome}`);
-        });
-function inicializarGraficos() {  // Adicionando a função que estava faltando
-    try {
-        // Criar novos gráficos
-vendasServicoChart = criarGraficoVendasServico(contextos.vendasServico);
-desempenhoVendedoresChart = criarGraficoDesempenho(contextos.desempenhoVendedores);
-vendasCategoriaChart = criarGraficoCategoria(contextos.vendasCategoria);
-
-console.log('Gráficos inicializados com sucesso!');
-    } catch (erro) {
-        console.error('Erro ao inicializar gráficos:', erro);
-        throw erro;
-    }
-
-// Inicialização das tabelas
-function inicializarTabelas() {
-    try {
-        const tabelas = {
-            relatorio: document.getElementById('tabelaRelatorio'),
-            vendas: document.getElementById('tabelaVendas')
-        };
-
-        // Verificar tabelas
-        Object.entries(tabelas).forEach(([nome, tabela]) => {
-            if (!tabela) throw new Error(`Tabela ${nome} não encontrada`);
-        });
-
-function inicializarTabelas() {
-    try {
-        const tabelas = {
-            relatorio: document.getElementById('tabelaRelatorio'),
-            vendas: document.getElementById('tabelaVendas')
-        };
-
-        // Verificar tabelas
-        Object.entries(tabelas).forEach(([nome, tabela]) => {
-            if (!tabela) throw new Error(`Tabela ${nome} não encontrada`);
-        });
-
-        // Inicializar funcionalidades das tabelas
-        inicializarSortableRelatorio();
-        inicializarOrdenacaoTabela();
-
-    } catch (erro) {
-        console.error('Erro ao inicializar tabelas:', erro);
-        throw erro;
-    }
-}
-
-function inicializarContextosGraficos() {
     const ctxVendasServico = document.getElementById('vendasServicoChart').getContext('2d');
     const ctxDesempenhoVendedores = document.getElementById('desempenhoVendedoresChart').getContext('2d');
     const ctxVendasCategoria = document.getElementById('vendasCategoriaChart').getContext('2d');
@@ -860,12 +731,6 @@ function inicializarContextosGraficos() {
         vendasCategoriaChart.destroy();
     }
 
-    return {
-        vendasServico: ctxVendasServico,
-        desempenhoVendedores: ctxDesempenhoVendedores,
-        vendasCategoria: ctxVendasCategoria
-    };
-}
     // Inicializar gráfico de Vendas por Serviço
     vendasServicoChart = new Chart(ctxVendasServico, {
         type: 'bar',
@@ -1876,19 +1741,8 @@ function atualizarFiltrosVendas() {
     });
 }
 
-// Inicialização quando o DOM estiver pronto
-document.addEventListener('DOMContentLoaded', () => {
-    try {
-        inicializarAplicacao();
-        
-        // Se estiver na aba de relatórios
-        const relatoriosTab = document.getElementById('relatoriosTab');
-        if (relatoriosTab?.classList.contains('active')) {
-            inicializarSortableRelatorio();
-        }
-    } catch (erro) {
-        console.error('Erro fatal na inicialização:', erro);
-        mostrarErroInicializacao();
-    }
+// Inicializar gráficos ao carregar a página
+document.addEventListener('DOMContentLoaded', function () {
+    inicializarGraficos();
+    atualizarDashboard();
 });
-
