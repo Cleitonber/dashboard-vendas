@@ -798,11 +798,11 @@ function inicializarGraficos() {
         });
 
         // Criar novos gráficos
-        vendasServicoChart = criarGraficoVendasServico(contextos.vendasServico);
-        desempenhoVendedoresChart = criarGraficoDesempenho(contextos.desempenhoVendedores);
-        vendasCategoriaChart = criarGraficoCategoria(contextos.vendasCategoria);
+vendasServicoChart = criarGraficoVendasServico(contextos.vendasServico);
+desempenhoVendedoresChart = criarGraficoDesempenho(contextos.desempenhoVendedores);
+vendasCategoriaChart = criarGraficoCategoria(contextos.vendasCategoria);
 
-        console.log('Gráficos inicializados com sucesso!');
+console.log('Gráficos inicializados com sucesso!');
     } catch (erro) {
         console.error('Erro ao inicializar gráficos:', erro);
         throw erro;
@@ -810,7 +810,6 @@ function inicializarGraficos() {
 
 // Inicialização das tabelas
 function inicializarTabelas() {
-
     try {
         const tabelas = {
             relatorio: document.getElementById('tabelaRelatorio'),
@@ -820,6 +819,21 @@ function inicializarTabelas() {
         // Verificar tabelas
         Object.entries(tabelas).forEach(([nome, tabela]) => {
             if (!tabela) throw new Error(`Tabela ${nome} não encontrada`);
+        });
+
+        // Inicializar funcionalidades das tabelas
+        inicializarSortableRelatorio();
+        inicializarOrdenacaoTabela();
+
+    } catch (erro) {
+        console.error('Erro ao inicializar tabelas:', erro);
+        throw erro;
+    }
+}
+
+        // Verificar tabelas
+        Object.entries(tabelas).forEach(([nome, tabela]) => {
+        if (!tabela) throw new Error(`Tabela ${nome} não encontrada`);
         });
 
         // Inicializar funcionalidades das tabelas
