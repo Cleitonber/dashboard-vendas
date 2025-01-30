@@ -960,6 +960,12 @@ document.getElementById('vendedorForm').addEventListener('submit', function (e) 
     atualizarListaVendedores();
     atualizarOpcoesVendedores();
     atualizarFiltrosVendas();
+const filtroVendedores = document.getElementById('filtroVendedorVendas');
+    const option = document.createElement('option');
+    option.value = novoVendedor.id;
+    option.textContent = novoVendedor.nome;
+    filtroVendedores.appendChild(option);
+
     alert('Vendedor cadastrado com sucesso!');
     limparCamposVendedor();
 });
@@ -1117,6 +1123,12 @@ document.getElementById('servicoForm').addEventListener('submit', function (e) {
     atualizarListaServicos();
     atualizarOpcoesServicos();
     atualizarFiltrosVendas();
+ const filtroServicos = document.getElementById('filtroServicoVendas');
+    const option = document.createElement('option');
+    option.value = novoServico.id;
+    option.textContent = novoServico.nome;
+    filtroServicos.appendChild(option);
+
     alert('Serviço cadastrado com sucesso!');
     limparCamposServico();
 });
@@ -1276,10 +1288,17 @@ document.getElementById('empresaForm').addEventListener('submit', function (e) {
     dados.empresasParceiras.push(novaEmpresa);
     atualizarListaEmpresas();
     atualizarOpcoesEmpresas();
-     atualizarFiltrosVendas();
+    const filtroEmpresas = document.getElementById('filtroEmpresaVendas');
+    const option = document.createElement('option');
+    option.value = novaEmpresa.id;
+    option.textContent = novaEmpresa.nome;
+    filtroEmpresas.appendChild(option);
+
     alert('Empresa cadastrada com sucesso!');
     limparCamposEmpresa();
 });
+
+
 
 // Função para limpar campos do formulário de empresa
 function limparCamposEmpresa() {
