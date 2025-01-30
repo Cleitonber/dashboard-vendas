@@ -13,6 +13,29 @@
         <div class="dashboard-header">
             <h1 class="dashboard-title">Dashboard de Gestão de Vendas</h1>
             
+            <!-- Personalizar Tema -->
+            <div class="theme-controls">
+                <button class="btn btn-secondary" onclick="toggleTheme()">
+                    Personalizar Tema
+                </button>
+                <div id="themeOptions" class="theme-options" style="display: none;">
+                    <div class="form-group">
+                        <label for="primaryColor">Cor Principal</label>
+                        <input type="color" id="primaryColor" onchange="updateTheme('primary', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="secondaryColor">Cor Secundária</label>
+                        <input type="color" id="secondaryColor" onchange="updateTheme('secondary', this.value)">
+                    </div>
+                    <div class="form-group">
+                        <label for="backgroundColor">Cor de Fundo</label>
+                        <input type="color" id="backgroundColor" onchange="updateTheme('background', this.value)">
+                    </div>
+                    <button class="btn btn-primary" onclick="saveTheme()">Salvar Tema</button>
+                    <button class="btn btn-secondary" onclick="resetTheme()">Restaurar Padrão</button>
+                </div>
+            </div>
+
             <!-- Navegação Principal -->
             <div class="navigation">
                 <button class="nav-button active" onclick="showTab('dashboardTab')">Dashboard</button>
@@ -67,7 +90,6 @@
                     <div id="ticketMedio" class="stat-value">R$ 0,00</div>
                 </div>
             </div>
-
             <!-- Grid de Gráficos -->
             <div class="grid">
                 <!-- Gráfico de Vendas por Serviço -->
@@ -97,7 +119,7 @@
                 <!-- Gráfico de Vendas por Categoria -->
                 <div class="card">
                     <div class="card-header">
-                        <h3 class="card-title">Vendas por Categoria</h3>
+                        <h3 class="card-title">Vendas por Categoria de Serviço</h3>
                     </div>
                     <div class="card-body">
                         <div class="chart-container">
@@ -203,7 +225,6 @@
                     <div id="controlesPaginacaoServicos" class="controles-paginacao"></div>
                 </div>
             </div>
-
             <!-- Cadastro de Empresa Parceira -->
             <div class="card">
                 <div class="card-header">
