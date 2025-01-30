@@ -307,89 +307,79 @@
                 </div>
             </div>
 
-          <!-- Seção de Listagem de Vendas -->
-<div class="card mb-4">
-    <div class="card-header">
-        <h5 class="mb-0">Listagem de Vendas</h5>
-    </div>
-    <div class="card-body">
-        <!-- Filtros -->
-        <div class="row mb-3">
-            <div class="col-md-2">
-                <label for="filtroDataInicialVendas">Data Inicial</label>
-                <input type="text" class="form-control" id="filtroDataInicialVendas" oninput="formatarDataInput(this)">
-            </div>
-            <div class="col-md-2">
-                <label for="filtroDataFinalVendas">Data Final</label>
-                <input type="text" class="form-control" id="filtroDataFinalVendas" oninput="formatarDataInput(this)">
-            </div>
-            <div class="col-md-2">
-                <label for="filtroIdVendas">ID da Venda</label>
-                <input type="number" class="form-control" id="filtroIdVendas">
-            </div>
-            <div class="col-md-2">
-                <label for="filtroVendedorVendas">Vendedor</label>
-                <select class="form-control" id="filtroVendedorVendas">
-                    <option value="">Todos</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label for="filtroServicoVendas">Serviço</label>
-                <select class="form-control" id="filtroServicoVendas">
-                    <option value="">Todos</option>
-                </select>
-            </div>
-            <div class="col-md-2">
-                <label for="filtroEmpresaVendas">Empresa</label>
-                <select class="form-control" id="filtroEmpresaVendas">
-                    <option value="">Todas</option>
-                </select>
+            <!-- Listagem de Vendas -->
+            <div class="card">
+                <div class="card-header">
+                    <h2 class="card-title">Listagem de Vendas</h2>
+                    <div>
+                        <button class="btn btn-secondary" onclick="exportarVendasExcel()">Exportar Excel</button>
+                        <button class="btn btn-secondary" onclick="exportarVendasPDF()">Exportar PDF</button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="filters">
+                        <div class="form-group">
+                            <label class="form-label">Data Inicial</label>
+                            <input type="text" id="filtroDataInicial" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Data Final</label>
+                            <input type="text" id="filtroDataFinal" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Vendedor</label>
+                            <select id="filtroVendedorVendas" class="form-select" multiple>
+                                <option value="">Todos</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Serviço</label>
+                            <select id="filtroServicoVendas" class="form-select" multiple>
+                                <option value="">Todos</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Empresa Parceira</label>
+                            <select id="filtroEmpresaVendas" class="form-select" multiple>
+                                <option value="">Todas</option>
+                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="filtrarVendas()">Filtrar</button>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Itens por página:</label>
+                        <select id="itensPorPaginaVendas" class="form-select" onchange="listarVendas()">
+                            <option value="5">5</option>
+                            <option value="10" selected>10</option>
+                            <option value="20">20</option>
+                        </select>
+                    </div>
+                    <table id="tabelaVendas">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>ID da Venda</th>
+                                <th>Vendedor</th>
+                                <th>Serviço</th>
+                                <th>Cliente</th>
+                                <th>Empresa Parceira</th>
+                                <th>Valor Venda</th>
+                                <th>Valor Receber</th>
+                                <th>Comissão</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- As linhas serão preenchidas dinamicamente via JavaScript -->
+                        </tbody>
+                    </table>
+                    <div id="controlesPaginacaoVendas" class="d-flex justify-content-between align-items-center mt-3"></div>
+                </div>
             </div>
         </div>
-
-        <!-- Botões e Itens por Página -->
-        <div class="row mb-3">
-            <div class="col-md-2">
-                <button class="btn btn-primary" onclick="filtrarVendas()">Gerar Listagem</button>
-            </div>
-            <div class="col-md-2">
-                <label for="itensPorPaginaVendas">Itens por página:</label>
-                <select class="form-control" id="itensPorPaginaVendas">
-                    <option value="5">5</option>
-                    <option value="10">10</option>
-                    <option value="20">20</option>
-                    <option value="50">50</option>
-                </select>
-            </div>
-        </div>
-
-        <!-- Tabela -->
-        <div class="table-responsive">
-            <table class="table table-striped" id="tabelaVendas">
-                <thead>
-                    <tr>
-                        <th>Data</th>
-                        <th>ID</th>
-                        <th>Vendedor</th>
-                        <th>Serviço</th>
-                        <th>Cliente</th>
-                        <th>Empresa</th>
-                        <th>Valor Venda</th>
-                        <th>Valor Receber</th>
-                        <th>Comissão</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-
-        <!-- Paginação -->
-        <div class="d-flex justify-content-between align-items-center mt-3">
-            <div id="controlesPaginacaoVendas"></div>
-        </div>
-    </div>
-</div>
 
         <!-- Relatórios -->
         <div id="relatorios" class="tab-content">
