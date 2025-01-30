@@ -1462,6 +1462,13 @@ document.getElementById('vendaForm').addEventListener('submit', function (e) {
         return;
     }
 
+let comissaoCalculada;
+    if (servico.tipoComissao === 'porcentagem') {
+        comissaoCalculada = (valorReceber * (comissao / 100));
+    } else {
+        comissaoCalculada = comissao;
+    }
+    
     if (servico.tipoComissao === 'fixa' && comissao > valorReceber) {
         alert('A comissão em reais não pode ser maior que o valor a receber.');
         return;
