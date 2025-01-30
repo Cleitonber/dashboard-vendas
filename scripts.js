@@ -327,10 +327,11 @@ function limparFiltros() {
 
     // Atualizar a tabela de relatórios com os dados sem filtros
     filtrarRelatorio();
-    
+
     // Inicializar o Sortable após preencher a tabela
     inicializarSortableRelatorio();
-}
+} // <-- Fechamento correto da função
+
 
 // Função para exportar relatório em Excel
 function exportarRelatorioExcel() {
