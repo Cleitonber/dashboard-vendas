@@ -51,6 +51,10 @@ function toggleList(listId) {
 // Função para preencher o filtro de colunas na ordem correta
 function preencherFiltroColunas() {
     const filtroColunas = document.getElementById('filtroColunas');
+     if (!filtroColunas) {
+        console.error('Elemento filtroColunas não encontrado!');
+        return;
+    }
     filtroColunas.innerHTML = ''; // Limpa o filtro de colunas
 
     // Definir a ordem das colunas
@@ -1745,4 +1749,12 @@ function atualizarFiltrosVendas() {
 document.addEventListener('DOMContentLoaded', function () {
     inicializarGraficos();
     atualizarDashboard();
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    preencherFiltroColunas(); // Preenche o filtro de colunas ao carregar a página
+});
+
+document.querySelector('[onclick="showTab(\'relatoriosTab\')"]').addEventListener('click', function () {
+    preencherFiltroColunas(); // Preenche o filtro de colunas ao abrir a aba de relatórios
 });
