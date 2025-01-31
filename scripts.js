@@ -1623,7 +1623,6 @@ document.getElementById('servicoVenda').addEventListener('change', function () {
             input.value = valor + '%';
         }
     }
-}
 
 // Função para formatar valores monetários
 function formatarMoeda(input) {
