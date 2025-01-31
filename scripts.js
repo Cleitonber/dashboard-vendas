@@ -4,8 +4,8 @@ let dados = {
     vendas: [],
     vendedores: [],
     servicos: [],
-    empresasParceiras: []
-    relatorios: []
+    empresasParceiras: [],
+    relatorios: [] // Adicione esta linha
 };
 
 let paginaAtualVendedores = 1;
