@@ -375,22 +375,28 @@ thead.appendChild(headerRow);
                         }
                         cell.style.textAlign = 'right'; // Alinhar à direita
                         break;
-                   case 'percentualComissao':
-    if (venda.tipoComissao === 'fixa') {
-        valor = venda.comissao.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    } else {
-        // Verifica o tipo de venda.comissao e formata adequadamente
-        const comissaoValor = typeof venda.comissao === 'string' 
-            ? parseFloat(venda.comissao.replace('%', '').replace(',', '.'))
-            : venda.comissao;
+                 case 'percentualComissao':
+    if (venda.tipoComissao === 'porcentagem') {
+        let comissaoValor = venda.comissao;
         
-        // Formata com duas casas decimais e adiciona %
-        valor = comissaoValor.toLocaleString('pt-BR', {
+        // Se for string, remove o % e converte
+        if (typeof comissaoValor === 'string') {
+            comissaoValor = parseFloat(
+                comissaoValor
+                    .replace('%', '')
+                    .replace(',', '.')
+            );
+        }
+
+        // Formata como porcentagem
+        valor = comissaoValor.toLocaleString('pt-BR', { 
             minimumFractionDigits: 2, 
-            maximumFractionDigits: 2
+            maximumFractionDigits: 2 
         }).replace('.', ',') + '%';
     }
     break;
+
+
                     default:
                         valor = '-';
                 }
@@ -1471,8 +1477,7 @@ document.getElementById('vendaForm').addEventListener('submit', function (e) {
     const empresaParceiraId = document.getElementById('empresaParceira').value;
     const valorVenda = parseFloat(document.getElementById('valorVenda').value.replace(/[^0-9,]/g, '').replace(',', '.'));
     const valorReceber = parseFloat(document.getElementById('valorReceber').value.replace(/[^0-9,]/g, '').replace(',', '.'));
-    const comissao = parseFloat(document.getElementById('comissao').value.replace(/[^0-9,]/g, '').replace(',', '.'));
-
+   const comissao = parseFloat(document.getElementById('comissao').value.replace(/[^0-9,]/g, '').replace(',', '.'));
     const vendedor = dados.vendedores.find(v => v.id == vendedorId);
     const servico = dados.servicos.find(s => s.id == servicoId);
     const empresaParceira = dados.empresasParceiras.find(e => e.id == empresaParceiraId);
@@ -1564,6 +1569,23 @@ function formatarTelefone(input) {
 function formatarComissao(input) {
     const servicoId = document.getElementById('servicoVenda').value;
     const servico = dados.servicos.find(s => s.id == servicoId);
+
+    if (servico && servico.tipoComissao === 'porcentagem') {
+        let valor = input.value.replace(/\D/g, '');
+        valor = (Number(valor) / 100);
+        input.value = valor.toLocaleString('pt-BR', { 
+            minimumFractionDigits: 2, 
+            maximumFractionDigits: 2 
+        }) + '%';
+    }
+}
+
+// No registro da venda
+const comissao = parseFloat(
+    document.getElementById('comissao').value
+        .replace('%', '')  // Remove o %
+        .replace(',', '.')  // Converte vírgula para ponto
+);
 // Atualizar o tipo de comissão com base no serviço selecionado
 document.getElementById('servicoVenda').addEventListener('change', function () {
     const servicoId = this.value; // Obtém o ID do serviço selecionado
