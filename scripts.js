@@ -1477,7 +1477,7 @@ document.getElementById('vendaForm').addEventListener('submit', function (e) {
     const empresaParceiraId = document.getElementById('empresaParceira').value;
     const valorVenda = parseFloat(document.getElementById('valorVenda').value.replace(/[^0-9,]/g, '').replace(',', '.'));
     const valorReceber = parseFloat(document.getElementById('valorReceber').value.replace(/[^0-9,]/g, '').replace(',', '.'));
-   const comissao = parseFloat(document.getElementById('comissao').value.replace(/[^0-9,]/g, '').replace(',', '.'));
+    const comissao = parseFloat(document.getElementById('comissao').value.replace(/[^0-9,]/g, '').replace(',', '.'));
     const vendedor = dados.vendedores.find(v => v.id == vendedorId);
     const servico = dados.servicos.find(s => s.id == servicoId);
     const empresaParceira = dados.empresasParceiras.find(e => e.id == empresaParceiraId);
@@ -1492,17 +1492,17 @@ document.getElementById('vendaForm').addEventListener('submit', function (e) {
         return;
     }
 
-let comissaoCalculada;
-if (servico.tipoComissao === 'porcentagem') {
-    // Remove o % e converte para número
-    const comissaoPercentual = parseFloat(
-        comissao.toString().replace('%', '').replace(',', '.')
-    );
-    comissaoCalculada = (valorReceber * (comissaoPercentual / 100));
-} else {
-    comissaoCalculada = comissao;
-}
-    
+    let comissaoCalculada;
+    if (servico.tipoComissao === 'porcentagem') {
+        // Remove o % e converte para número
+        const comissaoPercentual = parseFloat(
+            comissao.toString().replace('%', '').replace(',', '.')
+        );
+        comissaoCalculada = (valorReceber * (comissaoPercentual / 100));
+    } else {
+        comissaoCalculada = comissao;
+    }
+
     if (servico.tipoComissao === 'fixa' && comissao > valorReceber) {
         alert('A comissão em reais não pode ser maior que o valor a receber.');
         return;
@@ -1517,7 +1517,7 @@ if (servico.tipoComissao === 'porcentagem') {
         empresaParceira: empresaParceira.nome,
         valorVenda: valorVenda,
         valorReceber: valorReceber,
-        comissao: comissao,
+        comissao: comissaoCalculada, // Aqui usamos o valor calculado
         tipoComissao: servico.tipoComissao
     };
 
