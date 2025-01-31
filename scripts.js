@@ -1606,6 +1606,9 @@ document.getElementById('servicoVenda').addEventListener('change', function () {
     }
 });
 
+const servicoId = document.getElementById('servicoVenda').value; // Obtém o ID do serviço selecionado
+const servico = dados.servicos.find(s => s.id == servicoId); // Busca o serviço nos dados cadastrados
+
     if (servico) {
         if (servico.tipoComissao === 'fixa') {
             // Formata como moeda (R$)
