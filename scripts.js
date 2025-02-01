@@ -1678,7 +1678,19 @@ function listarVendas(vendas = []) {
     tbody.innerHTML = '';
 
     if (vendas.length === 0) {
-        return; // Não lista nada se não houver vendas
+        // Se não houver vendas, limpe a tabela e mantenha os controles de paginação e exportação
+        document.getElementById('controlesPaginacaoVendas').innerHTML = `
+            <div>
+                <button class="btn btn-secondary" onclick="mudarPaginaVendas(-1)" disabled>Anterior</button>
+                <span>Página 1 de 1</span>
+                <button class="btn btn-secondary" onclick="mudarPaginaVendas(1)" disabled>Próxima</button>
+            </div>
+            <div>
+                <button class="btn btn-secondary" onclick="exportarVendasExcel()">Exportar Excel</button>
+                <button class="btn btn-secondary" onclick="exportarVendasPDF()">Exportar PDF</button>
+            </div>
+        `;
+        return;
     }
 
     const itensPorPagina = parseInt(document.getElementById('itensPorPaginaVendas').value);
@@ -1706,12 +1718,18 @@ function listarVendas(vendas = []) {
         tbody.appendChild(row);
     });
 
-    // Atualizar controles de paginação
+    // Atualizar controles de paginação e exportação
     const totalPaginas = Math.ceil(vendas.length / itensPorPagina);
     document.getElementById('controlesPaginacaoVendas').innerHTML = `
-        <button class="btn btn-secondary" onclick="mudarPaginaVendas(-1)" ${paginaAtualVendas === 1 ? 'disabled' : ''}>Anterior</button>
-        <span>Página ${paginaAtualVendas} de ${totalPaginas}</span>
-        <button class="btn btn-secondary" onclick="mudarPaginaVendas(1)" ${paginaAtualVendas === totalPaginas ? 'disabled' : ''}>Próxima</button>
+        <div>
+            <button class="btn btn-secondary" onclick="mudarPaginaVendas(-1)" ${paginaAtualVendas === 1 ? 'disabled' : ''}>Anterior</button>
+            <span>Página ${paginaAtualVendas} de ${totalPaginas}</span>
+            <button class="btn btn-secondary" onclick="mudarPaginaVendas(1)" ${paginaAtualVendas === totalPaginas ? 'disabled' : ''}>Próxima</button>
+        </div>
+        <div>
+            <button class="btn btn-secondary" onclick="exportarVendasExcel()">Exportar Excel</button>
+            <button class="btn btn-secondary" onclick="exportarVendasPDF()">Exportar PDF</button>
+        </div>
     `;
 }
 
