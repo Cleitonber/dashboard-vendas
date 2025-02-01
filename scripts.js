@@ -1579,13 +1579,26 @@ function formatarComissao(input) {
     const servicoId = document.getElementById('servicoVenda').value;
     const servico = dados.servicos.find(s => s.id == servicoId);
 
-    if (servico && servico.tipoComissao === 'porcentagem') {
+    if (servico && servico.tipoComissao === 'fixa') {
+        // Remove tudo que não for número
         let valor = input.value.replace(/\D/g, '');
-        valor = (Number(valor) / 100);
-        input.value = valor.toLocaleString('pt-BR', { 
-            minimumFractionDigits: 2, 
-            maximumFractionDigits: 2 
+        
+        // Converte para número e formata como moeda brasileira
+        valor = (Number(valor) / 100).toLocaleString('pt-BR', {
+            style: 'currency',
+            currency: 'BRL'
+        });
+
+        // Atualiza o valor do campo
+        input.value = valor;
+    } else if (servico && servico.tipoComissao === 'porcentagem') {
+        // Formata como porcentagem
+        let valor = input.value.replace(/\D/g, '');
+        valor = (Number(valor) / 100).toLocaleString('pt-BR', {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
         }) + '%';
+        input.value = valor;
     }
 }
 
