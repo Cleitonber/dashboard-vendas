@@ -26,6 +26,11 @@ function showTab(tabId) {
     const buttons = document.querySelectorAll('.nav-button');
     buttons.forEach(button => button.classList.remove('active'));
     document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
+
+    // Reinicializar Sortable se estiver na aba de relatórios
+    if (tabId === 'relatoriosTab') {
+        setTimeout(inicializarSortableRelatorio, 100);
+    }
 }
 
 // Função para alternar a exibição das listas
@@ -170,22 +175,6 @@ function inicializarSortableRelatorio() {
             }
         }
     });
-}
-
-// Adicionar listener para reinicializar quando mudar de aba
-function showTab(tabId) {
-    const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => tab.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    
-    const buttons = document.querySelectorAll('.nav-button');
-    buttons.forEach(button => button.classList.remove('active'));
-    document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
-
-    // Reinicializar Sortable se estiver na aba de relatórios
-    if (tabId === 'relatoriosTab') {
-        setTimeout(inicializarSortableRelatorio, 100);
-    }
 }
 
 // Função para limpar os filtros e recarregar a tabela de relatórios
@@ -1743,8 +1732,8 @@ function mudarPaginaVendas(direcao) {
         paginaAtualVendas = 1;
     }
 
-    // Recarrega a listagem de vendas com a página atualizada
-    listarVendas();
+    // Chama a função filtrarVendas para atualizar a listagem com os filtros aplicados
+    filtrarVendas();
 }
 
 // Função para filtrar as vendas por período
