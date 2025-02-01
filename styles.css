@@ -109,11 +109,11 @@ body {
 }
 
 .tab-content {
-    display: none;
+    display: none; /* Oculta todas as abas por padrão */
 }
 
 .tab-content.active {
-    display: block;
+    display: block; /* Exibe a aba ativa */
 }
 
 /* Cards */
