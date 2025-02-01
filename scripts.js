@@ -237,8 +237,41 @@ function filtrarRelatorio() {
     const dataFinal = document.getElementById('dataFinal').value;
     const vendedorId = filtroVendedor ? filtroVendedor.value : null;
     const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
+
+    const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
+    const dataFinalObj = dataFinal ? new Date(dataFinal.split('/').reverse().join('-')) : null;
+
+    const vendasFiltradas = dados.relatorios.filter(venda => {
+        const dataVendaObj = new Date(venda.data.split('/').reverse().join('-'));
+
+        const filtroData = (!dataInicialObj || dataVendaObj >= dataInicialObj) &&
+                           (!dataFinalObj || dataVendaObj <= dataFinalObj);
+
+        const filtroVendedor = !vendedorId || venda.vendedor === dados.vendedores.find(v => v.id == vendedorId).nome;
+
+        return filtroData && filtroVendedor;
+    });
+
+    // Atualizar a tabela de relatórios com as vendas filtradas
+    atualizarTabelaRelatorio(vendasFiltradas, colunasSelecionadas);
+}
     // Adicionar após a função filtrarRelatorio()
 
+function atualizarTabelaRelatorio(vendasFiltradas, colunasSelecionadas) {
+    const tbody = document.querySelector('#tabelaRelatorio tbody');
+    tbody.innerHTML = '';
+
+    vendasFiltradas.forEach(venda => {
+        const row = document.createElement('tr');
+        colunasSelecionadas.forEach(coluna => {
+            const cell = document.createElement('td');
+            cell.textContent = venda[coluna];
+            row.appendChild(cell);
+        });
+        tbody.appendChild(row);
+    });
+}
+    
 function inicializarOrdenacaoTabela() {
     const thead = document.querySelector('#tabelaRelatorio thead');
     const ths = thead.querySelectorAll('th');
@@ -2000,3 +2033,4 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function () {
     preencherFiltroColunas(); // Preenche o filtro de colunas ao carregar a página
 });
+}
