@@ -625,3 +625,14 @@ th, td {
     border-radius: var(--radius);
     cursor: pointer;
 }
+
+#controlesPaginacaoVendas {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+}
+
+#controlesPaginacaoVendas > div {
+    margin-left: auto; /* Empurra os botões de exportação para a direita */
+}
