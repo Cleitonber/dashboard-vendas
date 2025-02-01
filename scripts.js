@@ -43,16 +43,25 @@ function showTab(tabId) {
         console.error(`Botão para a aba "${tabId}" não encontrado.`);
     }
 
-    if (tabId === 'relatorios') {
-        console.log('Inicializando Sortable para a aba de relatórios.');
-        setTimeout(() => {
-            const table = document.getElementById('tabelaRelatorio');
-            if (table) {
-                inicializarSortableRelatorio();
-            } else {
-                console.error('Tabela de relatório não encontrada!');
-            }
-        }, 300); // Aguarda 300ms para garantir que a tabela esteja carregada
+   if (tabId === 'relatorios') {
+    console.log('Aba de relatórios selecionada. Aguardando carregamento da tabela...');
+
+    // Observar mudanças no DOM para detectar quando a tabela é carregada
+    const observer = new MutationObserver((mutationsList, observer) => {
+        const table = document.getElementById('tabelaRelatorio');
+        if (table) {
+            console.log('Tabela de relatório encontrada. Inicializando Sortable...');
+            inicializarSortableRelatorio();
+            observer.disconnect(); // Parar de observar após a tabela ser encontrada
+        }
+    });
+
+    // Iniciar a observação no conteúdo da aba de relatórios
+    const relatoriosTab = document.getElementById('relatorios');
+    if (relatoriosTab) {
+        observer.observe(relatoriosTab, { childList: true, subtree: true });
+    } else {
+        console.error('Aba de relatórios não encontrada!');
     }
 }
 // Função para alternar a exibição das listas
