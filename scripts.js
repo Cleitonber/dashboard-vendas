@@ -65,6 +65,22 @@ function showTab(tabId) {
         }
     }
 }
+
+function converterParaData(dataString) {
+    // Verifica se a dataString é uma string e está no formato esperado
+    if (typeof dataString === 'string' && dataString.length === 10) {
+        // Divide a string em dia, mês e ano
+        const [dia, mes, ano] = dataString.split('/');
+        
+        // Cria um objeto Date (lembre-se que o mês em JavaScript é base 0, então subtraímos 1)
+        return new Date(ano, mes - 1, dia);
+    } else {
+        // Caso a dataString não seja uma string ou não esteja no formato esperado, retorna null
+        console.error('Formato de data inválido. Use o formato DD/MM/AAAA.');
+        return null;
+    }
+}
+
 // Função para alternar a exibição das listas
 function toggleList(listId) {
     const listName = listId.replace('List', ''); // Remove 'List' para obter 'vendedores'
