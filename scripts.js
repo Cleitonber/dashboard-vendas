@@ -66,19 +66,57 @@ function showTab(tabId) {
     }
 }
 
+// Função para converter uma string de data no formato DD/MM/AAAA para um objeto Date
 function converterParaData(dataString) {
-    // Verifica se a dataString é uma string e está no formato esperado
     if (typeof dataString === 'string' && dataString.length === 10) {
-        // Divide a string em dia, mês e ano
         const [dia, mes, ano] = dataString.split('/');
-        
-        // Cria um objeto Date (lembre-se que o mês em JavaScript é base 0, então subtraímos 1)
-        return new Date(ano, mes - 1, dia);
+        return new Date(ano, mes - 1, dia); // Mês é subtraído por 1
     } else {
-        // Caso a dataString não seja uma string ou não esteja no formato esperado, retorna null
         console.error('Formato de data inválido. Use o formato DD/MM/AAAA.');
         return null;
     }
+}
+
+// Função para calcular a diferença entre as datas
+function calcularDiferenca() {
+    // Captura os valores dos inputs
+    const dataInicial = document.getElementById('dataInicial').value;
+    const dataFinal = document.getElementById('dataFinal').value;
+
+    // Converte as strings em objetos Date
+    const dataInicialObj = converterParaData(dataInicial);
+    const dataFinalObj = converterParaData(dataFinal);
+
+    // Verifica se a conversão foi bem-sucedida
+    if (dataInicialObj && dataFinalObj) {
+        // Calcula a diferença em milissegundos
+        const diferencaEmMs = dataFinalObj - dataInicialObj;
+
+        // Converte a diferença para dias
+        const diferencaEmDias = diferencaEmMs / (1000 * 60 * 60 * 24);
+
+        // Exibe o resultado no console (ou na página)
+        console.log("Diferença em dias:", diferencaEmDias);
+
+        // Exibe o resultado na página (opcional)
+        const resultadoElemento = document.getElementById('resultado');
+        if (resultadoElemento) {
+            resultadoElemento.textContent = `Diferença em dias: ${diferencaEmDias}`;
+        }
+    } else {
+        console.error("Datas inválidas. Verifique o formato.");
+    }
+}
+
+// Adiciona event listeners aos campos de data
+const dataInicialInput = document.getElementById('dataInicial');
+const dataFinalInput = document.getElementById('dataFinal');
+
+if (dataInicialInput && dataFinalInput) {
+    dataInicialInput.addEventListener('input', calcularDiferenca);
+    dataFinalInput.addEventListener('input', calcularDiferenca);
+} else {
+    console.error('Campos de data não encontrados.');
 }
 
 document.getElementById('calcular').addEventListener('click', function () {
