@@ -384,78 +384,43 @@
     </div>
 </div>
         <!-- Relatórios -->
-        <div id="relatorios" class="tab-content">
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title">Relatório de Vendas</h2>
-                </div>
-                <div class="card-body">
-                    <div class="filters">
-                        <div class="form-group">
-                            <label class="form-label">Data Inicial</label>
-                            <input type="text" id="dataInicial" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Data Final</label>
-                            <input type="text" id="dataFinal" class="form-input" placeholder="DD/MM/AAAA" maxlength="10" oninput="formatarDataInput(this)">
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Vendedor</label>
-                            <select id="filtroVendedor" class="form-select">
-                                <option value="">Todos</option>
-                                <!-- As opções serão preenchidas dinamicamente via JavaScript -->
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Colunas</label>
-                            <small class="form-text">(Pressione Ctrl para selecionar mais de um item)</small>
-                            <select id="filtroColunas" class="form-select" multiple>
-                                <option value="data" selected>Data da Venda</option>
-                                <option value="id" selected>ID da Venda</option>
-                                <option value="vendedor" selected>Nome do Vendedor</option>
-                                <option value="servico" selected>Serviço Vendido</option>
-                                <option value="tipoComissao" selected>Tipo de Comissão</option>
-                                <option value="nomeCliente" selected>Nome do Cliente</option>
-                                <option value="empresaParceira" selected>Empresa Parceira</option>
-                                <option value="comissao" selected>Valor da Comissão</option>
-                                <option value="percentualComissao" selected>Variável da Comissão</option>
-                                <option value="valorBrutoReceber" selected>Valor Bruto a Receber</option>
-                                <option value="valorVenda" selected>Valor da Venda</option>
-                            </select>
-                        </div>
-                        <button class="btn btn-primary" onclick="filtrarRelatorio()">Gerar</button>
-                        <button id="btnLimparFiltros" class="btn btn-secondary" onclick="limparFiltros()">Limpar Filtros</button>
-                    </div>
-<table id="tabelaRelatorio">
-    <thead>
-        <tr>
-            <th data-tipo="texto">Data da Venda</th>
-            <th data-tipo="texto">ID da Venda</th>
-            <th data-tipo="texto">Nome do Vendedor</th>
-            <th data-tipo="texto">Serviço Vendido</th>
-            <th data-tipo="texto">Tipo de Comissão</th>
-            <th data-tipo="texto">Nome do Cliente</th>
-            <th data-tipo="texto">Empresa Parceira</th>
-            <th data-tipo="monetario">Valor da Venda</th>
-            <th data-tipo="monetario">Valor Bruto a Receber</th>
-            <th data-tipo="monetario">Valor da Comissão</th>
-            <th data-tipo="texto">Variável da Comissão</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-    <tfoot>
-        <tr></tr>
-    </tfoot>
-</table>
-
-                    <div class="mt-3">
-                        <button class="btn btn-secondary" onclick="exportarRelatorioExcel()">Exportar Excel</button>
-                        <button class="btn btn-secondary" onclick="exportarRelatorioPDF()">Exportar PDF</button>
-                    </div>
-                </div>
+       <div id="relatorios" class="tab-content">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Relatório de Vendas</h2>
+        </div>
+        <div class="card-body">
+            <div class="filters">
+                <!-- Filtros aqui -->
+            </div>
+            <table id="tabelaRelatorio">
+                <thead>
+                    <tr>
+                        <th data-tipo="texto">Data da Venda</th>
+                        <th data-tipo="texto">ID da Venda</th>
+                        <th data-tipo="texto">Nome do Vendedor</th>
+                        <th data-tipo="texto">Serviço Vendido</th>
+                        <th data-tipo="texto">Tipo de Comissão</th>
+                        <th data-tipo="texto">Nome do Cliente</th>
+                        <th data-tipo="texto">Empresa Parceira</th>
+                        <th data-tipo="monetario">Valor da Venda</th>
+                        <th data-tipo="monetario">Valor Bruto a Receber</th>
+                        <th data-tipo="monetario">Valor da Comissão</th>
+                        <th data-tipo="texto">Variável da Comissão</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr></tr>
+                </tfoot>
+            </table>
+            <div class="mt-3">
+                <button class="btn btn-secondary" onclick="exportarRelatorioExcel()">Exportar Excel</button>
+                <button class="btn btn-secondary" onclick="exportarRelatorioPDF()">Exportar PDF</button>
             </div>
         </div>
     </div>
+</div>
 
     <!-- Spinner de carregamento -->
     <div id="loadingSpinner" class="loading-spinner d-none">
