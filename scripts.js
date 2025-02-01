@@ -1719,7 +1719,7 @@ function listarVendas(vendas = []) {
     });
 
     // Atualizar controles de paginação e exportação
-    const totalPaginas = Math.ceil(vendas.length / itensPorPagina);
+   const totalPaginas = Math.ceil(vendas.length / itensPorPagina);
     document.getElementById('controlesPaginacaoVendas').innerHTML = `
         <div>
             <button class="btn btn-secondary" onclick="mudarPaginaVendas(-1)" ${paginaAtualVendas === 1 ? 'disabled' : ''}>Anterior</button>
@@ -1735,7 +1735,15 @@ function listarVendas(vendas = []) {
 
 // Função para mudar a página de vendas
 function mudarPaginaVendas(direcao) {
+    // Atualiza a página atual com base na direção (1 para próxima, -1 para anterior)
     paginaAtualVendas += direcao;
+
+    // Garante que a página atual não seja menor que 1
+    if (paginaAtualVendas < 1) {
+        paginaAtualVendas = 1;
+    }
+
+    // Recarrega a listagem de vendas com a página atualizada
     listarVendas();
 }
 
