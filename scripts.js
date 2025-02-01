@@ -79,7 +79,7 @@ function toggleList(listId) {
 // Função para preencher o filtro de colunas na ordem correta
 function preencherFiltroColunas() {
     const filtroColunas = document.getElementById('filtroColunas');
-     if (!filtroColunas) {
+    if (!filtroColunas) {
         console.error('Elemento filtroColunas não encontrado!');
         return;
     }
@@ -1986,4 +1986,8 @@ document.addEventListener('DOMContentLoaded', function() {
     inicializarGraficos();
     preencherAnos();
     atualizarDashboard();
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    preencherFiltroColunas(); // Preenche o filtro de colunas ao carregar a página
 });
