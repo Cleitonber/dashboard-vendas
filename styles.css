@@ -634,5 +634,7 @@ th, td {
 }
 
 #controlesPaginacaoVendas > div {
-    margin-left: auto; /* Empurra os botões de exportação para a direita */
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Espaçamento entre os botões */
 }
