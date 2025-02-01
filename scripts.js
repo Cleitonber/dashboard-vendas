@@ -43,25 +43,26 @@ function showTab(tabId) {
         console.error(`Botão para a aba "${tabId}" não encontrado.`);
     }
 
-   if (tabId === 'relatorios') {
-    console.log('Aba de relatórios selecionada. Aguardando carregamento da tabela...');
+    if (tabId === 'relatorios') {
+        console.log('Aba de relatórios selecionada. Aguardando carregamento da tabela...');
 
-    // Observar mudanças no DOM para detectar quando a tabela é carregada
-    const observer = new MutationObserver((mutationsList, observer) => {
-        const table = document.getElementById('tabelaRelatorio');
-        if (table) {
-            console.log('Tabela de relatório encontrada. Inicializando Sortable...');
-            inicializarSortableRelatorio();
-            observer.disconnect(); // Parar de observar após a tabela ser encontrada
+        // Observar mudanças no DOM para detectar quando a tabela é carregada
+        const observer = new MutationObserver((mutationsList, observer) => {
+            const table = document.getElementById('tabelaRelatorio');
+            if (table) {
+                console.log('Tabela de relatório encontrada. Inicializando Sortable...');
+                inicializarSortableRelatorio();
+                observer.disconnect(); // Parar de observar após a tabela ser encontrada
+            }
+        });
+
+        // Iniciar a observação no conteúdo da aba de relatórios
+        const relatoriosTab = document.getElementById('relatorios');
+        if (relatoriosTab) {
+            observer.observe(relatoriosTab, { childList: true, subtree: true });
+        } else {
+            console.error('Aba de relatórios não encontrada!');
         }
-    });
-
-    // Iniciar a observação no conteúdo da aba de relatórios
-    const relatoriosTab = document.getElementById('relatorios');
-    if (relatoriosTab) {
-        observer.observe(relatoriosTab, { childList: true, subtree: true });
-    } else {
-        console.error('Aba de relatórios não encontrada!');
     }
 }
 // Função para alternar a exibição das listas
@@ -233,11 +234,12 @@ function limparFiltros() {
 // Função para filtrar e gerar o relatório
 function filtrarRelatorio() {
     const filtroVendedor = document.getElementById('filtroVendedor');
-    const dataInicial = document.getElementById('dataInicial').value;
-    const dataFinal = document.getElementById('dataFinal').value;
+    const dataInicial = document.getElementById('dataInicial').value; // Define dataInicial aqui
+    const dataFinal = document.getElementById('dataFinal').value; // Define dataFinal aqui
     const vendedorId = filtroVendedor ? filtroVendedor.value : null;
     const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
 
+    // Converter datas para o formato Date
     const dataInicialObj = dataInicial ? new Date(dataInicial.split('/').reverse().join('-')) : null;
     const dataFinalObj = dataFinal ? new Date(dataFinal.split('/').reverse().join('-')) : null;
 
