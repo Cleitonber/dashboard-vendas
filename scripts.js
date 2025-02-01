@@ -47,7 +47,15 @@ function showTab(tabId) {
 
     if (tabId === 'relatorios') {
         console.log('Reinicializando Sortable para a aba de relatórios.');
-        setTimeout(inicializarSortableRelatorio, 100);
+        // Aguardar um pouco para garantir que a tabela esteja completamente carregada
+        setTimeout(() => {
+            const table = document.getElementById('tabelaRelatorio');
+            if (table) {
+                inicializarSortableRelatorio();
+            } else {
+                console.error('Tabela de relatório não encontrada!');
+            }
+        }, 300); // Ajuste o tempo conforme necessário
     }
 }
 // Função para alternar a exibição das listas
