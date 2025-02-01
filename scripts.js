@@ -18,21 +18,35 @@ let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart;
 
 // Função para alternar entre as abas
 function showTab(tabId) {
+    // Remove a classe 'active' de todas as abas
     const tabs = document.querySelectorAll('.tab-content');
     tabs.forEach(tab => tab.classList.remove('active'));
 
-    document.getElementById(tabId).classList.add('active');
+    // Adiciona a classe 'active' à aba selecionada
+    const selectedTab = document.getElementById(tabId);
+    if (selectedTab) {
+        selectedTab.classList.add('active');
+    } else {
+        console.error(`Aba com ID "${tabId}" não encontrada.`);
+    }
 
+    // Remove a classe 'active' de todos os botões de navegação
     const buttons = document.querySelectorAll('.nav-button');
     buttons.forEach(button => button.classList.remove('active'));
-    document.querySelector(`[onclick="showTab('${tabId}')"]`).classList.add('active');
 
-    // Reinicializar Sortable se estiver na aba de relatórios
-    if (tabId === 'relatoriosTab') {
+    // Adiciona a classe 'active' ao botão clicado
+    const clickedButton = document.querySelector(`[onclick="showTab('${tabId}')"]`);
+    if (clickedButton) {
+        clickedButton.classList.add('active');
+    } else {
+        console.error(`Botão para a aba "${tabId}" não encontrado.`);
+    }
+
+    // Reinicializa o Sortable se estiver na aba de relatórios
+    if (tabId === 'relatorios') {
         setTimeout(inicializarSortableRelatorio, 100);
     }
 }
-
 // Função para alternar a exibição das listas
 function toggleList(listId) {
     const listName = listId.replace('List', ''); // Remove 'List' para obter 'vendedores'
