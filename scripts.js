@@ -7,7 +7,7 @@ let dados = {
     empresasParceiras: [],
     relatorios: [] // Adicione esta linha
 };
-
+let dataInicial = new Date();
 let paginaAtualVendedores = 1;
 let paginaAtualServicos = 1;
 let paginaAtualEmpresas = 1;
