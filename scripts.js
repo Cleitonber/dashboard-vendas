@@ -81,6 +81,31 @@ function converterParaData(dataString) {
     }
 }
 
+document.getElementById('calcular').addEventListener('click', function () {
+    // Captura os valores dos inputs
+    const dataInicial = document.getElementById('dataInicial').value;
+    const dataFinal = document.getElementById('dataFinal').value;
+
+    // Converte as strings em objetos Date
+    const dataInicialObj = converterParaData(dataInicial);
+    const dataFinalObj = converterParaData(dataFinal);
+
+    // Verifica se a conversão foi bem-sucedida
+    if (dataInicialObj && dataFinalObj) {
+        // Agora você pode usar dataInicialObj e dataFinalObj como objetos Date
+        console.log("Data Inicial:", dataInicialObj);
+        console.log("Data Final:", dataFinalObj);
+
+        // Aqui você pode continuar com a lógica do seu código
+        // Exemplo: calcular a diferença entre as datas
+        const diferencaEmMs = dataFinalObj - dataInicialObj;
+        const diferencaEmDias = diferencaEmMs / (1000 * 60 * 60 * 24);
+        console.log("Diferença em dias:", diferencaEmDias);
+    } else {
+        console.error("Datas inválidas. Verifique o formato.");
+    }
+});
+
 // Função para alternar a exibição das listas
 function toggleList(listId) {
     const listName = listId.replace('List', ''); // Remove 'List' para obter 'vendedores'
