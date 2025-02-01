@@ -2009,10 +2009,9 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Adicionar event listeners para atualização automática do dashboard
-document.addEventListener('DOMContentLoaded', function() {
-    // Selecionar elementos de filtro
-    const mesFiltro = document.getElementById('mesFiltro');
+document.addEventListener('DOMContentLoaded', function () {
     const anoFiltro = document.getElementById('anoFiltro');
+    const mesFiltro = document.getElementById('mesFiltro'); // Certifique-se de que mesFiltro está definido em algum lugar
 
     // Adicionar event listener para mudança de mês
     mesFiltro.addEventListener('change', function() {
@@ -2028,8 +2027,5 @@ document.addEventListener('DOMContentLoaded', function() {
     inicializarGraficos();
     preencherAnos();
     atualizarDashboard();
-});
-
-document.addEventListener('DOMContentLoaded', function () {
     preencherFiltroColunas(); // Preenche o filtro de colunas ao carregar a página
 });
