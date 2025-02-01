@@ -18,32 +18,35 @@ let vendasServicoChart, desempenhoVendedoresChart, vendasCategoriaChart;
 
 // Função para alternar entre as abas
 function showTab(tabId) {
-    // Remove a classe 'active' de todas as abas
-    const tabs = document.querySelectorAll('.tab-content');
-    tabs.forEach(tab => tab.classList.remove('active'));
+    console.log(`Tentando abrir a aba: ${tabId}`);
 
-    // Adiciona a classe 'active' à aba selecionada
+    const tabs = document.querySelectorAll('.tab-content');
+    tabs.forEach(tab => {
+        console.log(`Aba encontrada: ${tab.id}`);
+        tab.classList.remove('active');
+    });
+
     const selectedTab = document.getElementById(tabId);
     if (selectedTab) {
+        console.log(`Aba "${tabId}" encontrada. Adicionando classe 'active'.`);
         selectedTab.classList.add('active');
     } else {
         console.error(`Aba com ID "${tabId}" não encontrada.`);
     }
 
-    // Remove a classe 'active' de todos os botões de navegação
     const buttons = document.querySelectorAll('.nav-button');
     buttons.forEach(button => button.classList.remove('active'));
 
-    // Adiciona a classe 'active' ao botão clicado
     const clickedButton = document.querySelector(`[onclick="showTab('${tabId}')"]`);
     if (clickedButton) {
+        console.log(`Botão para a aba "${tabId}" encontrado. Adicionando classe 'active'.`);
         clickedButton.classList.add('active');
     } else {
         console.error(`Botão para a aba "${tabId}" não encontrado.`);
     }
 
-    // Reinicializa o Sortable se estiver na aba de relatórios
     if (tabId === 'relatorios') {
+        console.log('Reinicializando Sortable para a aba de relatórios.');
         setTimeout(inicializarSortableRelatorio, 100);
     }
 }
