@@ -22,14 +22,13 @@ function showTab(tabId) {
 
     const tabs = document.querySelectorAll('.tab-content');
     tabs.forEach(tab => {
-        console.log(`Aba encontrada: ${tab.id}`);
         tab.classList.remove('active');
     });
 
     const selectedTab = document.getElementById(tabId);
     if (selectedTab) {
-        console.log(`Aba "${tabId}" encontrada. Adicionando classe 'active'.`);
         selectedTab.classList.add('active');
+        console.log(`Aba "${tabId}" exibida com sucesso.`);
     } else {
         console.error(`Aba com ID "${tabId}" não encontrada.`);
     }
@@ -39,15 +38,13 @@ function showTab(tabId) {
 
     const clickedButton = document.querySelector(`[onclick="showTab('${tabId}')"]`);
     if (clickedButton) {
-        console.log(`Botão para a aba "${tabId}" encontrado. Adicionando classe 'active'.`);
         clickedButton.classList.add('active');
     } else {
         console.error(`Botão para a aba "${tabId}" não encontrado.`);
     }
 
     if (tabId === 'relatorios') {
-        console.log('Reinicializando Sortable para a aba de relatórios.');
-        // Aguardar um pouco para garantir que a tabela esteja completamente carregada
+        console.log('Inicializando Sortable para a aba de relatórios.');
         setTimeout(() => {
             const table = document.getElementById('tabelaRelatorio');
             if (table) {
@@ -55,7 +52,7 @@ function showTab(tabId) {
             } else {
                 console.error('Tabela de relatório não encontrada!');
             }
-        }, 300); // Ajuste o tempo conforme necessário
+        }, 300); // Aguarda 300ms para garantir que a tabela esteja carregada
     }
 }
 // Função para alternar a exibição das listas
@@ -115,7 +112,12 @@ function preencherFiltroColunas() {
 
 function inicializarSortableRelatorio() {
     const table = document.getElementById('tabelaRelatorio');
-    if (!table) return;
+    if (!table) {
+        console.error('Tabela de relatório não encontrada!');
+        return;
+    }
+
+    console.log('Tabela de relatório encontrada. Inicializando Sortable...');
 
     // Destruir instância anterior se existir
     if (table.sortableInstance) {
