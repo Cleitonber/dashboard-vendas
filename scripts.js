@@ -2029,3 +2029,23 @@ document.addEventListener('DOMContentLoaded', function () {
     atualizarDashboard();
     preencherFiltroColunas(); // Preenche o filtro de colunas ao carregar a página
 });
+
+// Definir a função preencherFiltroColunas
+function preencherFiltroColunas() {
+    // Lógica para preencher o filtro de colunas
+    console.log("Preenchendo filtro de colunas");
+    // Adicione aqui a lógica necessária para preencher o filtro de colunas
+}
+
+// Certifique-se de definir as outras funções chamadas no código
+function inicializarGraficos() {
+    // Lógica para inicializar gráficos
+}
+
+function preencherAnos() {
+    // Lógica para preencher anos
+}
+
+function atualizarDashboard() {
+    // Lógica para atualizar o dashboard
+}
