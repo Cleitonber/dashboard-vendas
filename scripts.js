@@ -5,7 +5,36 @@ let dados = {
     vendedores: [],
     servicos: [],
     empresasParceiras: [],
-    relatorios: [] // Adicione esta linha
+    relatorios: [let dados = {
+    relatorios: [
+        {
+            data: '01/01/2023',
+            id: 1,
+            vendedor: 'João',
+            servico: 'Serviço A',
+            tipoComissao: 'fixa',
+            nomeCliente: 'Cliente 1',
+            empresaParceira: 'Empresa X',
+            valorVenda: 1000,
+            valorBrutoReceber: 800,
+            comissao: 100,
+            percentualComissao: '10%'
+        },
+        {
+            data: '02/01/2023',
+            id: 2,
+            vendedor: 'Maria',
+            servico: 'Serviço B',
+            tipoComissao: 'porcentagem',
+            nomeCliente: 'Cliente 2',
+            empresaParceira: 'Empresa Y',
+            valorVenda: 2000,
+            valorBrutoReceber: 1600,
+            comissao: 200,
+            percentualComissao: '12.5%'
+        }
+        // Adicione mais dados aqui...
+    ]
 };
 let dataInicial = new Date();
 let paginaAtualVendedores = 1;
@@ -43,26 +72,15 @@ function showTab(tabId) {
         console.error(`Botão para a aba "${tabId}" não encontrado.`);
     }
 
-    if (tabId === 'relatorios') {
-        console.log('Aba de relatórios selecionada. Aguardando carregamento da tabela...');
+   if (tabId === 'relatorios') {
+    console.log('Aba de relatórios selecionada. Verificando tabela...');
 
-        // Observar mudanças no DOM para detectar quando a tabela é carregada
-        const observer = new MutationObserver((mutationsList, observer) => {
-            const table = document.getElementById('tabelaRelatorio');
-            if (table) {
-                console.log('Tabela de relatório encontrada. Inicializando Sortable...');
-                inicializarSortableRelatorio();
-                observer.disconnect(); // Parar de observar após a tabela ser encontrada
-            }
-        });
-
-        // Iniciar a observação no conteúdo da aba de relatórios
-        const relatoriosTab = document.getElementById('relatorios');
-        if (relatoriosTab) {
-            observer.observe(relatoriosTab, { childList: true, subtree: true });
-        } else {
-            console.error('Aba de relatórios não encontrada!');
-        }
+    const table = document.getElementById('tabelaRelatorio');
+    if (table) {
+        console.log('Tabela de relatório encontrada. Inicializando Sortable...');
+        inicializarSortableRelatorio();
+    } else {
+        console.error('Tabela de relatório não encontrada!');
     }
 }
 
@@ -206,7 +224,16 @@ function inicializarSortableRelatorio() {
         return;
     }
 
+    const tbody = table.querySelector('tbody');
+    if (!tbody || tbody.children.length === 0) {
+        console.error('Tabela de relatório está vazia!');
+        return;
+    }
+
     console.log('Tabela de relatório encontrada. Inicializando Sortable...');
+
+    // Restante do código...
+}
 
     // Destruir instância anterior se existir
     if (table.sortableInstance) {
@@ -313,8 +340,8 @@ function limparFiltros() {
 // Função para filtrar e gerar o relatório
 function filtrarRelatorio() {
     const filtroVendedor = document.getElementById('filtroVendedor');
-    const dataInicial = document.getElementById('dataInicial').value; // Define dataInicial aqui
-    const dataFinal = document.getElementById('dataFinal').value; // Define dataFinal aqui
+    const dataInicial = document.getElementById('dataInicial').value;
+    const dataFinal = document.getElementById('dataFinal').value;
     const vendedorId = filtroVendedor ? filtroVendedor.value : null;
     const colunasSelecionadas = Array.from(document.getElementById('filtroColunas').selectedOptions).map(option => option.value);
 
