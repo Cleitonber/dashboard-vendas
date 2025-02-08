@@ -1002,7 +1002,8 @@ function inicializarAplicativo() {
     atualizarListaVendedores();
     atualizarListaServicos();
     atualizarListaEmpresas();
-    atualizarFiltroVendedores(); // Atualiza o filtro de vendedores na aba de relatórios
+    atualizarFiltroVendedores();
+    atualizarFiltroVendedoresVendas();// Atualiza o filtro de vendedores na aba de relatórios
 }
 
 // Event Listener para quando o DOM estiver carregado
