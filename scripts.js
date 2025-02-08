@@ -1007,3 +1007,27 @@ function inicializarAplicativo() {
 
 // Event Listener para quando o DOM estiver carregado
 document.addEventListener('DOMContentLoaded', inicializarAplicativo);
+
+// Função para filtrar vendas na aba de "Vendas"
+function filtrarVendas() {
+    // Obter valores dos filtros
+    const mesSelecionado = parseInt(document.getElementById('mesFiltro').value);
+    const anoSelecionado = parseInt(document.getElementById('anoFiltro').value);
+    const vendedorSelecionado = document.getElementById('filtroVendedorVendas')?.value || null;
+
+    // Filtrar vendas com base nos critérios
+    const vendasFiltradas = dados.vendas.filter(venda => {
+        const [dia, mes, ano] = venda.data.split('/').map(Number);
+
+        // Filtro por mês e ano
+        const filtroMesAno = (!mesSelecionado || mes === mesSelecionado + 1) && (!anoSelecionado || ano === anoSelecionado);
+
+        // Filtro por vendedor (se selecionado)
+        const filtroVendedor = !vendedorSelecionado || venda.vendedor === dados.vendedores.find(v => v.id == vendedorSelecionado)?.nome;
+
+        return filtroMesAno && filtroVendedor;
+    });
+
+    // Atualizar a tabela de vendas com os dados filtrados
+    listarVendas(vendasFiltradas);
+}
